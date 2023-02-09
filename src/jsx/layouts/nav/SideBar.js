@@ -227,6 +227,14 @@ const SideBar = () => {
 									Acara
 								</Link>
 							</li>
+							<li>
+								<Link
+									className={`${path === "chart-chartjs" ? "mm-active" : ""}`}
+									to="/event"
+								>
+									Event
+								</Link>
+							</li>
 						</ul>
 					</li>
 					<li className={`${bootstrap.includes(path) ? "mm-active" : ""}`}>
