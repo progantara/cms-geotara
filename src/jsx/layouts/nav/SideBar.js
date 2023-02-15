@@ -203,6 +203,12 @@ const SideBar = () => {
 									Geosite
 								</Link>
 							</li>
+							<li>
+								<Link
+									className={`${path === "app-calender" ? "mm-active" : ""}`}
+									to="/360-view"
+								>360 Media</Link>
+							</li>
 						</ul>
 					</li>
 					<li className={`${charts.includes(path) ? "mm-active" : ""}`}>

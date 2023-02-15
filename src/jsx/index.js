@@ -17,6 +17,9 @@ import Home from "./pages/Dashboard";
 // Geopark
 import Geopark from "./components/Geopark/Geopark";
 
+// 360
+import view360 from "./components/360/view360";
+
 // Publikasi
 import Article from "./components/Article/Article";
 import ArticleForm from "./components/Article/ArticleForm";
@@ -140,6 +143,9 @@ const Markup = () => {
 
 		/// Geopark
 		{ url: "geopark", component: Geopark },
+
+		// 360
+		{ url: "360-view", component: view360 },
 
 		/// Publikasi
 		{ url: "article", component: Article },
