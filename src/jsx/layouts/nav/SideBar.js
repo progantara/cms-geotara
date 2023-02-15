@@ -196,22 +196,6 @@ const SideBar = () => {
 									Wisata
 								</Link>
 							</li>
-							<li>
-								<Link
-									className={`${path === "post-details" ? "mm-active" : ""}`}
-									to="/post-details"
-								>
-									Geoarea
-								</Link>
-							</li>
-							<li>
-								<Link
-									className={`${path === "app-calender" ? "mm-active" : ""}`}
-									to="/app-calender"
-								>
-									Geosite
-								</Link>
-							</li>
 						</ul>
 					</li>
 					<li className={`${charts.includes(path) ? "mm-active" : ""}`}>
@@ -230,18 +214,10 @@ const SideBar = () => {
 							</li>
 							<li>
 								<Link
-									className={`${path === "chart-chartjs" ? "mm-active" : ""}`}
-									to="/chart-chartjs"
-								>
-									Acara
-								</Link>
-							</li>
-							<li>
-								<Link
-									className={`${path === "chart-chartjs" ? "mm-active" : ""}`}
+									className={`${path === "event" ? "mm-active" : ""}`}
 									to="/event"
 								>
-									Event
+									Acara
 								</Link>
 							</li>
 						</ul>
@@ -262,24 +238,24 @@ const SideBar = () => {
 							</li>
 							<li>
 								<Link
-									className={`${path === "ui-alert" ? "mm-active" : ""}`}
-									to="/ui-alert"
+									className={`${path === "travel-tour" ? "mm-active" : ""}`}
+									to="/travel-tour"
 								>
 									Travel & Tour
 								</Link>
 							</li>
 							<li>
 								<Link
-									className={`${path === "ui-badge" ? "mm-active" : ""}`}
-									to="/ui-badge"
+									className={`${path === "attraction" ? "mm-active" : ""}`}
+									to="/attraction"
 								>
 									Attraction
 								</Link>
 							</li>
 							<li>
 								<Link
-									className={`${path === "ui-button" ? "mm-active" : ""}`}
-									to="/ui-button"
+									className={`${path === "merchant" ? "mm-active" : ""}`}
+									to="/merchant"
 								>
 									Merchant & Souvenir
 								</Link>
