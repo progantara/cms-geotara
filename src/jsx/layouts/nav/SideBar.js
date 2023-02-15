@@ -183,6 +183,22 @@ const SideBar = () => {
 							<li>
 								<Link
 									className={`${path === "post-details" ? "mm-active" : ""}`}
+									to="/kota"
+								>
+									Kecamatan / Kota
+								</Link>
+							</li>
+							<li>
+								<Link
+									className={`${path === "post-details" ? "mm-active" : ""}`}
+									to="/wisata"
+								>
+									Wisata
+								</Link>
+							</li>
+							<li>
+								<Link
+									className={`${path === "post-details" ? "mm-active" : ""}`}
 									to="/post-details"
 								>
 									Geoarea
@@ -218,6 +234,14 @@ const SideBar = () => {
 									to="/chart-chartjs"
 								>
 									Acara
+								</Link>
+							</li>
+							<li>
+								<Link
+									className={`${path === "chart-chartjs" ? "mm-active" : ""}`}
+									to="/event"
+								>
+									Event
 								</Link>
 							</li>
 						</ul>

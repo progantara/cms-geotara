@@ -17,9 +17,19 @@ import Home from "./pages/Dashboard";
 // Geopark
 import Geopark from "./components/Geopark/Geopark";
 
+//Kota-Kecamatan
+import Kota from "./components/Kota/Kota";
+import KotaForm from "./components/Kota/KotaForm";
+
+// Wisata
+import Wisata from "./components/Wisata/Wisata";
+import WisataForm from "./components/Wisata/WisataForm";
+
 // Publikasi
 import Article from "./components/Article/Article";
 import ArticleForm from "./components/Article/ArticleForm";
+import Event from "./components/Event/Event";
+import EventForm from "./components/Event/EventForm";
 
 // Partnership
 import Accomodation from "./components/Accomodation/Accomodation";
@@ -141,10 +151,23 @@ const Markup = () => {
 		/// Geopark
 		{ url: "geopark", component: Geopark },
 
+		/// Kota-Kecamatan
+		{ url: "kota", component: Kota },
+		{ url: "kota/add", component: KotaForm },
+		{ url: "kota/edit/:id", component: KotaForm },
+
+		/// Wisata
+		{ url: "wisata", component: Wisata },
+		{ url: "wisata/add", component: WisataForm },
+		{ url: "wisata/edit/:id", component: WisataForm },
+
 		/// Publikasi
 		{ url: "article", component: Article },
 		{ url: "article/add", component: ArticleForm },
 		{ url: "article/edit/:id", component: ArticleForm },
+		{ url: "event", component: Event },
+		{ url: "event/add", component: EventForm },
+		{ url: "event/edit/:id", component: EventForm },
 
 		/// Partnership
 		{ url: "accomodation", component: Accomodation },
