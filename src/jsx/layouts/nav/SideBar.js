@@ -39,13 +39,6 @@ const SideBar = () => {
 			return aaa.classList.toggle("menu-toggle");
 		}
 		btn.addEventListener("click", toggleFunc);
-
-		//sidebar icon Heart blast
-		var handleheartBlast = document.querySelector(".heart");
-		function heartBlast() {
-			return handleheartBlast.classList.toggle("heart-blast");
-		}
-		handleheartBlast.addEventListener("click", heartBlast);
 	}, []);
 	let scrollPosition = useScrollPosition();
 	/// Path
@@ -310,11 +303,6 @@ const SideBar = () => {
 						</ul>
 					</li>
 				</MM>
-				<div className="copyright">
-					<p className="fs-12">
-						Made with <span className="heart"></span> by Geotara
-					</p>
-				</div>
 			</PerfectScrollbar>
 		</div>
 	);
