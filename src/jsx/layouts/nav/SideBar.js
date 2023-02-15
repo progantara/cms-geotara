@@ -190,6 +190,22 @@ const SideBar = () => {
 							<li>
 								<Link
 									className={`${path === "post-details" ? "mm-active" : ""}`}
+									to="/kota"
+								>
+									Kecamatan / Kota
+								</Link>
+							</li>
+							<li>
+								<Link
+									className={`${path === "post-details" ? "mm-active" : ""}`}
+									to="/wisata"
+								>
+									Wisata
+								</Link>
+							</li>
+							<li>
+								<Link
+									className={`${path === "post-details" ? "mm-active" : ""}`}
 									to="/post-details"
 								>
 									Geoarea
