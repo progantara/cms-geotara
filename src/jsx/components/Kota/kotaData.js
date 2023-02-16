@@ -1,4 +1,4 @@
-const wisataData = {
+const kotaData = {
   data: [
      [
         "1",
@@ -27,7 +27,7 @@ const wisataData = {
   ],
 };
 const data = {
-  wisataData,
+  kotaData,
 };
 
 export default data;
