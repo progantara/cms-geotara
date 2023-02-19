@@ -71,7 +71,7 @@ const WisataList = () => {
                             ) : (
                               <Fragment>
                                 {da}
-                                {i === 5 && (
+                                {i === 7 && (
                                   <div className="d-flex">
                                     <Link
                                       href="#"

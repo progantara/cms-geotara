@@ -37,7 +37,7 @@ const EventList = () => {
     <div className="col-12">
       <div className="card">
         <div className="card-header">
-          <h4 className="card-title">Daftar Event</h4>
+          <h4 className="card-title">Daftar Acara</h4>
           <Link
             to="/event/add"
           >

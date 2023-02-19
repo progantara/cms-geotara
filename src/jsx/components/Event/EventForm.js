@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import MaterialTime from "./MaterialTime";
 import { Link } from "react-router-dom";
+import DropFile from "../Wisata/DropFile";
 
 class EventForm extends Component {
    render() {
@@ -10,7 +11,7 @@ class EventForm extends Component {
                <div className="col-xl-12 col-xxl-12">
                   <div className="card">
                      <div className="card-header">
-                        <h4 className="card-title">Form Event</h4>
+                        <h4 className="card-title">Tambah Acara</h4>
                      </div>
                      <div className="card-body">
                         <div className="summernote">
@@ -19,12 +20,8 @@ class EventForm extends Component {
                                  <div className="basic-form">
                                     <form onSubmit={(e) => e.preventDefault()}>
                                        <div className="row">
-                                          <label>Thumbnail</label>
-                                          <div className="input-group">
-                                             <div className="from-file">
-                                                <input type="file" className="form-file-input form-control" />
-                                             </div>
-                                          </div>
+                                          <label>Cover</label>
+                                          <DropFile />
                                           <div className="form-group mb-3 col-md-6">
                                              <label>Judul</label>
                                              <input
@@ -54,6 +51,7 @@ class EventForm extends Component {
                                                 className="form-control"
                                                 // rows="4"
                                                 id="description"
+                                                placeholder="Description"
                                              ></textarea>
                                           </div>
                                           {/* <div className="form-group mb-3 col-md-6">

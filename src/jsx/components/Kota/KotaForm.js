@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import DropFile from "../Wisata/DropFile";
 
 class KotaForm extends Component {
    render() {
@@ -18,12 +19,8 @@ class KotaForm extends Component {
                                  <div className="basic-form">
                                     <form onSubmit={(e) => e.preventDefault()}>
                                        <div className="row">
-                                          <label>Thumbnail</label>
-                                          <div className="input-group">
-                                             <div className="from-file">
-                                                <input type="file" className="form-file-input form-control" />
-                                             </div>
-                                          </div>
+                                          <label>Cover</label>
+                                          <DropFile />
                                           <div className="form-group mb-3 col-md-6">
                                              <label>Name</label>
                                              <input
