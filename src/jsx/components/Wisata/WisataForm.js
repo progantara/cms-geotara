@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import MaterialTime from "./MaterialTime";
 import { Link } from "react-router-dom";
 
-class EventForm extends Component {
+class WisataForm extends Component {
    render() {
       return (
          <div className="h-80">
@@ -10,7 +9,7 @@ class EventForm extends Component {
                <div className="col-xl-12 col-xxl-12">
                   <div className="card">
                      <div className="card-header">
-                        <h4 className="card-title">Form Event</h4>
+                        <h4 className="card-title">Form Wisata</h4>
                      </div>
                      <div className="card-body">
                         <div className="summernote">
@@ -26,18 +25,18 @@ class EventForm extends Component {
                                              </div>
                                           </div>
                                           <div className="form-group mb-3 col-md-6">
-                                             <label>Judul</label>
+                                             <label>Name</label>
                                              <input
                                                 type="text"
                                                 className="form-control"
-                                                placeholder="Event"
+                                                placeholder="City"
                                              />
                                           </div>
                                           <div className="form-group mb-3 col-md-4">
-                                             <label>Organizer</label>
+                                             <label>Category</label>
                                              <select
                                                 defaultValue={"option"}
-                                                id="inputOrganizer"
+                                                id="inputCategory"
                                                 className="form-control"
                                              >
                                                 <option value="option" disabled>
@@ -52,7 +51,7 @@ class EventForm extends Component {
                                              <label>Description</label>
                                              <textarea
                                                 className="form-control"
-                                                // rows="4"
+                                                placeholder="Description"
                                                 id="description"
                                              ></textarea>
                                           </div>
@@ -92,22 +91,8 @@ class EventForm extends Component {
                                                 <option>Option 3</option>
                                              </select>
                                           </div>
-                                          <div className="form-group col-md-2">
-                                             <label>HTM</label>
-                                             <input type="text" className="form-control" placeholder="Gratis" />
-                                          </div>
                                        </div>
-                                       <div className="row">
-                                          <div className="col-xl-3 col-xxl-6 col-md-6 mb-3">
-                                             <label>Start</label>
-                                             <MaterialTime />
-                                          </div>
-                                          <div className="col-xl-3 col-xxl-6 col-md-6 mb-3">
-                                             <label>End</label>
-                                             <MaterialTime />
-                                          </div>
-                                       </div>
-                                       <Link to="/event-table">
+                                       <Link to="/wisata-table">
                                           <button type="submit" className="btn btn-primary">Submit</button>
                                        </Link>
                                     </form>
@@ -124,4 +109,4 @@ class EventForm extends Component {
    }
 }
 
-export default EventForm;
+export default WisataForm;

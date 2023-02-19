@@ -1,18 +1,18 @@
 import React, { Fragment, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
-import data from "./eventData.js";
+import data from "./kotaData.js";
 import swal from "sweetalert";
 
-const EventList = () => {
+const KotaList = () => {
   const sort = 3;
-  let paggination = Array(Math.ceil(data.eventData.data.length / sort))
+  let paggination = Array(Math.ceil(data.kotaData.data.length / sort))
     .fill()
     .map((_, i) => i + 1);
 
   const activePag = useRef(0);
   const jobData = useRef(
-    data.eventData.data.slice(
+    data.kotaData.data.slice(
       activePag.current * sort,
       (activePag.current + 1) * sort
     )
@@ -21,12 +21,12 @@ const EventList = () => {
   const onClick = (i) => {
     activePag.current = i;
 
-    jobData.current = data.eventData.data.slice(
+    jobData.current = data.kotaData.data.slice(
       activePag.current * sort,
       (activePag.current + 1) * sort
     );
     /* setdemo(
-      data.eventData.data.slice(
+      data.kotaData.data.slice(
         activePag.current * sort,
         (activePag.current + 1) * sort
       )
@@ -37,9 +37,9 @@ const EventList = () => {
     <div className="col-12">
       <div className="card">
         <div className="card-header">
-          <h4 className="card-title">Daftar Event</h4>
+          <h4 className="card-title">Daftar Kecamatan / Kota</h4>
           <Link
-            to="/event/add"
+            to="/kota/add"
           >
             <Button className="me-2" variant="primary btn-rounded">
               <span className="btn-icon-start text-primary">
@@ -55,7 +55,7 @@ const EventList = () => {
               <table id="example" className="display w-100 dataTable">
                 <thead>
                   <tr role="row">
-                    {data.eventData.columns.map((d, i) => (
+                    {data.kotaData.columns.map((d, i) => (
                       <th key={i}>{d}</th>
                     ))}
                   </tr>
@@ -71,7 +71,7 @@ const EventList = () => {
                             ) : (
                               <Fragment>
                                 {da}
-                                {i === 8 && (
+                                {i === 5 && (
                                   <div className="d-flex">
                                     <Link
                                       href="#"
@@ -80,7 +80,7 @@ const EventList = () => {
                                       <i className="fas fa-eye"></i>
                                     </Link>
                                     <Link
-                                      to="/event/edit/:id"
+                                      to="/kota/edit/:id"
                                       className="btn btn-primary shadow btn-xs sharp me-1"
                                     >
                                       <i className="fas fa-pen"></i>
@@ -90,7 +90,7 @@ const EventList = () => {
                                       className="btn btn-danger shadow btn-xs sharp"
                                       onClick={() =>
                                         swal({
-                                          title: "Anda yakin ingin menghapus event ini?",
+                                          title: "Anda yakin ingin menghapus data ini?",
                                           text:
                                           "Setelah dihapus, Anda tidak akan dapat memulihkannya",
                                           icon: "warning",
@@ -98,7 +98,7 @@ const EventList = () => {
                                           dangerMode: true,
                                         }).then((willDelete) => {
                                           if (willDelete) {
-                                            swal("Event telah dihapus!", {
+                                            swal("Data telah dihapus!", {
                                               icon: "success",
                                             });
                                           }
@@ -119,7 +119,7 @@ const EventList = () => {
                 </tbody>
                 {/* <tfoot>
                   <tr role="row">
-                    {data.eventData.columns.map((d, i) => (
+                    {data.kotaData.columns.map((d, i) => (
                       <th key={i}>{d}</th>
                     ))}
                   </tr>
@@ -140,7 +140,7 @@ const EventList = () => {
                 >
                   <Link
                     className="paginate_button previous disabled"
-                    to="/event"
+                    to="/kota"
                     onClick={() =>
                       activePag.current > 0 && onClick(activePag.current - 1)
                     }
@@ -151,7 +151,7 @@ const EventList = () => {
                     {paggination.map((number, i) => (
                       <Link
                         key={i}
-                        to="/event"
+                        to="/kota"
                         className={`paginate_button  ${activePag.current === i ? "current" : ""
                           } `}
                         onClick={() => onClick(i)}
@@ -162,7 +162,7 @@ const EventList = () => {
                   </span>
                   <Link
                     className="paginate_button next"
-                    to="/event"
+                    to="/kota"
                     onClick={() =>
                       activePag.current + 1 < paggination.length &&
                       onClick(activePag.current + 1)
@@ -180,4 +180,4 @@ const EventList = () => {
   );
 };
 
-export default EventList;
+export default KotaList;

@@ -17,7 +17,7 @@ class MM extends Component {
 		this.$el = this.el;
 		this.mm = new Metismenu(this.$el);
 	}
-	componentWillUnmount() {}
+	componentWillUnmount() { }
 	render() {
 		return (
 			<div className="mm-wrapper">
@@ -39,13 +39,6 @@ const SideBar = () => {
 			return aaa.classList.toggle("menu-toggle");
 		}
 		btn.addEventListener("click", toggleFunc);
-
-		//sidebar icon Heart blast
-		var handleheartBlast = document.querySelector(".heart");
-		function heartBlast() {
-			return handleheartBlast.classList.toggle("heart-blast");
-		}
-		handleheartBlast.addEventListener("click", heartBlast);
 	}, []);
 	let scrollPosition = useScrollPosition();
 	/// Path
@@ -54,15 +47,15 @@ const SideBar = () => {
 	path = path[path.length - 1];
 	/// Active menu
 	let deshBoard = [
-			"",
-			"dashboard-dark",
-			"guest-list",
-			"guest-detail",
-			"concierge",
-			"room-list",
-			"reviews",
-			"task",
-		],
+		"",
+		"dashboard-dark",
+		"guest-list",
+		"guest-detail",
+		"concierge",
+		"room-list",
+		"reviews",
+		"task",
+	],
 		app = [
 			"app-profile",
 			"post-details",
@@ -155,15 +148,14 @@ const SideBar = () => {
 		];
 	return (
 		<div
-			className={`deznav ${iconHover} ${
-				sidebarposition.value === "fixed" &&
-				sidebarLayout.value === "horizontal" &&
-				headerposition.value === "static"
+			className={`deznav ${iconHover} ${sidebarposition.value === "fixed" &&
+					sidebarLayout.value === "horizontal" &&
+					headerposition.value === "static"
 					? scrollPosition > 120
 						? "fixed"
 						: ""
 					: ""
-			}`}
+				}`}
 		>
 			<PerfectScrollbar className="deznav-scroll">
 				<MM className="metismenu" id="menu">
@@ -190,18 +182,24 @@ const SideBar = () => {
 							<li>
 								<Link
 									className={`${path === "post-details" ? "mm-active" : ""}`}
-									to="/post-details"
+									to="/kota"
 								>
-									Geoarea
+									Kecamatan / Kota
 								</Link>
 							</li>
 							<li>
 								<Link
-									className={`${path === "app-calender" ? "mm-active" : ""}`}
-									to="/app-calender"
+									className={`${path === "post-details" ? "mm-active" : ""}`}
+									to="/wisata"
 								>
-									Geosite
+									Wisata
 								</Link>
+							</li>
+							<li>
+								<Link
+									className={`${path === "post-details" ? "mm-active" : ""}`}
+									to="/360-view"
+								>360 Media</Link>
 							</li>
 						</ul>
 					</li>
@@ -221,18 +219,10 @@ const SideBar = () => {
 							</li>
 							<li>
 								<Link
-									className={`${path === "chart-chartjs" ? "mm-active" : ""}`}
-									to="/chart-chartjs"
-								>
-									Acara
-								</Link>
-							</li>
-							<li>
-								<Link
-									className={`${path === "chart-chartjs" ? "mm-active" : ""}`}
+									className={`${path === "event" ? "mm-active" : ""}`}
 									to="/event"
 								>
-									Event
+									Acara
 								</Link>
 							</li>
 						</ul>
@@ -253,24 +243,24 @@ const SideBar = () => {
 							</li>
 							<li>
 								<Link
-									className={`${path === "ui-alert" ? "mm-active" : ""}`}
-									to="/ui-alert"
+									className={`${path === "travel-tour" ? "mm-active" : ""}`}
+									to="/travel-tour"
 								>
 									Travel & Tour
 								</Link>
 							</li>
 							<li>
 								<Link
-									className={`${path === "ui-badge" ? "mm-active" : ""}`}
-									to="/ui-badge"
+									className={`${path === "attraction" ? "mm-active" : ""}`}
+									to="/attraction"
 								>
 									Attraction
 								</Link>
 							</li>
 							<li>
 								<Link
-									className={`${path === "ui-button" ? "mm-active" : ""}`}
-									to="/ui-button"
+									className={`${path === "merchant" ? "mm-active" : ""}`}
+									to="/merchant"
 								>
 									Merchant & Souvenir
 								</Link>
@@ -294,11 +284,6 @@ const SideBar = () => {
 						</ul>
 					</li>
 				</MM>
-				<div className="copyright">
-					<p className="fs-12">
-						Made with <span className="heart"></span> by Geotara
-					</p>
-				</div>
 			</PerfectScrollbar>
 		</div>
 	);
