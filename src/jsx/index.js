@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import LoadingBar from "react-top-loading-bar";
 
 /// React router dom
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, useLocation } from "react-router-dom";
 
 /// Css
 import "./index.css";
@@ -11,33 +12,9 @@ import "./step.css";
 /// Layout
 import Nav from "./layouts/nav";
 import Footer from "./layouts/Footer";
+
 /// Dashboard
 import Home from "./pages/Dashboard";
-
-// Geopark
-import Geopark from "./components/Geopark/Geopark";
-
-//Kota-Kecamatan
-import Kota from "./components/Kota/Kota";
-import KotaForm from "./components/Kota/KotaForm";
-
-// Wisata
-import Wisata from "./components/Wisata/Wisata";
-import WisataForm from "./components/Wisata/WisataForm";
-
-// Publikasi
-import Article from "./components/Article/Article";
-import ArticleForm from "./components/Article/ArticleForm";
-import Event from "./components/Event/Event";
-import EventForm from "./components/Event/EventForm";
-
-// Partnership
-import Accomodation from "./components/Accomodation/Accomodation";
-import AccomodationForm from "./components/Accomodation/AccomodationForm";
-
-// Autentikasi
-import User from "./components/User/User";
-import UserForm from "./components/User/UserForm";
 
 import DashboardDark from "./components/Dashboard/DashboardDark";
 import GuestList from "./components/Dashboard/GuestList";
@@ -133,10 +110,35 @@ import Error503 from "./pages/Error503";
 import { ThemeContext } from "../context/ThemeContext";
 import Section from "./components/Section";
 
+// Profil
+const Profil = React.lazy(() => import("./components/Profil/Profil"));
+
+// Wisata
+const Wisata = React.lazy(() => import("./components/Wisata/Wisata"));
+const WisataForm = React.lazy(() => import("./components/Wisata/WisataForm"));
+
+// Virtual Tour
+const VirtualTourViewEditor = React.lazy(() => import("./components/VirtualTour/VirtualTourViewEditor"));
+
+// Publikasi
+const Article = React.lazy(() => import("./components/Article/Article"));
+const ArticleForm = React.lazy(() => import("./components/Article/ArticleForm"));
+
+const Event = React.lazy(() => import("./components/Event/Event"));
+const EventForm = React.lazy(() => import("./components/Event/EventForm"));
+
+// Partnership
+const Accomodation = React.lazy(() => import("./components/Accomodation/Accomodation"));
+const AccomodationForm = React.lazy(() => import("./components/Accomodation/AccomodationForm"));
+
+// Autentikasi
+const User = React.lazy(() => import("./components/User/User"));
+const UserForm = React.lazy(() => import("./components/User/UserForm"));
+
 const Markup = () => {
 	const { menuToggle } = useContext(ThemeContext);
 	const routes = [
-		{ url: 'section', component: Section },
+		{ url: "section", component: Section },
 		/// Dashboard
 		{ url: "", component: Home },
 		{ url: "dashboard", component: Home },
@@ -148,36 +150,34 @@ const Markup = () => {
 		{ url: "reviews", component: Reviews },
 		{ url: "task", component: Task },
 
-		/// Geopark
-		{ url: "geopark", component: Geopark },
-
-		/// Kota-Kecamatan
-		{ url: "kota", component: Kota },
-		{ url: "kota/add", component: KotaForm },
-		{ url: "kota/edit/:id", component: KotaForm },
+		/// Profil
+		{ url: "profil", component: Profil },
 
 		/// Wisata
 		{ url: "wisata", component: Wisata },
-		{ url: "wisata/add", component: WisataForm },
+		{ url: "wisata/tambah", component: WisataForm },
 		{ url: "wisata/edit/:id", component: WisataForm },
 
+		/// Virtual Tour
+		{ url: "virtual-tour/editor", component: VirtualTourViewEditor },
+
 		/// Publikasi
-		{ url: "article", component: Article },
-		{ url: "article/add", component: ArticleForm },
-		{ url: "article/edit/:id", component: ArticleForm },
-		{ url: "event", component: Event },
-		{ url: "event/add", component: EventForm },
-		{ url: "event/edit/:id", component: EventForm },
+		{ url: "artikel", component: Article },
+		{ url: "artikel/tambah", component: ArticleForm },
+		{ url: "artikel/edit/:id", component: ArticleForm },
+		{ url: "acara", component: Event },
+		{ url: "acara/tambah", component: EventForm },
+		{ url: "acara/edit/:id", component: EventForm },
 
 		/// Partnership
-		{ url: "accomodation", component: Accomodation },
-		{ url: "accomodation/add", component: AccomodationForm },
-		{ url: "accomodation/edit/:id", component: AccomodationForm },
+		{ url: "akomodasi", component: Accomodation },
+		{ url: "akomodasi/tambah", component: AccomodationForm },
+		{ url: "akomodasi/edit/:id", component: AccomodationForm },
 
 		/// Autentikasi
-		{ url: "user", component: User },
-		{ url: "user/add", component: UserForm },
-		{ url: "user/edit/:id", component: UserForm },
+		{ url: "pengguna", component: User },
+		{ url: "pengguna/tambah", component: UserForm },
+		{ url: "pengguna/edit/:id", component: UserForm },
 
 		/// Apps
 		{ url: "app-profile", component: AppProfile },
@@ -269,6 +269,23 @@ const Markup = () => {
 	path = path[path.length - 1];
 
 	let pagePath = path.split("-").includes("page");
+
+	const [progress, setProgress] = useState(0);
+	const [prevLoc, setPrevLoc] = useState("");
+	const location = useLocation();
+
+	useEffect(() => {
+		setPrevLoc(location.pathname);
+		setProgress(100);
+		if (location.pathname === prevLoc) {
+			setPrevLoc("");
+		}
+	}, [location]);
+
+	useEffect(() => {
+		setProgress(0);
+	}, [prevLoc]);
+
 	return (
 		<>
 			<div
@@ -278,12 +295,15 @@ const Markup = () => {
 				}`}
 			>
 				{!pagePath && <Nav />}
-
 				<div className={`${!pagePath ? "content-body" : ""}`}>
 					<div
 						className={`${!pagePath ? "container-fluid" : ""}`}
 						style={{ minHeight: window.screen.height - 60 }}
 					>
+						<LoadingBar
+							color="#f11946"
+							progress={progress}
+						/>
 						<Switch>
 							{routes.map((data, i) => (
 								<Route
