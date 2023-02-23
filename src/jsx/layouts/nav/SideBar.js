@@ -17,7 +17,7 @@ class MM extends Component {
 		this.$el = this.el;
 		this.mm = new Metismenu(this.$el);
 	}
-	componentWillUnmount() {}
+	componentWillUnmount() { }
 	render() {
 		return (
 			<div className="mm-wrapper">
@@ -47,15 +47,15 @@ const SideBar = () => {
 	path = path[path.length - 1];
 	/// Active menu
 	let deshBoard = [
-			"",
-			"dashboard-dark",
-			"guest-list",
-			"guest-detail",
-			"concierge",
-			"room-list",
-			"reviews",
-			"task",
-		],
+		"",
+		"dashboard-dark",
+		"guest-list",
+		"guest-detail",
+		"concierge",
+		"room-list",
+		"reviews",
+		"task",
+	],
 		app = [
 			"app-profile",
 			"post-details",
@@ -148,15 +148,14 @@ const SideBar = () => {
 		];
 	return (
 		<div
-			className={`deznav ${iconHover} ${
-				sidebarposition.value === "fixed" &&
-				sidebarLayout.value === "horizontal" &&
-				headerposition.value === "static"
+			className={`deznav ${iconHover} ${sidebarposition.value === "fixed" &&
+					sidebarLayout.value === "horizontal" &&
+					headerposition.value === "static"
 					? scrollPosition > 120
 						? "fixed"
 						: ""
 					: ""
-			}`}
+				}`}
 		>
 			<PerfectScrollbar className="deznav-scroll">
 				<MM className="metismenu" id="menu">
@@ -195,6 +194,12 @@ const SideBar = () => {
 								>
 									Wisata
 								</Link>
+							</li>
+							<li>
+								<Link
+									className={`${path === "post-details" ? "mm-active" : ""}`}
+									to="/360-view"
+								>360 Media</Link>
 							</li>
 						</ul>
 					</li>

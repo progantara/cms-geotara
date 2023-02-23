@@ -7,7 +7,7 @@ const Event = () => {
     <Fragment>
       <PageTitle
         activeMenu="List"
-        motherMenu="Event"
+        motherMenu="Acara"
         pageContent="List"
       />
       <div className="row">
