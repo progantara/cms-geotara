@@ -168,38 +168,24 @@ const SideBar = () => {
 					<li className={`${app.includes(path) ? "mm-active" : ""}`}>
 						<Link className="has-arrow ai-icon" to="#">
 							<i className="fa fa-map-marked"></i>
-							<span className="nav-text">Geopark</span>
+							<span className="nav-text">Wisata</span>
 						</Link>
 						<ul>
 							<li>
 								<Link
-									className={`${path === "geopark" ? "mm-active" : ""}`}
-									to="/geopark"
+									className={`${path === "profil" ? "mm-active" : ""}`}
+									to="/profil"
 								>
-									My Geopark
+									Profil
 								</Link>
 							</li>
 							<li>
 								<Link
-									className={`${path === "post-details" ? "mm-active" : ""}`}
-									to="/kota"
-								>
-									Kecamatan / Kota
-								</Link>
-							</li>
-							<li>
-								<Link
-									className={`${path === "post-details" ? "mm-active" : ""}`}
+									className={`${path === "wisata" ? "mm-active" : ""}`}
 									to="/wisata"
 								>
 									Wisata
 								</Link>
-							</li>
-							<li>
-								<Link
-									className={`${path === "post-details" ? "mm-active" : ""}`}
-									to="/360-view"
-								>360 Media</Link>
 							</li>
 						</ul>
 					</li>
@@ -211,16 +197,16 @@ const SideBar = () => {
 						<ul>
 							<li>
 								<Link
-									className={`${path === "article" ? "mm-active" : ""}`}
-									to="/article"
+									className={`${path === "artikel" ? "mm-active" : ""}`}
+									to="/artikel"
 								>
 									Artikel
 								</Link>
 							</li>
 							<li>
 								<Link
-									className={`${path === "event" ? "mm-active" : ""}`}
-									to="/event"
+									className={`${path === "acara" ? "mm-active" : ""}`}
+									to="/acara"
 								>
 									Acara
 								</Link>
@@ -230,31 +216,15 @@ const SideBar = () => {
 					<li className={`${bootstrap.includes(path) ? "mm-active" : ""}`}>
 						<Link className="has-arrow ai-icon" to="#">
 							<i className="fa fa-handshake"></i>
-							<span className="nav-text">Partnership</span>
+							<span className="nav-text">Kemitraan</span>
 						</Link>
 						<ul>
 							<li>
 								<Link
-									className={`${path === "accomodation" ? "mm-active" : ""}`}
-									to="/accomodation"
+									className={`${path === "akomodasi" ? "mm-active" : ""}`}
+									to="/akomodasi"
 								>
-									Accomodation
-								</Link>
-							</li>
-							<li>
-								<Link
-									className={`${path === "travel-tour" ? "mm-active" : ""}`}
-									to="/travel-tour"
-								>
-									Travel & Tour
-								</Link>
-							</li>
-							<li>
-								<Link
-									className={`${path === "attraction" ? "mm-active" : ""}`}
-									to="/attraction"
-								>
-									Attraction
+									Akomodasi
 								</Link>
 							</li>
 							<li>
@@ -262,7 +232,7 @@ const SideBar = () => {
 									className={`${path === "merchant" ? "mm-active" : ""}`}
 									to="/merchant"
 								>
-									Merchant & Souvenir
+									Merchant
 								</Link>
 							</li>
 						</ul>
@@ -275,10 +245,10 @@ const SideBar = () => {
 						<ul>
 							<li>
 								<Link
-									className={`${path === "user" ? "mm-active" : ""}`}
-									to="/user"
+									className={`${path === "pengguna" ? "mm-active" : ""}`}
+									to="/pengguna"
 								>
-									User
+									Pengguna
 								</Link>
 							</li>
 						</ul>

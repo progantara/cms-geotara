@@ -6,9 +6,9 @@ const DataArticle = () => {
   return (
     <Fragment>
       <PageTitle
-        activeMenu="List"
-        motherMenu="Article"
-        pageContent="List"
+        activeMenu="Data Artikel"
+        motherMenu="Artikel"
+        pageContent="Daftar Artikel"
       />
       <div className="row">
         <ArticleList />

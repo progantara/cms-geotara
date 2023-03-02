@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import Rte from "./Rte";
 import { Link, useParams } from "react-router-dom";
 
@@ -6,12 +6,12 @@ const ArticleForm = () => {
 	const { id } = useParams();
 
 	let title = "Tambah Artikel";
-	let button = "Simpan";
+	let button = "Tambah";
 	if (id !== undefined) {
 		title = "Edit Artikel";
-		button = "Update";
+		button = "Perbarui";
 	}
-  
+
 	return (
 		<div className="h-80">
 			<div className="row">
@@ -21,36 +21,45 @@ const ArticleForm = () => {
 							<h4 className="card-title">{title}</h4>
 						</div>
 						<div className="card-body">
-							<div className="summernote">
-								<form onSubmit={(e) => e.preventDefault()}>
+							<form onSubmit={(e) => e.preventDefault()}>
+								<div className="basic-form">
 									<div className="form-group">
-										<label>Thumbnail</label>
-										<div className="input-group">
-											<div className="from-file">
+										<label>Banner</label>
+										<div className="input-group mb-3">
+											<div className="form-file">
 												<input
 													type="file"
-													className="form-file-input form-control"
+													className="custom-file-input form-control"
 												/>
 											</div>
 										</div>
-										<label>Title Article</label>
+									</div>
+									<div className="form-group">
+										<label>Judul Artikel</label>
 										<input
 											type="text"
 											className="form-control mb-3"
-											placeholder="Title Article"
+											placeholder="Masukkan judul artikel"
 										/>
-										<label>Article Content</label>
+									</div>
+								</div>
+								<div className="summernote">
+									<div className="form-group">
+										<label>Konten</label>
 										<Rte />
 									</div>
-									<div className="form-group m-3">
-										<Link to="/article-table">
-											<button type="submit" className="btn btn-primary">
-												{button}
-											</button>
-										</Link>
-									</div>
-								</form>
-							</div>
+								</div>
+								<div className="form-group mt-3">
+									<button type="submit" className="btn btn-primary me-2">
+										{button}
+									</button>
+									<Link to="/artikel">
+										<button type="button" className="btn btn-warning">
+											Kembali
+										</button>
+									</Link>
+								</div>
+							</form>
 						</div>
 					</div>
 				</div>

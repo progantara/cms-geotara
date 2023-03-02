@@ -1,20 +1,20 @@
 import React, { Fragment } from "react";
 import PageTitle from "../../layouts/PageTitle";
-import AccomodationList from "./AccomodationList";
+import MerchantList from "./MerchantList";
 
-const Accomodation = () => {
+const Merchant = () => {
   return (
     <Fragment>
       <PageTitle
         activeMenu="Daftar"
-        motherMenu="Akomodasi"
+        motherMenu="Merchant"
         pageContent="Daftar"
       />
       <div className="row">
-        <AccomodationList />
+        <MerchantList />
       </div>
     </Fragment>
   );
 };
 
-export default Accomodation;
+export default Merchant;

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import swal from "sweetalert";
 import DataTable from "react-data-table-component";
 
-const AccomodationList = () => {
+const MerchantList = () => {
 	const columns = [
 		{
 			name: "No",
@@ -19,14 +19,14 @@ const AccomodationList = () => {
       width: '20%',
 		},
 		{
-			name: "Harga",
-			selector: (row) => row.harga,
+			name: "Kontak",
+			selector: (row) => row.kontak,
 			sortable: true,
       width: '20%',
 		},
 		{
-			name: "Lokasi",
-			selector: (row) => row.lokasi,
+			name: "Alamat",
+			selector: (row) => row.alamat,
 			sortable: true,
       width: '30%',
 		},
@@ -41,16 +41,16 @@ const AccomodationList = () => {
 		{
 			id: 1,
 			no: "1",
-			nama: "Homestay Ciletuh Pass",
-			harga: "Rp. 25.000,00 s.d Rp. 50.000,00",
-			lokasi: "Bandung, Jawa Barat",
+			nama: "Toko Souvenir Ciletuh Pass",
+			kontak: "081222954662",
+			alamat: "Bandung, Jawa Barat",
 			aksi: (
 				<div className="d-flex">
-					<Link to="/akomodasi/detail/1" className="btn btn-primary shadow btn-xs sharp me-1">
+					<Link to="/merchant/detail/1" className="btn btn-primary shadow btn-xs sharp me-1">
 						<i className="fas fa-eye"></i>
 					</Link>
 					<Link
-						to="/akomodasi/edit/1"
+						to="/merchant/edit/1"
 						className="btn btn-secondary shadow btn-xs sharp me-1"
 					>
 						<i className="fas fa-pen"></i>
@@ -60,14 +60,14 @@ const AccomodationList = () => {
 						className="btn btn-danger shadow btn-xs sharp"
 						onClick={() =>
 							swal({
-								title: "Anda yakin ingin menghapus akomodasi ini?",
+								title: "Anda yakin ingin menghapus merchant ini?",
 								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
 								icon: "warning",
 								buttons: true,
 								dangerMode: true,
 							}).then((willDelete) => {
 								if (willDelete) {
-									swal("Akomodasi telah dihapus!", {
+									swal("Merchant telah dihapus!", {
 										icon: "success",
 									});
 								}
@@ -87,11 +87,11 @@ const AccomodationList = () => {
 			lokasi: "Bandung, Jawa Barat",
 			aksi: (
 				<div className="d-flex">
-					<Link to="/akomodasi/detail/1" className="btn btn-primary shadow btn-xs sharp me-1">
+					<Link to="/merchant/detail/1" className="btn btn-primary shadow btn-xs sharp me-1">
 						<i className="fas fa-eye"></i>
 					</Link>
 					<Link
-						to="/akomodasi/edit/1"
+						to="/merchant/edit/1"
 						className="btn btn-secondary shadow btn-xs sharp me-1"
 					>
 						<i className="fas fa-pen"></i>
@@ -153,8 +153,8 @@ const AccomodationList = () => {
 		<div className="col-12">
 			<div className="card">
 				<div className="card-header">
-					<h4 className="card-title">Daftar Akomodasi</h4>
-					<Link to="/akomodasi/tambah">
+					<h4 className="card-title">Daftar Merchant</h4>
+					<Link to="/merchant/tambah">
 						<Button className="me-2" variant="primary btn-rounded">
 							<span className="btn-icon-start text-primary">
 								<i className="fa fa-plus color-primary" />
@@ -181,4 +181,4 @@ const AccomodationList = () => {
 	);
 };
 
-export default AccomodationList;
+export default MerchantList;

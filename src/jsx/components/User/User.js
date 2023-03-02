@@ -7,9 +7,9 @@ const User = () => {
 	return (
 		<Fragment>
 			<PageTitle
-				activeMenu="List"
-				motherMenu="User"
-				pageContent="List"
+				activeMenu="Daftar"
+				motherMenu="Pengguna"
+				pageContent="Daftar"
 			/>
 			<div className="row">
 				<UserList />
