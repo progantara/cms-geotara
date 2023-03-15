@@ -22,22 +22,25 @@ export function loginAction(email, password, history) {
     return (dispatch) => {
         login(email, password)
             .then((response) => {
-                console.log(response)
                 saveTokenInLocalStorage({
-                    email: response.data.email,
-                    acccessToken: response.data.access_token,
+                    user: {
+                        name: response.data.data.user.name,
+                        email: response.data.data.user.email,
+                        role: response.data.data.user.role,
+                    },
+                    access_token: response.data.data.access_token,
                 });
                 runLogoutTimer(
                     dispatch,
                     1000 * 60 * 60 * 24,
                     history,
                 );
-                dispatch(loginConfirmedAction(response.data));
+                dispatch(loginConfirmedAction(response.data.data));
 				history.push('/dashboard');                
             })
             .catch((error) => {
-				// console.log(error);
-                const errorMessage = formatError(error.response);
+                error = JSON.parse(JSON.stringify(error));
+                const errorMessage = formatError(error);
                 dispatch(loginFailedAction(errorMessage));
             });
     };

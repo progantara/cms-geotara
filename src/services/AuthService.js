@@ -9,18 +9,17 @@ export function login(email, password) {
 	};
 	return axios.post(`http://127.0.0.1:8000/api/master/auth/login`, postData, {
 		headers: {
-			"Content-Type": "multipart/form-data",
-			Accept: "application/json, text-plain, /",
+			"Content-Type": "application/json",
+			"Accept": "application/json"
 		},
 	});
 }
 
 export function formatError(errorResponse) {
-	switch (errorResponse.message) {
-		case "Unauthorized":
-			//return 'Email not found';
+	switch (errorResponse.name) {
+		case "Error":
 			swal("Oops", "Login Invalid", "error", { button: "Try Again!" });
-			break;
+            return errorResponse
 
 		default:
 			return "";

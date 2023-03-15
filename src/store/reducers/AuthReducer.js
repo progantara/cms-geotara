@@ -7,8 +7,12 @@ import {
 
 const initialState = {
 	auth: {
-		email: "",
-		accessToken: "",
+        user: {
+            name: "",
+            email: "",
+            role: ""
+        },
+		access_token: "",
 	},
 	errorMessage: "",
 	successMessage: "",
@@ -20,8 +24,12 @@ export function AuthReducer(state = initialState, action) {
 		return {
 			...state,
 			auth: {
-                email: action.payload.email,
-                accessToken: action.payload.access_token,
+                user: {
+                    name: action.payload.user.name,
+                    email: action.payload.user.email,
+                    role: action.payload.user.role
+                },
+                access_token: action.payload.access_token,
             },
 			errorMessage: "",
 			successMessage: "Login Successfully Completed",
@@ -35,16 +43,22 @@ export function AuthReducer(state = initialState, action) {
 			errorMessage: "",
 			successMessage: "",
 			auth: {
-				email: "",
-				accessToken: "",
-			},
+                auth: {
+                    user: {
+                        name: "",
+                        email: "",
+                        role: ""
+                    },
+                    access_token: "",
+                },
+            },
 		};
 	}
 
 	if (action.type === LOGIN_FAILED_ACTION) {
 		return {
 			...state,
-			errorMessage: action.payload.message,
+			errorMessage: action.payload.name,
 			successMessage: "",
 			showLoading: false,
 		};
