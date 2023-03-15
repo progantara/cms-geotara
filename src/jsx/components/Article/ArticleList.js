@@ -50,7 +50,7 @@ const ArticleList = () => {
 						<i className="fas fa-eye"></i>
 					</Link>
 					<Link
-						to="/pengguna/edit/1"
+						to="/artikel/edit/1"
 						className="btn btn-secondary shadow btn-xs sharp me-1"
 					>
 						<i className="fas fa-pen"></i>
@@ -60,14 +60,14 @@ const ArticleList = () => {
 						className="btn btn-danger shadow btn-xs sharp"
 						onClick={() =>
 							swal({
-								title: "Anda yakin ingin menghapus pengguna ini?",
+								title: "Anda yakin ingin menghapus artikel ini?",
 								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
 								icon: "warning",
 								buttons: true,
 								dangerMode: true,
 							}).then((willDelete) => {
 								if (willDelete) {
-									swal("Pengguna telah dihapus!", {
+									swal("Artikel telah dihapus!", {
 										icon: "success",
 									});
 								}

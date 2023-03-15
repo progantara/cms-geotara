@@ -3,36 +3,12 @@ import {
     login,
     runLogoutTimer,
     saveTokenInLocalStorage,
-    signUp,
 } from '../../services/AuthService';
 
-
-export const SIGNUP_CONFIRMED_ACTION = '[signup action] confirmed signup';
-export const SIGNUP_FAILED_ACTION = '[signup action] failed signup';
 export const LOGIN_CONFIRMED_ACTION = '[login action] confirmed login';
 export const LOGIN_FAILED_ACTION = '[login action] failed login';
 export const LOADING_TOGGLE_ACTION = '[Loading action] toggle loading';
 export const LOGOUT_ACTION = '[Logout action] logout action';
-
-export function signupAction(email, password, history) {
-    return (dispatch) => {
-        signUp(email, password)
-        .then((response) => {
-            saveTokenInLocalStorage(response.data);
-            runLogoutTimer(
-                dispatch,
-                response.data.expiresIn * 1000,
-                history,
-            );
-            dispatch(confirmedSignupAction(response.data));
-            history.push('/dashboard');
-        })
-        .catch((error) => {
-            const errorMessage = formatError(error.response.data);
-            dispatch(signupFailedAction(errorMessage));
-        });
-    };
-}
 
 export function logout(history) {
     localStorage.removeItem('userDetails');
@@ -46,18 +22,22 @@ export function loginAction(email, password, history) {
     return (dispatch) => {
         login(email, password)
             .then((response) => {
-                saveTokenInLocalStorage(response.data);
+                console.log(response)
+                saveTokenInLocalStorage({
+                    email: response.data.email,
+                    acccessToken: response.data.access_token,
+                });
                 runLogoutTimer(
                     dispatch,
-                    response.data.expiresIn * 1000,
+                    1000 * 60 * 60 * 24,
                     history,
                 );
                 dispatch(loginConfirmedAction(response.data));
 				history.push('/dashboard');                
             })
             .catch((error) => {
-				//console.log(error);
-                const errorMessage = formatError(error.response.data);
+				// console.log(error);
+                const errorMessage = formatError(error.response);
                 dispatch(loginFailedAction(errorMessage));
             });
     };
@@ -74,20 +54,6 @@ export function loginConfirmedAction(data) {
     return {
         type: LOGIN_CONFIRMED_ACTION,
         payload: data,
-    };
-}
-
-export function confirmedSignupAction(payload) {
-    return {
-        type: SIGNUP_CONFIRMED_ACTION,
-        payload,
-    };
-}
-
-export function signupFailedAction(message) {
-    return {
-        type: SIGNUP_FAILED_ACTION,
-        payload: message,
     };
 }
 

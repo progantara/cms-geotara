@@ -12,8 +12,6 @@ import "./vendor/bootstrap-select/dist/css/bootstrap-select.min.css";
 import './vendor/datatables/css/dataTables.min.css';
 import "./css/style.css";
 
-
-const SignUp = lazy(() => import('./jsx/pages/Registration'));
 const ForgotPassword = lazy(() => import('./jsx/pages/ForgotPassword'));
 const Login = lazy(() => {
     return new Promise(resolve => {
@@ -30,7 +28,6 @@ function App (props) {
     let routes = (  
         <Switch>
             <Route path='/login' component={Login} />
-            <Route path='/page-register' component={SignUp} />
             <Route path='/page-forgot-password' component={ForgotPassword} />
         </Switch>
     );

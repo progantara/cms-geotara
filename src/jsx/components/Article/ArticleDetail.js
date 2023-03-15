@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Rte from "./Rte";
+import Rte from "./ArticleRte";
 
 const ArticleDetail = () => {
   const { banner, setBanner } = useState("");

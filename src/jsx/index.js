@@ -25,7 +25,6 @@ import Reviews from "./components/Dashboard/Reviews";
 import Task from "./components/Dashboard/Task";
 
 /// Pages
-import Registration from "./pages/Registration";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import LockScreen from "./pages/LockScreen";
@@ -116,7 +115,6 @@ const Markup = () => {
 		{ url: "pengguna/edit/:id", component: UserForm },
 
 		/// pages
-		{ url: "page-register", component: Registration },
 		{ url: "page-lock-screen", component: LockScreen },
 		{ url: "page-login", component: Login },
 		{ url: "page-forgot-password", component: ForgotPassword },

@@ -1,5 +1,5 @@
 import React from "react";
-import Rte from "./Rte";
+import Rte from "./ArticleRte";
 import { Link, useParams } from "react-router-dom";
 
 const ArticleForm = () => {
@@ -22,7 +22,7 @@ const ArticleForm = () => {
 						</div>
 						<div className="card-body">
 							<form onSubmit={(e) => e.preventDefault()}>
-								<div className="basic-form">
+								<div className="basic-form form_file_input">
 									<div className="form-group">
 										<label>Banner</label>
 										<div className="input-group mb-3">
@@ -32,6 +32,8 @@ const ArticleForm = () => {
 													className="custom-file-input form-control"
 												/>
 											</div>
+
+											<span className="input-group-text">Upload</span>
 										</div>
 									</div>
 									<div className="form-group">
