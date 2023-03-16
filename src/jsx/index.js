@@ -35,6 +35,10 @@ import Error500 from "./pages/Error500";
 import Error503 from "./pages/Error503";
 import { ThemeContext } from "../context/ThemeContext";
 import Section from "./components/Section";
+import ViewList from "./components/360/ViewList";
+import { useSelector } from "react-redux";
+import { ConnectedRouter } from "connected-react-router";
+import { history } from "../store/store";
 
 // Profil
 const Profil = React.lazy(() => import("./components/Profil/Profil"));
@@ -43,23 +47,39 @@ const Profil = React.lazy(() => import("./components/Profil/Profil"));
 const Wisata = React.lazy(() => import("./components/Wisata/Wisata"));
 const WisataForm = React.lazy(() => import("./components/Wisata/WisataForm"));
 
+// Kota
+const Kota = React.lazy(() => import("./components/Lokasi/Kota/Kota"));
+const KotaForm = React.lazy(() => import("./components/Lokasi/Kota/KotaForm"));
+
 // Virtual Tour
-const VirtualTourViewEditor = React.lazy(() => import("./components/VirtualTour/VirtualTourViewEditor"));
+const VirtualTourViewEditor = React.lazy(() =>
+	import("./components/VirtualTour/VirtualTourViewEditor")
+);
 
 // Publikasi
 const Article = React.lazy(() => import("./components/Article/Article"));
-const ArticleForm = React.lazy(() => import("./components/Article/ArticleForm"));
-const ArticleDetail = React.lazy(() => import("./components/Article/ArticleDetail"));
+const ArticleForm = React.lazy(() =>
+	import("./components/Article/ArticleForm")
+);
+const ArticleDetail = React.lazy(() =>
+	import("./components/Article/ArticleDetail")
+);
 
 const Event = React.lazy(() => import("./components/Event/Event"));
 const EventForm = React.lazy(() => import("./components/Event/EventForm"));
 
 // Kemitraan
-const Accomodation = React.lazy(() => import("./components/Accomodation/Accomodation"));
-const AccomodationForm = React.lazy(() => import("./components/Accomodation/AccomodationForm"));
+const Accomodation = React.lazy(() =>
+	import("./components/Accomodation/Accomodation")
+);
+const AccomodationForm = React.lazy(() =>
+	import("./components/Accomodation/AccomodationForm")
+);
 
 const Merchant = React.lazy(() => import("./components/Merchant/Merchant"));
-const MerchantForm = React.lazy(() => import("./components/Merchant/MerchantForm"));
+const MerchantForm = React.lazy(() =>
+	import("./components/Merchant/MerchantForm")
+);
 
 // Autentikasi
 const User = React.lazy(() => import("./components/User/User"));
@@ -88,8 +108,14 @@ const Markup = () => {
 		{ url: "wisata/tambah", component: WisataForm },
 		{ url: "wisata/edit/:id", component: WisataForm },
 
+		/// Lokasi
+		{ url: "kota", component: Kota },
+		{ url: "kota/tambah", component: KotaForm },
+		{ url: "kota/edit/:id", component: KotaForm },
+
 		/// Virtual Tour
 		{ url: "virtual-tour/editor", component: VirtualTourViewEditor },
+		{ url: "360/view", component: ViewList },
 
 		/// Publikasi
 		{ url: "artikel", component: Article },
@@ -130,54 +156,39 @@ const Markup = () => {
 
 	let pagePath = path.split("-").includes("page");
 
-	const [progress, setProgress] = useState(0);
-	const [prevLoc, setPrevLoc] = useState("");
-	const location = useLocation();
-
-	useEffect(() => {
-		setPrevLoc(location.pathname);
-		setProgress(100);
-		if (location.pathname === prevLoc) {
-			setPrevLoc("");
-		}
-	}, [location]);
-
-	useEffect(() => {
-		setProgress(0);
-	}, [prevLoc]);
+	const { progress, show } = useSelector((state) => state.loadingBar);
 
 	return (
 		<>
-			<div
-				id={`${!pagePath ? "main-wrapper" : ""}`}
-				className={`${!pagePath ? "show" : "vh-100"}  ${
-					menuToggle ? "menu-toggle" : ""
-				}`}
-			>
-				{!pagePath && <Nav />}
-				<div className={`${!pagePath ? "content-body" : ""}`}>
-					<div
-						className={`${!pagePath ? "container-fluid" : ""}`}
-						style={{ minHeight: window.screen.height - 60 }}
-					>
-						<LoadingBar
-							color="#f11946"
-							progress={progress}
-						/>
-						<Switch>
-							{routes.map((data, i) => (
-								<Route
-									key={i}
-									exact
-									path={`/${data.url}`}
-									component={data.component}
-								/>
-							))}
-						</Switch>
+			<ConnectedRouter history={history}>
+				<div
+					id={`${!pagePath ? "main-wrapper" : ""}`}
+					className={`${!pagePath ? "show" : "vh-100"}  ${
+						menuToggle ? "menu-toggle" : ""
+					}`}
+				>
+					{!pagePath && <Nav />}
+					<div className={`${!pagePath ? "content-body" : ""}`}>
+						<div
+							className={`${!pagePath ? "container-fluid" : ""}`}
+							style={{ minHeight: window.screen.height - 60 }}
+						>
+							{show && <LoadingBar color="#f11946" progress={progress} />}
+							<Switch>
+								{routes.map((data, i) => (
+									<Route
+										key={i}
+										exact
+										path={`/${data.url}`}
+										component={data.component}
+									/>
+								))}
+							</Switch>
+						</div>
 					</div>
+					{!pagePath && <Footer />}
 				</div>
-				{!pagePath && <Footer />}
-			</div>
+			</ConnectedRouter>
 		</>
 	);
 };

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import DropFile from "../Wisata/DropFile";
+import DropFile from "./KotaDropfile";
 
 class KotaForm extends Component {
    render() {

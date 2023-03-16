@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import PageTitle from "../../layouts/PageTitle";
+import PageTitle from "../../../layouts/PageTitle";
 import KotaList from "./KotaList";
 
 const Kota = () => {
