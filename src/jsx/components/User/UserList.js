@@ -1,83 +1,44 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import swal from "sweetalert";
 import DataTable from "react-data-table-component";
+import { getAllUser } from "../../../services/UserService";
+import ClipLoader from "react-spinners/ClipLoader";
+import Swal from "sweetalert2";
 
 const UserList = () => {
+	const [data, setData] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+
 	const columns = [
 		{
 			name: "No",
 			selector: (row) => row.no,
 			sortable: true,
-      width: '10%',
+			width: "10%",
 		},
 		{
 			name: "Nama",
-			selector: (row) => row.nama,
+			selector: (row) => row.name,
 			sortable: true,
-      width: '20%',
+			width: "20%",
 		},
 		{
 			name: "Email",
 			selector: (row) => row.email,
 			sortable: true,
-      width: '20%',
+			width: "20%",
 		},
 		{
 			name: "Peran",
-			selector: (row) => row.peran,
+			selector: (row) => row.role,
 			sortable: true,
-      width: '30%',
+			width: "30%",
 		},
 		{
 			name: "Aksi",
-			selector: (row) => row.aksi,
-      width: '20%',
-		},
-	];
-
-	const data = [
-		{
-			id: 1,
-			no: "1",
-			nama: "Sobri W",
-			email: "wajisobri@gmail.com",
-			peran: "Pengelola Wisata",
-			aksi: (
-				<div className="d-flex">
-					<Link to="/pengguna/detail/1" className="btn btn-primary shadow btn-xs sharp me-1">
-						<i className="fas fa-eye"></i>
-					</Link>
-					<Link
-						to="/pengguna/edit/1"
-						className="btn btn-secondary shadow btn-xs sharp me-1"
-					>
-						<i className="fas fa-pen"></i>
-					</Link>
-					<Link
-						to="#"
-						className="btn btn-danger shadow btn-xs sharp"
-						onClick={() =>
-							swal({
-								title: "Anda yakin ingin menghapus akomodasi ini?",
-								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-								icon: "warning",
-								buttons: true,
-								dangerMode: true,
-							}).then((willDelete) => {
-								if (willDelete) {
-									swal("Akomodasi telah dihapus!", {
-										icon: "success",
-									});
-								}
-							})
-						}
-					>
-						<i className="fa fa-trash"></i>
-					</Link>
-				</div>
-			),
+			selector: (row) => row.action,
+			width: "20%",
 		},
 	];
 
@@ -105,8 +66,69 @@ const UserList = () => {
 		},
 	};
 
-	// use effect
-	useEffect(() => {}, []);
+	useEffect(() => {
+		setIsLoading(true);
+		getAllUser()
+			.then((res) => {
+				res.data.data.map((item, index) => {
+					setData((data) => [
+						...data,
+						{
+							no: index + 1,
+							name: item.name,
+							email: item.email,
+							role: item.role,
+							action: (
+								<div className="d-flex">
+									<Link
+										to={"/pengguna/detail/" + item._id}
+										className="btn btn-primary shadow btn-xs sharp me-1"
+									>
+										<i className="fas fa-eye"></i>
+									</Link>
+									<Link
+										to={"/pengguna/edit/" + item._id}
+										className="btn btn-secondary shadow btn-xs sharp me-1"
+									>
+										<i className="fas fa-pen"></i>
+									</Link>
+									<Link
+										to="#"
+										className="btn btn-danger shadow btn-xs sharp"
+										onClick={() =>
+											Swal.fire({
+												title: "Anda yakin ingin menghapus akomodasi ini?",
+												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+												icon: "warning",
+												showCancelButton: true,
+												confirmButtonColor: "#3085d6",
+												cancelButtonColor: "#d33",
+												confirmButtonText: "Ya, hapus!",
+											}).then((res) => {
+												if (res.isConfirmed) {
+													Swal.fire(
+														'Dihapus!',
+														'Pengguna telah dihapus.',
+														'success'
+													)
+												}
+											})
+										}
+									>
+										<i className="fa fa-trash"></i>
+									</Link>
+								</div>
+							),
+						},
+					]);
+				});
+				setIsLoading(false);
+			})
+			.catch((err) => {
+				console.log(err);
+				setIsLoading(false);
+			});
+	}, []);
 
 	return (
 		<div className="col-12">
@@ -131,6 +153,14 @@ const UserList = () => {
 								pagination
 								paginationPerPage={10}
 								customStyles={customStyles}
+								progressPending={isLoading}
+								progressComponent={
+									<ClipLoader
+										color={"#20c997"}
+										loading={isLoading}
+										aria-label="Loading Spinner"
+									/>
+								}
 							/>
 						</div>
 					</div>

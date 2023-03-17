@@ -1,19 +1,9 @@
 import axios from "axios";
 import { getAccessToken } from "./AuthService";
 
-export const getAllArticle = () => {
+export const getAllTourismPlace = () => {
   return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel`, {
-      headers: {
-        'Authorization': `Bearer ${getAccessToken()}`,
-        "Accept": "application/json"
-      },
-    })
-}
-
-export const getArticle = (id) => {
-  return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .get(`http://127.0.0.1:8000/api/master/wisata`, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -21,9 +11,19 @@ export const getArticle = (id) => {
     })
 };
 
-export const createArticle = (article) => {
+export const getTourismPlace = (id) => {
   return axios
-    .post(`http://127.0.0.1:8000/api/master/artikel`, article, {
+    .get(`http://127.0.0.1:8000/api/master/wisata` + id, {
+      headers: {
+        'Authorization': `Bearer ${getAccessToken()}`,
+        "Accept": "application/json"
+      },
+    })
+};
+
+export const createTourismPlace = (tourismPlace) => {
+  return axios
+    .post(`http://127.0.0.1:8000/api/master/wisata`, tourismPlace, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -32,9 +32,9 @@ export const createArticle = (article) => {
     })
 };
 
-export const updateArticle = (id, article) => {
+export const updateTourismPlace = (id, tourismPlace) => {
   return axios
-    .put(`http://127.0.0.1:8000/api/master/artikel` + id, article, {
+    .put(`http://127.0.0.1:8000/api/master/wisata` + id, tourismPlace, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -43,9 +43,9 @@ export const updateArticle = (id, article) => {
     })
 };
 
-export const deleteArticle = (id) => {
+export const deleteTourismPlace = (id) => {
   return axios
-    .delete(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .delete(`http://127.0.0.1:8000/api/master/wisata` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",

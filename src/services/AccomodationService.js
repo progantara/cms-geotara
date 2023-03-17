@@ -1,9 +1,9 @@
 import axios from "axios";
 import { getAccessToken } from "./AuthService";
 
-export const getAllArticle = () => {
+export const getAllAccomodation = () => {
   return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel`, {
+    .get(`http://127.0.0.1:8000/api/master/sponsorship/penginapan`, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -11,9 +11,9 @@ export const getAllArticle = () => {
     })
 }
 
-export const getArticle = (id) => {
+export const getAccomodation = (id) => {
   return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .get(`http://127.0.0.1:8000/api/master/sponsorship/penginapan` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -21,9 +21,9 @@ export const getArticle = (id) => {
     })
 };
 
-export const createArticle = (article) => {
+export const createAccomodation = (accomodation) => {
   return axios
-    .post(`http://127.0.0.1:8000/api/master/artikel`, article, {
+    .post(`http://127.0.0.1:8000/api/master/sponsorship/penginapan`, accomodation, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -32,9 +32,9 @@ export const createArticle = (article) => {
     })
 };
 
-export const updateArticle = (id, article) => {
+export const updateAccomodation = (id, accomodation) => {
   return axios
-    .put(`http://127.0.0.1:8000/api/master/artikel` + id, article, {
+    .put(`http://127.0.0.1:8000/api/master/sponsorship/penginapan` + id, accomodation, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -43,9 +43,9 @@ export const updateArticle = (id, article) => {
     })
 };
 
-export const deleteArticle = (id) => {
+export const deleteAccomodation = (id) => {
   return axios
-    .delete(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .delete(`http://127.0.0.1:8000/api/master/sponsorship/penginapan` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",

@@ -5,6 +5,9 @@ import swal from "sweetalert";
 import DataTable from "react-data-table-component";
 
 const AccomodationList = () => {
+	const [data, setData] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+
 	const columns = [
 		{
 			name: "No",
@@ -14,111 +17,26 @@ const AccomodationList = () => {
 		},
 		{
 			name: "Nama",
-			selector: (row) => row.nama,
+			selector: (row) => row.name,
 			sortable: true,
       width: '20%',
 		},
 		{
 			name: "Harga",
-			selector: (row) => row.harga,
+			selector: (row) => row.price,
 			sortable: true,
       width: '20%',
 		},
 		{
 			name: "Lokasi",
-			selector: (row) => row.lokasi,
+			selector: (row) => row.location,
 			sortable: true,
       width: '30%',
 		},
 		{
 			name: "Aksi",
-			selector: (row) => row.aksi,
+			selector: (row) => row.action,
       width: '20%',
-		},
-	];
-
-	const data = [
-		{
-			id: 1,
-			no: "1",
-			nama: "Homestay Ciletuh Pass",
-			harga: "Rp. 25.000,00 s.d Rp. 50.000,00",
-			lokasi: "Bandung, Jawa Barat",
-			aksi: (
-				<div className="d-flex">
-					<Link to="/akomodasi/detail/1" className="btn btn-primary shadow btn-xs sharp me-1">
-						<i className="fas fa-eye"></i>
-					</Link>
-					<Link
-						to="/akomodasi/edit/1"
-						className="btn btn-secondary shadow btn-xs sharp me-1"
-					>
-						<i className="fas fa-pen"></i>
-					</Link>
-					<Link
-						to="#"
-						className="btn btn-danger shadow btn-xs sharp"
-						onClick={() =>
-							swal({
-								title: "Anda yakin ingin menghapus akomodasi ini?",
-								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-								icon: "warning",
-								buttons: true,
-								dangerMode: true,
-							}).then((willDelete) => {
-								if (willDelete) {
-									swal("Akomodasi telah dihapus!", {
-										icon: "success",
-									});
-								}
-							})
-						}
-					>
-						<i className="fa fa-trash"></i>
-					</Link>
-				</div>
-			),
-		},
-    {
-			id: 2,
-			no: "2",
-			nama: "Homestay Ciletuh Pass",
-			harga: "Rp. 25.000,00 s.d Rp. 50.000,00",
-			lokasi: "Bandung, Jawa Barat",
-			aksi: (
-				<div className="d-flex">
-					<Link to="/akomodasi/detail/1" className="btn btn-primary shadow btn-xs sharp me-1">
-						<i className="fas fa-eye"></i>
-					</Link>
-					<Link
-						to="/akomodasi/edit/1"
-						className="btn btn-secondary shadow btn-xs sharp me-1"
-					>
-						<i className="fas fa-pen"></i>
-					</Link>
-					<Link
-						to="#"
-						className="btn btn-danger shadow btn-xs sharp"
-						onClick={() =>
-							swal({
-								title: "Anda yakin ingin menghapus akomodasi ini?",
-								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-								icon: "warning",
-								buttons: true,
-								dangerMode: true,
-							}).then((willDelete) => {
-								if (willDelete) {
-									swal("Akomodasi telah dihapus!", {
-										icon: "success",
-									});
-								}
-							})
-						}
-					>
-						<i className="fa fa-trash"></i>
-					</Link>
-				</div>
-			),
 		},
 	];
 
@@ -147,7 +65,65 @@ const AccomodationList = () => {
 	};
 
 	// use effect
-	useEffect(() => {}, []);
+	useEffect(() => {
+		setIsLoading(true);
+		getAllAkomodasi()
+			.then((res) => {
+				res.data.data.map((item, index) => {
+					setData((data) => [
+						...data,
+						{
+							no: index + 1,
+							name: item.nama,
+							price: item.harga,
+							location: item.lokasi,
+							action: (
+								<div className="d-flex">
+									<Link
+										to={`/akomodasi/detail/${item._id}`}
+										className="btn btn-primary shadow btn-xs sharp me-1"
+									>
+										<i className="fas fa-eye"></i>
+									</Link>
+									<Link
+										to={`/akomodasi/edit/${item._id}`}
+										className="btn btn-secondary shadow btn-xs sharp me-1"
+									>
+										<i className="fas fa-pen"></i>
+									</Link>
+									<Link
+										to="#"
+										className="btn btn-danger shadow btn-xs sharp"
+										onClick={() =>
+											swal({
+												title: "Anda yakin ingin menghapus akomodasi ini?",
+												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+												icon: "warning",
+												buttons: true,
+												dangerMode: true,
+											}).then((willDelete) => {
+												if (willDelete) {
+													swal("Akomodasi telah dihapus!", {
+														icon: "success",
+													});
+												}
+											})
+										}
+									>
+										<i className="fa fa-trash"></i>
+									</Link>
+								</div>
+							),
+						},
+					]);
+				});
+				setIsLoading(false);
+			})
+			.catch((err) => {
+				console.log(err);
+				setIsLoading(false);
+			});
+	}, []);
 
 	return (
 		<div className="col-12">

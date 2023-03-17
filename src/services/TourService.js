@@ -1,9 +1,9 @@
 import axios from "axios";
 import { getAccessToken } from "./AuthService";
 
-export const getAllArticle = () => {
+export const getAllTour = () => {
   return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel`, {
+    .get(`http://127.0.0.1:8000/api/master/sponsorship/tour`, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -11,9 +11,9 @@ export const getAllArticle = () => {
     })
 }
 
-export const getArticle = (id) => {
+export const getTour = (id) => {
   return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .get(`http://127.0.0.1:8000/api/master/sponsorship/tour` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -21,9 +21,9 @@ export const getArticle = (id) => {
     })
 };
 
-export const createArticle = (article) => {
+export const createTour = (tour) => {
   return axios
-    .post(`http://127.0.0.1:8000/api/master/artikel`, article, {
+    .post(`http://127.0.0.1:8000/api/master/sponsorship/tour`, tour, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -32,9 +32,9 @@ export const createArticle = (article) => {
     })
 };
 
-export const updateArticle = (id, article) => {
+export const updateTour = (id, tour) => {
   return axios
-    .put(`http://127.0.0.1:8000/api/master/artikel` + id, article, {
+    .put(`http://127.0.0.1:8000/api/master/sponsorship/tour` + id, tour, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -43,9 +43,9 @@ export const updateArticle = (id, article) => {
     })
 };
 
-export const deleteArticle = (id) => {
+export const deleteTour = (id) => {
   return axios
-    .delete(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .delete(`http://127.0.0.1:8000/api/master/sponsorship/tour` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",

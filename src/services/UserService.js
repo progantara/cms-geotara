@@ -1,9 +1,9 @@
 import axios from "axios";
 import { getAccessToken } from "./AuthService";
 
-export const getAllArticle = () => {
-  return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel`, {
+export const getAllUser = () => {
+	return axios
+		.get(`http://127.0.0.1:8000/api/master/user`, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -11,9 +11,9 @@ export const getAllArticle = () => {
     })
 }
 
-export const getArticle = (id) => {
+export const getUser = (id) => {
   return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .get(`http://127.0.0.1:8000/api/master/user/` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -21,9 +21,9 @@ export const getArticle = (id) => {
     })
 };
 
-export const createArticle = (article) => {
+export const createUser = (user) => {
   return axios
-    .post(`http://127.0.0.1:8000/api/master/artikel`, article, {
+    .post(`http://127.0.0.1:8000/api/master/auth/register`, user, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -32,9 +32,9 @@ export const createArticle = (article) => {
     })
 };
 
-export const updateArticle = (id, article) => {
+export const updateUser = (id, user) => {
   return axios
-    .put(`http://127.0.0.1:8000/api/master/artikel` + id, article, {
+    .put(`http://127.0.0.1:8000/api/master/user/` + id, user, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -43,9 +43,9 @@ export const updateArticle = (id, article) => {
     })
 };
 
-export const deleteArticle = (id) => {
+export const deleteUser = (id) => {
   return axios
-    .delete(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .delete(`http://127.0.0.1:8000/api/master/user/` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
