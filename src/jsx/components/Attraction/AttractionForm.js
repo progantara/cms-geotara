@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-class RestaurantForm extends Component {
+class AttractionForm extends Component {
 	render() {
 		return (
 			<div className="h-80">
@@ -9,7 +9,7 @@ class RestaurantForm extends Component {
 					<div className="col-xl-12 col-xxl-12">
 						<div className="card">
 							<div className="card-header">
-								<h4 className="card-title">Form Restaurant</h4>
+								<h4 className="card-title">Form Attraction</h4>
 							</div>
 							<div className="card-body">
 								<div className="summernote">
@@ -201,4 +201,4 @@ class RestaurantForm extends Component {
 	}
 }
 
-export default RestaurantForm;
+export default AttractionForm;

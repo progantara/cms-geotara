@@ -3,9 +3,8 @@ import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import DataTable from 'react-data-table-component';
-import Axios from 'axios';
 
-const RestaurantList = () => {
+const TourList = () => {
 	const columns = [
 		{
 			name: 'No',
@@ -67,11 +66,7 @@ const RestaurantList = () => {
 								confirmButtonText: 'Ya, hapus!',
 							}).then((res) => {
 								if (res.isConfirmed) {
-									Swal.fire(
-										'Dihapus!',
-										'Restaurant telah dihapus.',
-										'success'
-									);
+									Swal.fire('Dihapus!', 'Tour telah dihapus.', 'success');
 								}
 							})
 						}
@@ -145,35 +140,6 @@ const RestaurantList = () => {
 		},
 	};
 
-	// 	const { jobList, setJobList } = useContext(JobContext);
-
-	// useEffect(() => {
-	// 	const fetchData = async () => {
-	// 		const res = await axios.get(`https://dev-example.sanbercloud.com/api/job-vacancy`);
-	// 		setJobList(
-	// 			res.data.data.map((item) => {
-	// 				return {
-	// 					id: item.id,
-	// 					title: item.title,
-	// 					job_description: item.job_description,
-	// 					job_qualification: item.job_qualification,
-	// 					job_type: item.job_type,
-	// 					job_tenure: item.job_tenure,
-	// 					job_status: item.job_status,
-	// 					price: item.price,
-	// 					company_name: item.company_name,
-	// 					company_image_url: item.company_image_url,
-	// 					company_city: item.company_city,
-	// 					salary_min: item.salary_min,
-	// 					salary_max: item.salary_max,
-	// 				};
-	// 			})
-	// 		);
-	// 		console.log(res.data);
-	// 	};
-
-	// 	fetchData();
-	// }, [setJobList]);
 	// use effect
 	useEffect(() => {}, []);
 
@@ -181,7 +147,7 @@ const RestaurantList = () => {
 		<div className="col-12">
 			<div className="card">
 				<div className="card-header">
-					<h4 className="card-title">Daftar Restaurant</h4>
+					<h4 className="card-title">Daftar Tour</h4>
 					<Link to="/merchant/tambah">
 						<Button className="me-2" variant="primary btn-rounded">
 							<span className="btn-icon-start text-primary">
@@ -209,4 +175,4 @@ const RestaurantList = () => {
 	);
 };
 
-export default RestaurantList;
+export default TourList;
