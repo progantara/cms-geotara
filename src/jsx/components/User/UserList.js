@@ -97,7 +97,7 @@ const UserList = () => {
 										className="btn btn-danger shadow btn-xs sharp"
 										onClick={() =>
 											Swal.fire({
-												title: "Anda yakin ingin menghapus akomodasi ini?",
+												title: "Anda yakin ingin menghapus pengguna ini?",
 												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
 												icon: "warning",
 												showCancelButton: true,

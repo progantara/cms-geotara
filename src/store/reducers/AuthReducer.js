@@ -58,7 +58,7 @@ export function AuthReducer(state = initialState, action) {
 	if (action.type === LOGIN_FAILED_ACTION) {
 		return {
 			...state,
-			errorMessage: action.payload.name,
+			errorMessage: action.payload.message,
 			successMessage: "",
 			showLoading: false,
 		};

@@ -2,7 +2,7 @@ import React, { Fragment, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import data from "./kotaData.js";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 
 const KotaList = () => {
   const sort = 3;
@@ -89,21 +89,24 @@ const KotaList = () => {
                                       to="#"
                                       className="btn btn-danger shadow btn-xs sharp"
                                       onClick={() =>
-                                        swal({
-                                          title: "Anda yakin ingin menghapus data ini?",
-                                          text:
-                                          "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+                                        Swal.fire({
+                                          title: "Anda yakin ingin menghapus kota ini?",
+                                          text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
                                           icon: "warning",
-                                          buttons: true,
-                                          dangerMode: true,
-                                        }).then((willDelete) => {
-                                          if (willDelete) {
-                                            swal("Data telah dihapus!", {
-                                              icon: "success",
-                                            });
+                                          showCancelButton: true,
+                                          confirmButtonColor: "#3085d6",
+                                          cancelButtonColor: "#d33",
+                                          confirmButtonText: "Ya, hapus!",
+                                        }).then((res) => {
+                                          if (res.isConfirmed) {
+                                            Swal.fire(
+                                              'Dihapus!',
+                                              'Kota telah dihapus.',
+                                              'success'
+                                            )
                                           }
                                         })
-                                      } 
+                                      }
                                     >
                                       <i className="fa fa-trash"></i>
                                     </Link>

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
 
 const EventList = () => {

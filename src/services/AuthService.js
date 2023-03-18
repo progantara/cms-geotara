@@ -1,5 +1,5 @@
 import axios from "axios";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import { loginConfirmedAction, logout } from "../store/actions/AuthActions";
 
 export const login = (email, password) => {
@@ -18,7 +18,8 @@ export const login = (email, password) => {
 export const formatError = (errorResponse) => {
   switch (errorResponse.name) {
     case "Error":
-      swal("Oops", "Login Invalid", "error", { button: "Try Again!" });
+      Swal.fire("Oops", "Login Invalid", "error", { button: "Try Again!" });
+      console.log(errorResponse)
       return errorResponse;
 
     default:

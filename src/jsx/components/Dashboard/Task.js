@@ -1,7 +1,7 @@
 import React, { useState} from 'react';
 import { Link} from 'react-router-dom';
 import {Dropdown, Modal} from 'react-bootstrap';
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import {nanoid} from 'nanoid';
 //Images
 //import data from './../Boltz/Task/Postpage.json';
@@ -109,7 +109,7 @@ const PostPage = () => {
             const newContacts = [...contacts, newContact];
             setContacts(newContacts);
             setPostModal(false);
-            swal('Good job!', 'Successfully Added', "success");
+            Swal.fire('Good job!', 'Successfully Added', "success");
             addFormData.Cust_Name = addFormData.Location = addFormData.Date_Join = '';         
             
         }else{

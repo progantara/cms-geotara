@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
+import { getAllAccomodation } from "../../../services/AccomodationService";
 
 const AccomodationList = () => {
 	const [data, setData] = useState([]);
@@ -67,7 +68,7 @@ const AccomodationList = () => {
 	// use effect
 	useEffect(() => {
 		setIsLoading(true);
-		getAllAkomodasi()
+		getAllAccomodation()
 			.then((res) => {
 				res.data.data.map((item, index) => {
 					setData((data) => [
@@ -95,17 +96,21 @@ const AccomodationList = () => {
 										to="#"
 										className="btn btn-danger shadow btn-xs sharp"
 										onClick={() =>
-											swal({
+											Swal.fire({
 												title: "Anda yakin ingin menghapus akomodasi ini?",
 												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
 												icon: "warning",
-												buttons: true,
-												dangerMode: true,
-											}).then((willDelete) => {
-												if (willDelete) {
-													swal("Akomodasi telah dihapus!", {
-														icon: "success",
-													});
+												showCancelButton: true,
+												confirmButtonColor: "#3085d6",
+												cancelButtonColor: "#d33",
+												confirmButtonText: "Ya, hapus!",
+											}).then((res) => {
+												if (res.isConfirmed) {
+													Swal.fire(
+														'Dihapus!',
+														'Akomodasi telah dihapus.',
+														'success'
+													)
 												}
 											})
 										}
