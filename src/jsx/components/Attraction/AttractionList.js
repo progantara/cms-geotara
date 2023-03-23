@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import DataTable from 'react-data-table-component';
 
-const MerchantList = () => {
+const AttractionList = () => {
 	const columns = [
 		{
 			name: 'No',
@@ -66,7 +66,11 @@ const MerchantList = () => {
 								confirmButtonText: 'Ya, hapus!',
 							}).then((res) => {
 								if (res.isConfirmed) {
-									Swal.fire('Dihapus!', 'Merchant telah dihapus.', 'success');
+									Swal.fire(
+										'Dihapus!',
+										'Attraction telah dihapus.',
+										'success'
+									);
 								}
 							})
 						}
@@ -147,7 +151,7 @@ const MerchantList = () => {
 		<div className="col-12">
 			<div className="card">
 				<div className="card-header">
-					<h4 className="card-title">Daftar Merchant</h4>
+					<h4 className="card-title">Daftar Attraction</h4>
 					<Link to="/merchant/tambah">
 						<Button className="me-2" variant="primary btn-rounded">
 							<span className="btn-icon-start text-primary">
@@ -175,4 +179,4 @@ const MerchantList = () => {
 	);
 };
 
-export default MerchantList;
+export default AttractionList;

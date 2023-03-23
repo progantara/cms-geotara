@@ -1,12 +1,12 @@
 export const showLoadingBar = () => ({
-  type: 'SHOW_LOADING_BAR',
+	type: 'SHOW_LOADING_BAR',
 });
 
 export const hideLoadingBar = () => ({
-  type: 'HIDE_LOADING_BAR',
+	type: 'HIDE_LOADING_BAR',
 });
 
 export const setLoadingProgress = (progress) => ({
-  type: 'SET_LOADING_PROGRESS',
-  payload: progress,
+	type: 'SET_LOADING_PROGRESS',
+	payload: progress,
 });
