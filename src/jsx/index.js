@@ -35,7 +35,6 @@ import Error500 from "./pages/Error500";
 import Error503 from "./pages/Error503";
 import { ThemeContext } from "../context/ThemeContext";
 import Section from "./components/Section";
-import ViewList from "./components/360/ViewList";
 import { useSelector } from "react-redux";
 import { ConnectedRouter } from "connected-react-router";
 import { history } from "../store/store";
@@ -54,6 +53,9 @@ const KotaForm = React.lazy(() => import("./components/Lokasi/Kota/KotaForm"));
 // Virtual Tour
 const VirtualTourViewEditor = React.lazy(() =>
 	import("./components/VirtualTour/VirtualTourViewEditor")
+);
+const VirtualTourViewList = React.lazy(() =>
+	import("./components/VirtualTour/VirtualTourViewList")
 );
 
 // Publikasi
@@ -115,7 +117,7 @@ const Markup = () => {
 
 		/// Virtual Tour
 		{ url: "virtual-tour/editor", component: VirtualTourViewEditor },
-		{ url: "360/view", component: ViewList },
+		{ url: "virtual-tour/view", component: VirtualTourViewList },
 
 		/// Publikasi
 		{ url: "artikel", component: Article },
