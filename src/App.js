@@ -1,21 +1,21 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect } from 'react';
 
 /// Components
-import Index from "./jsx";
-import { connect, useDispatch } from "react-redux";
-import { Route, Switch, withRouter } from "react-router-dom";
+import Index from './jsx';
+import { connect, useDispatch } from 'react-redux';
+import { Route, Switch, withRouter } from 'react-router-dom';
 // action
-import { checkAutoLogin } from "./services/AuthService";
-import { isAuthenticated } from "./store/selectors/AuthSelectors";
+import { checkAutoLogin } from './services/AuthService';
+import { isAuthenticated } from './store/selectors/AuthSelectors';
 /// Style
-import "./vendor/bootstrap-select/dist/css/bootstrap-select.min.css";
-import "./vendor/datatables/css/dataTables.min.css";
-import "./css/style.css";
+import './vendor/bootstrap-select/dist/css/bootstrap-select.min.css';
+import './vendor/datatables/css/dataTables.min.css';
+import './css/style.css';
 
-const ForgotPassword = lazy(() => import("./jsx/pages/ForgotPassword"));
+const ForgotPassword = lazy(() => import('./jsx/pages/ForgotPassword'));
 const Login = lazy(() => {
 	return new Promise((resolve) => {
-		setTimeout(() => resolve(import("./jsx/pages/Login")), 500);
+		setTimeout(() => resolve(import('./jsx/pages/Login')), 500);
 	});
 });
 

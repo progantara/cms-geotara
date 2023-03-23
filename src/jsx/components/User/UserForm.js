@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
-import { createUser, getUser, updateUser } from "../../../services/UserService";
+import React, { useEffect, useState } from 'react';
+import { Link, useHistory, useParams } from 'react-router-dom';
+import { createUser, getUser, updateUser } from '../../../services/UserService';
 
 export default function UserForm() {
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [passwordConfirmation, setPasswordConfirmation] = useState("");
-	const [role, setRole] = useState("");
-	const [error, setError] = useState("");
+	const [name, setName] = useState('');
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [passwordConfirmation, setPasswordConfirmation] = useState('');
+	const [role, setRole] = useState('');
+	const [error, setError] = useState('');
 	const history = useHistory();
 
 	const { id } = useParams();
 
-	let title = "Tambah Pengguna";
-	let button = "Simpan";
+	let title = 'Tambah Pengguna';
+	let button = 'Simpan';
 	if (id !== undefined) {
-		title = "Edit Pengguna";
-		button = "Update";
+		title = 'Edit Pengguna';
+		button = 'Update';
 	}
 
 	const handleCreate = (e) => {
@@ -30,11 +30,11 @@ export default function UserForm() {
 			role,
 		})
 			.then((res) => {
-				swal("Berhasil!", "Pengguna berhasil ditambahkan", "success");
-				history.push("/pengguna");
+				swal('Berhasil!', 'Pengguna berhasil ditambahkan', 'success');
+				history.push('/pengguna');
 			})
 			.catch((err) => {
-				swal("Gagal!", "Pengguna gagal ditambahkan", "error");
+				swal('Gagal!', 'Pengguna gagal ditambahkan', 'error');
 			});
 	};
 
@@ -46,11 +46,11 @@ export default function UserForm() {
 			role,
 		})
 			.then((res) => {
-				swal("Berhasil!", "Pengguna berhasil diupdate", "success");
-				history.push("/pengguna");
+				swal('Berhasil!', 'Pengguna berhasil diupdate', 'success');
+				history.push('/pengguna');
 			})
 			.catch((err) => {
-				swal("Gagal!", "Pengguna gagal diupdate", "error");
+				swal('Gagal!', 'Pengguna gagal diupdate', 'error');
 			});
 	};
 
@@ -85,7 +85,13 @@ export default function UserForm() {
 										className="form-control"
 										placeholder="Masukkan Nama"
 										value={name}
-										onChange={(e) => setName(e.target.value)}
+										onChange={(e) =>
+											setName(
+												e
+													.target
+													.value
+											)
+										}
 									/>
 								</div>
 								<div className="form-group mb-3 col-md-6">
@@ -95,20 +101,32 @@ export default function UserForm() {
 										className="form-control"
 										placeholder="Masukkan Email"
 										value={email}
-										onChange={(e) => setEmail(e.target.value)}
+										onChange={(e) =>
+											setEmail(
+												e
+													.target
+													.value
+											)
+										}
 									/>
 								</div>
 								{id === undefined ? (
-								<div className="form-group mb-3 col-md-6">
-									<label>Kata Sandi</label>
-									<input
-										type="password"
-										className="form-control"
-										placeholder="Masukkan Password"
-										value={password}
-										onChange={(e) => setPassword(e.target.value)}
-									/>
-								</div>
+									<div className="form-group mb-3 col-md-6">
+										<label>Kata Sandi</label>
+										<input
+											type="password"
+											className="form-control"
+											placeholder="Masukkan Password"
+											value={password}
+											onChange={(e) =>
+												setPassword(
+													e
+														.target
+														.value
+												)
+											}
+										/>
+									</div>
 								) : null}
 								{id === undefined ? (
 									<div className="form-group mb-3 col-md-6">
@@ -117,7 +135,13 @@ export default function UserForm() {
 											type="password"
 											className="form-control"
 											placeholder="Masukkan Kata Sandi Kembali"
-											onChange={(e) => setPasswordConfirmation(e.target.value)}
+											onChange={(e) =>
+												setPasswordConfirmation(
+													e
+														.target
+														.value
+												)
+											}
 										/>
 									</div>
 								) : null}
@@ -126,17 +150,27 @@ export default function UserForm() {
 								<div className="form-group mb-3 col-md-4">
 									<label>Peran</label>
 									<select
-										defaultValue={"option"}
+										defaultValue={'option'}
 										id="inputState"
 										className="form-control"
-										onChange={(e) => setRole(e.target.value)}
+										onChange={(e) =>
+											setRole(
+												e
+													.target
+													.value
+											)
+										}
 									>
 										<option value="option" disabled>
 											Pilih Peran...
 										</option>
 										<option value="admin">Admin</option>
-										<option value="writer">Penulis Konten</option>
-										<option value="visitor">Pengunjung</option>
+										<option value="writer">
+											Penulis Konten
+										</option>
+										<option value="visitor">
+											Pengunjung
+										</option>
 									</select>
 								</div>
 							</div>
