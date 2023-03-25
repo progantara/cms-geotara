@@ -20,6 +20,7 @@ export const getRestaurant = (id) => {
 };
 
 export const createRestaurant = (restaurant) => {
+	console.log(restaurant);
 	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/restoran/`, restaurant, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
