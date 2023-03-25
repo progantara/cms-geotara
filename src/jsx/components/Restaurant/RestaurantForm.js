@@ -85,14 +85,20 @@ export default function UserForm() {
 		console.log(inputResturant);
 	};
 
-	const handleDateChange = (time, fieldName) => {
-		const selectedTime = time.toLocaleTimeString('en-US');
+	const handleDateChange = (date, type) => {
+		const options = {
+			hour12: false,
+			timeZone: 'Asia/Jakarta',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+		};
+		const selectedTime = date.toLocaleString('id-ID', options);
+		console.log(selectedTime); // tambahkan log untuk memastikan format yang dihasilkan benar
 		setInputRestaurant((prevInput) => ({
 			...prevInput,
-			[fieldName]: selectedTime,
+			[type]: selectedTime,
 		}));
-		// alert(fieldName + ' ' + selectedTime);
-		console.log(inputResturant);
 	};
 
 	const handleCreate = (e) => {
@@ -376,7 +382,9 @@ export default function UserForm() {
 															<TimePicker
 																name="jam_buka"
 																value={
-																	new Date()
+																	inputResturant.jam_buka
+																		? inputResturant.jam_buka
+																		: new Date()
 																}
 																onChange={(
 																	time
@@ -386,6 +394,7 @@ export default function UserForm() {
 																		'jam_buka'
 																	)
 																}
+																format="HH:mm:ss a"
 															/>
 														</MuiPickersUtilsProvider>
 													</div>
@@ -402,7 +411,9 @@ export default function UserForm() {
 															<TimePicker
 																name="jam_tutup"
 																value={
-																	new Date()
+																	inputResturant.jam_tutup
+																		? inputResturant.jam_tutup
+																		: new Date()
 																}
 																onChange={(
 																	time
@@ -412,6 +423,7 @@ export default function UserForm() {
 																		'jam_tutup'
 																	)
 																}
+																format="HH:mm:ss a"
 															/>
 														</MuiPickersUtilsProvider>
 													</div>
