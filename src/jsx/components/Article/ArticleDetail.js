@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Rte from "./ArticleRte";
+import Select from "react-select";
 
 const ArticleDetail = () => {
-  const { banner, setBanner } = useState("");
-  const { judul, setJudul } = useState("");
-  const { konten, setKonten } = useState("");
+	const { banner, setBanner } = useState("");
+	const { judul, setJudul } = useState("");
+	const { konten, setKonten } = useState("");
 
 	return (
 		<div className="h-80">
@@ -30,7 +30,7 @@ const ArticleDetail = () => {
 									</div>
 								</div>
 								<div className="form-group">
-									<label>Judul Artikel</label>
+									<label>Judul</label>
 									<input
 										type="text"
 										className="form-control mb-3"
@@ -38,11 +38,21 @@ const ArticleDetail = () => {
 										value={judul}
 									/>
 								</div>
+								<div className="form-group">
+									<label>Tag</label>
+									<Select
+										closeMenuOnSelect={false}
+										components={{ ClearIndicator }}
+										styles={{ clearIndicator: ClearIndicatorStyles }}
+										defaultValue={[colourOptions[4], colourOptions[5]]}
+										isMulti
+										options={colourOptions}
+									/>
+								</div>
 							</div>
 							<div className="summernote">
 								<div className="form-group">
 									<label>Konten</label>
-									<Rte />
 								</div>
 							</div>
 						</div>

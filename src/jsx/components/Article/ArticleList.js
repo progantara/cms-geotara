@@ -1,18 +1,22 @@
 /**
  * TODO:
- * 1. Buat fungsi untuk mengambil data author by ID
- * 2. Buat fungsi untuk mem-format tanggal
+ * 
  */
 
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
-import { getAllArticle } from "../../../services/ArticleService";
+import { deleteArticle, getAllArticle } from "../../../services/ArticleService";
 import ClipLoader from "react-spinners/ClipLoader";
+import moment from "moment";
+import "moment/locale/id";
+import { getUser } from "../../../services/UserService";
+moment.locale("id");
 
 const ArticleList = () => {
+	const history = useHistory();
 	const [data, setData] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -21,30 +25,30 @@ const ArticleList = () => {
 			name: "No",
 			selector: (row) => row.no,
 			sortable: true,
-      width: '10%',
+			width: "10%",
 		},
 		{
 			name: "Judul",
 			selector: (row) => row.title,
 			sortable: true,
-      width: '30%',
+			width: "30%",
 		},
 		{
 			name: "Penulis",
 			selector: (row) => row.writer,
 			sortable: true,
-      width: '20%',
+			width: "20%",
 		},
 		{
 			name: "Tanggal Publikasi",
 			selector: (row) => row.publication_date,
 			sortable: true,
-      width: '20%',
+			width: "20%",
 		},
 		{
 			name: "Aksi",
 			selector: (row) => row.action,
-      width: '20%',
+			width: "20%",
 		},
 	];
 
@@ -78,62 +82,76 @@ const ArticleList = () => {
 		getAllArticle()
 			.then((res) => {
 				res.data.data.map((item, index) => {
-					setData((data) => [
-						...data,
-						{
-							id: item._id,
-							no: index + 1,
-							title: item.judul,
-							writer: item.author_id,
-							publication_date: item.created_at,
-							action: (
-								<div className="d-flex">
-									<Link
-										to={`/artikel/detail/${item._id}`}
-										className="btn btn-primary shadow btn-xs sharp me-1"
-									>
-										<i className="fas fa-eye"></i>
-									</Link>
-									<Link
-										to={`/artikel/edit/${item._id}`}
-										className="btn btn-secondary shadow btn-xs sharp me-1"
-									>
-										<i className="fas fa-pen"></i>
-									</Link>
-									<Link
-										to="#"
-										className="btn btn-danger shadow btn-xs sharp"
-										onClick={() =>
-											Swal.fire({
-												title: "Anda yakin ingin menghapus artikel ini?",
-												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-												icon: "warning",
-												showCancelButton: true,
-												confirmButtonColor: "#3085d6",
-												cancelButtonColor: "#d33",
-												confirmButtonText: "Ya, hapus!",
-											}).then((res) => {
-												if (res.isConfirmed) {
-													Swal.fire(
-														'Dihapus!',
-														'Artikel telah dihapus.',
-														'success'
-													)
+					getUser(item.author_id)
+						.then((user) => {
+							setData((data) => [
+								...data,
+								{
+									id: item._id,
+									no: index + 1,
+									title: item.judul,
+									writer: user.data.data.name,
+									publication_date: moment(item.created_at).format("LL"),
+									action: (
+										<div className="d-flex">
+											<Link
+												to={`/artikel/detail/${item._id}`}
+												className="btn btn-primary shadow btn-xs sharp me-1"
+											>
+												<i className="fas fa-eye"></i>
+											</Link>
+											<Link
+												to={`/artikel/edit/${item._id}`}
+												className="btn btn-secondary shadow btn-xs sharp me-1"
+											>
+												<i className="fas fa-pen"></i>
+											</Link>
+											<Link
+												to="#"
+												className="btn btn-danger shadow btn-xs sharp"
+												onClick={() =>
+													Swal.fire({
+														title: "Anda yakin ingin menghapus artikel ini?",
+														text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+														icon: "warning",
+														showCancelButton: true,
+														confirmButtonColor: "#3085d6",
+														cancelButtonColor: "#d33",
+														confirmButtonText: "Ya, hapus!",
+													}).then((res) => {
+														if (res.isConfirmed) {
+															deleteArticle(item._id)
+																.then((res) => {
+																	Swal.fire(
+																		"Dihapus!",
+																		"Artikel telah dihapus.",
+																		"success"
+																	);
+																	history.push("/artikel");
+																})
+																.catch((err) => {
+																	Swal.fire("Gagal!", "Artikel gagal dihapus", "error");
+																});
+														}
+													})
 												}
-											})
-										}
-									>
-										<i className="fa fa-trash"></i>
-									</Link>
-								</div>
-							),
-						},
-					]);
+											>
+												<i className="fa fa-trash"></i>
+											</Link>
+										</div>
+									),
+								},
+							]);
+							setIsLoading(false);
+						})
+						.catch((errUser) => {
+							Swal.fire('Gagal!', 'Artikel gagal dimuat, silahkan refresh', 'error');
+							setIsLoading(false);
+						});
 				});
-				setIsLoading(false);
 			})
 			.catch((err) => {
-				console.log(err);
+				Swal.fire('Gagal!', 'Artikel gagal dimuat', 'error');
 				setIsLoading(false);
 			});
 	}, []);

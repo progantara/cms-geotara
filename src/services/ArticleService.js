@@ -13,7 +13,7 @@ export const getAllArticle = () => {
 
 export const getArticle = (id) => {
   return axios
-    .get(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .get(`http://127.0.0.1:8000/api/master/artikel/` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -27,25 +27,25 @@ export const createArticle = (article) => {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Content-Type": "multipart/form-data"
       },
     })
 };
 
 export const updateArticle = (id, article) => {
   return axios
-    .put(`http://127.0.0.1:8000/api/master/artikel` + id, article, {
+    .post(`http://127.0.0.1:8000/api/master/artikel/` + id, article, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Content-Type": "multipart/form-data"
       },
     })
 };
 
 export const deleteArticle = (id) => {
   return axios
-    .delete(`http://127.0.0.1:8000/api/master/artikel` + id, {
+    .delete(`http://127.0.0.1:8000/api/master/artikel/` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
