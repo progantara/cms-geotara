@@ -3,7 +3,8 @@ import { Button } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
-import { getAllTourismPlace } from "../../../services/TourismPlaceService";
+import { deleteTourismPlace, getAllTourismPlace } from "../../../services/TourismPlaceService";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const WisataList = () => {
 	const history = useHistory();
@@ -19,83 +20,26 @@ const WisataList = () => {
 		},
 		{
 			name: "Nama",
-			selector: (row) => row.nama,
+			selector: (row) => row.name,
 			sortable: true,
 			width: "25%",
 		},
 		{
 			name: "Kategori",
-			selector: (row) => row.kategori,
+			selector: (row) => row.category,
 			sortable: true,
 			width: "15%",
 		},
 		{
 			name: "Lokasi",
-			selector: (row) => row.lokasi,
+			selector: (row) => row.location,
 			sortable: true,
 			width: "25%",
 		},
 		{
 			name: "Aksi",
-			selector: (row) => row.aksi,
+			selector: (row) => row.action,
 			width: "25%",
-		},
-	];
-
-	const dummy = [
-		{
-			id: 1,
-			no: "1",
-			nama: "Curug Sodong",
-			kategori: "Curug",
-			lokasi: "Bandung, Jawa Barat",
-			aksi: (
-				<div className="d-flex">
-					<Link
-						to="/wisata/detail/1"
-						className="btn btn-primary shadow btn-xs me-1"
-					>
-						<i className="fas fa-eye"></i>
-					</Link>
-					<Link
-						to="/wisata/edit/1"
-						className="btn btn-secondary shadow btn-xs me-1"
-					>
-						<i className="fas fa-pen"></i>
-					</Link>
-					<Link
-						to="#"
-						className="btn btn-danger shadow btn-xs me-1"
-						onClick={() =>
-							Swal.fire({
-								title: "Anda yakin ingin menghapus wisata ini?",
-								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-								icon: "warning",
-								showCancelButton: true,
-								confirmButtonColor: "#3085d6",
-								cancelButtonColor: "#d33",
-								confirmButtonText: "Ya, hapus!",
-							}).then((res) => {
-								if (res.isConfirmed) {
-									Swal.fire(
-										'Dihapus!',
-										'Wisata telah dihapus.',
-										'success'
-									)
-								}
-							})
-						}
-					>
-						<i className="fa fa-trash"></i>
-					</Link>
-					<Link
-						to="#"
-						className="btn btn-info shadow btn-xs me-1"
-						>
-						V-Tour
-					</Link>
-				</div>
-			),
 		},
 	];
 
@@ -129,76 +73,74 @@ const WisataList = () => {
 		getAllTourismPlace()
 			.then((res) => {
 				res.data.data.map((item, index) => {
-					getUser(item.author_id)
-						.then((user) => {
-							setData((data) => [
-								...data,
-								{
-									id: item._id,
-									no: index + 1,
-									title: item.judul,
-									writer: user.data.data.name,
-									publication_date: moment(item.created_at).format("LL"),
-									action: (
-										<div className="d-flex">
-											<Link
-												to={`/wisata/detail/${item._id}`}
-												className="btn btn-primary shadow btn-xs sharp me-1"
-											>
-												<i className="fas fa-eye"></i>
-											</Link>
-											<Link
-												to={`/wisata/edit/${item._id}`}
-												className="btn btn-secondary shadow btn-xs sharp me-1"
-											>
-												<i className="fas fa-pen"></i>
-											</Link>
-											<Link
-												to="#"
-												className="btn btn-danger shadow btn-xs sharp"
-												onClick={() =>
-													Swal.fire({
-														title: "Anda yakin ingin menghapus wisata ini?",
-														text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-														icon: "warning",
-														showCancelButton: true,
-														confirmButtonColor: "#3085d6",
-														cancelButtonColor: "#d33",
-														confirmButtonText: "Ya, hapus!",
-													}).then((res) => {
-														if (res.isConfirmed) {
-															deleteArticle(item._id)
-																.then((res) => {
-																	Swal.fire(
-																		"Dihapus!",
-																		"Wisata telah dihapus.",
-																		"success"
-																	);
-																	history.push("/wisata");
-																})
-																.catch((err) => {
-																	Swal.fire("Gagal!", "Wisata gagal dihapus", "error");
-																});
-														}
-													})
+					setData((data) => [
+						...data,
+						{
+							id: item._id,
+							no: index + 1,
+							name: item.nama,
+							category: item.kategori,
+							location: item.lokasi.alamat,
+							action: (
+								<div className="d-flex">
+									<Link
+										to={`/wisata/detail/${item._id}`}
+										className="btn btn-primary shadow btn-xs sharp me-1"
+									>
+										<i className="fas fa-eye"></i>
+									</Link>
+									<Link
+										to={`/wisata/edit/${item._id}`}
+										className="btn btn-secondary shadow btn-xs sharp me-1"
+									>
+										<i className="fas fa-pen"></i>
+									</Link>
+									<Link
+										to="#"
+										className="btn btn-danger shadow btn-xs sharp"
+										onClick={() =>
+											Swal.fire({
+												title: "Anda yakin ingin menghapus wisata ini?",
+												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+												icon: "warning",
+												showCancelButton: true,
+												confirmButtonColor: "#3085d6",
+												cancelButtonColor: "#d33",
+												confirmButtonText: "Ya, hapus!",
+											}).then((res) => {
+												if (res.isConfirmed) {
+													deleteTourismPlace(item._id)
+														.then((res) => {
+															setData(data.filter((item) => item.id !== res.data.data._id));
+															Swal.fire(
+																"Dihapus!",
+																"Wisata telah dihapus.",
+																"success"
+															);
+															history.push("/wisata");
+														})
+														.catch((err) => {
+															Swal.fire(
+																"Gagal!",
+																"Wisata gagal dihapus",
+																"error"
+															);
+														});
 												}
-											>
-												<i className="fa fa-trash"></i>
-											</Link>
-										</div>
-									),
-								},
-							]);
-							setIsLoading(false);
-						})
-						.catch((errUser) => {
-							Swal.fire('Gagal!', 'Wisata gagal dimuat, silahkan refresh', 'error');
-							setIsLoading(false);
-						});
+											})
+										}
+									>
+										<i className="fa fa-trash"></i>
+									</Link>
+								</div>
+							),
+						},
+					]);
+					setIsLoading(false);
 				});
 			})
 			.catch((err) => {
-				Swal.fire('Gagal!', 'Wisata gagal dimuat', 'error');
+				Swal.fire("Gagal!", "Wisata gagal dimuat", "error");
 				setIsLoading(false);
 			});
 	}, []);
@@ -226,6 +168,14 @@ const WisataList = () => {
 								pagination
 								paginationPerPage={5}
 								customStyles={customStyles}
+								progressPending={isLoading}
+								progressComponent={
+									<ClipLoader
+										color={"#20c997"}
+										loading={isLoading}
+										aria-label="Loading Spinner"
+									/>
+								}
 							/>
 						</div>
 					</div>

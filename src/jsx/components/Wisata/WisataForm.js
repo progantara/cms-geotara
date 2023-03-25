@@ -1,116 +1,539 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import DropFile from "./DropFile";
-import MaterialTime from "./MaterialTime";
+// TODO:
+// 1. Dapatin lat long dari Maps -> OpenLayer
+// 2. Dapatin id desa dari Database
 
-class WisataForm extends Component {
-   render() {
-      return (
-         <div className="h-80">
-            <div className="row">
-               <div className="col-xl-12 col-xxl-12">
-                  <div className="card">
-                     <div className="card-header">
-                        <h4 className="card-title">Tambah Wisata</h4>
-                     </div>
-                     <div className="card-body">
-                        <div className="summernote">
-                           <div className="card">
-                              <div className="card-body">
-                                 <div className="basic-form">
-                                    <form onSubmit={(e) => e.preventDefault()}>
-                                       <div className="row">
-                                          <label>Cover</label>
-                                          <DropFile />
-                                          <div className="form-group mb-3 col-md-6">
-                                             <label>Nama</label>
-                                             <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Masukkan Nama"
-                                             />
-                                          </div>
-                                          <div className="form-group mb-3 col-md-6">
-                                             <label>Kategori</label>
-                                             <select
-                                                defaultValue={"option"}
-                                                id="inputKategori"
-                                                className="form-control"
-                                             >
-                                                <option value="option" disabled>
-                                                   Pilih Kategori
-                                                </option>
-                                                <option>Option 1</option>
-                                                <option>Option 2</option>
-                                                <option>Option 3</option>
-                                             </select>
-                                          </div>
-                                          <div className="form-group mb-6">
-                                             <label>Deskripsi</label>
-                                             <textarea
-                                                className="form-control"
-                                                placeholder="Masukkan Deskripsi"
-                                                id="description"
-                                             ></textarea>
-                                          </div> 
-                                       </div>
-                                       <div className="row">
-                                          <div className="col-xl-2 col-xxl-6 col-md-4 mb-3">
-                                             <label>Waktu Mulai</label>
-                                             <MaterialTime />
-                                          </div>
-                                          <div className="col-xl-3 col-xxl-6 col-md-4 mb-3">
-                                             <label>Waktu Akhir</label>
-                                             <MaterialTime />
-                                          </div>
-                                       </div>
-                                       <div className="row">
-                                          <div className="form-group mb-3 col-md-6">
-                                             <label>Kota</label>
-                                             <select
-                                                defaultValue={"option"}
-                                                id="inputKota"
-                                                className="form-control"
-                                             >
-                                                <option value="option" disabled>
-                                                   Pilih Kota
-                                                </option>
-                                                <option>Option 1</option>
-                                                <option>Option 2</option>
-                                                <option>Option 3</option>
-                                             </select>
-                                          </div>
-                                          <div className="form-group mb-3 col-md-6">
-                                             <label>Provinsi</label>
-                                             <select
-                                                defaultValue={"option"}
-                                                id="inputProvinsi"
-                                                className="form-control"
-                                             >
-                                                <option value="option" disabled>
-                                                   Pilih Provinsi
-                                                </option>
-                                                <option>Option 1</option>
-                                                <option>Option 2</option>
-                                                <option>Option 3</option>
-                                             </select>
-                                          </div>
-                                       </div>
-                                       <Link to="/wisata-table">
-                                          <button type="submit" className="btn btn-primary">Submit</button>
-                                       </Link>
-                                    </form>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      );
-   }
-}
+import React, { Component, useCallback, useEffect, useState } from "react";
+import { Link, useHistory, useParams } from "react-router-dom";
+import MaterialTime from "./MaterialTime";
+import "react-dropzone-uploader/dist/styles.css";
+import { checkImageResolution } from "../../../utils/checkImageWidth";
+import Select from "react-select";
+import { currencyFormatter } from "../../../utils/stringFormatter";
+import { TimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import { fromLonLat, toLonLat } from "ol/proj";
+import "ol/ol.css";
+import { RControl, RLayerTile, RMap, ROSM } from "rlayers";
+import { createTourismPlace, getTourismPlace, updateTourismPlace } from "../../../services/TourismPlaceService";
+import { format } from "date-fns";
+import Swal from "sweetalert2";
+
+const kategoriOption = [{ value: "alam", label: "Wisata", color: "#00B8D9" }];
+
+const subkategoriOption = [
+	{ value: "pantai", label: "Pantai", color: "#00B8D9" },
+	{ value: "curug", label: "Curug", color: "#00B8D9" },
+];
+
+const ClearIndicator = (props) => {
+	const {
+		children = "clear all",
+		getStyles,
+		innerProps: { ref, ...restInnerProps },
+	} = props;
+	return (
+		<div
+			{...restInnerProps}
+			ref={ref}
+			style={getStyles("clearIndicator", props)}
+		>
+			<div style={{ padding: "0px 5px" }}>{children}</div>
+		</div>
+	);
+};
+
+const ClearIndicatorStyles = (base, state) => ({
+	...base,
+	cursor: "pointer",
+	color: state.isFocused ? "blue" : "black",
+});
+
+const WisataForm = () => {
+	const history = useHistory();
+	const { id } = useParams();
+
+	let title = "Tambah Wisata";
+	let button = "Tambah";
+	if (id !== undefined) {
+		title = "Edit Wisata";
+		button = "Perbarui";
+	}
+
+	const [thumbnailPreview, setThumbnailPreview] = useState("");
+	const [thumbnail, setThumbnail] = useState("");
+	const [nama, setNama] = useState("");
+	const [deskripsi, setDeskripsi] = useState("");
+	const [kategori, setKategori] = useState([]);
+	const [subkategori, setSubkategori] = useState([]);
+	const [hargaTiket, setHargaTiket] = useState("");
+	const [isActive, setIsActive] = useState();
+	const [jamOperasional, setJamOperasional] = useState([
+		{
+			mulai: "",
+			akhir: "",
+			hari: "Senin",
+		},
+	]);
+	const [lokasi, setLokasi] = useState({
+		lat: "",
+		long: "",
+		desa_id: "",
+		alamat: "",
+	});
+
+	const handleCreate = (e) => {
+		e.preventDefault();
+		const data = new FormData();
+		data.append("nama", nama);
+		data.append("deskripsi", deskripsi);
+		kategori
+			.map((item) => item.value)
+			.forEach((item, index) => {
+				data.append(`kategori[${index}]`, item);
+			});
+		subkategori
+			.map((item) => item.value)
+			.forEach((item, index) => {
+				data.append(`sub_kategori[${index}]`, item);
+			});
+		data.append("harga_tiket", hargaTiket);
+		data.append("is_active", isActive);
+		jamOperasional.forEach((item, index) => {
+			data.append(`jam_operasional[${index}][hari]`, item.hari);
+			data.append(`jam_operasional[${index}][mulai]`, item.mulai);
+			data.append(`jam_operasional[${index}][akhir]`, item.akhir);
+		});
+		data.append("lat", lokasi.lat);
+		data.append("long", lokasi.long);
+		data.append("desa_id", lokasi.desa_id);
+		data.append("alamat", lokasi.alamat);
+		data.append("thumbnail", thumbnail);
+		createTourismPlace(data)
+			.then((res) => {
+				Swal.fire("Berhasil!", "Wisata berhasil ditambahkan", "success");
+				history.push("/wisata");
+			})
+			.catch((err) => {
+				Swal.fire("Gagal!", "Wisata gagal ditambahkan", "error");
+			});
+	};
+
+	const handleUpdate = (e) => {
+		e.preventDefault();
+		const data = new FormData();
+		data.append("nama", nama);
+		data.append("deskripsi", deskripsi);
+		kategori
+			.map((item) => item.value)
+			.forEach((item, index) => {
+				data.append(`kategori[${index}]`, item);
+			});
+		subkategori
+			.map((item) => item.value)
+			.forEach((item, index) => {
+				data.append(`sub_kategori[${index}]`, item);
+			});
+		data.append("harga_tiket", hargaTiket);
+		data.append("is_active", isActive);
+		jamOperasional.forEach((item, index) => {
+			data.append(`jam_operasional[${index}][hari]`, item.hari);
+			data.append(`jam_operasional[${index}][mulai]`, item.mulai);
+			data.append(`jam_operasional[${index}][akhir]`, item.akhir);
+		});
+		data.append("lat", lokasi.lat);
+		data.append("long", lokasi.long);
+		data.append("desa_id", lokasi.desa_id);
+		data.append("alamat", lokasi.alamat);
+		if(thumbnail !== "") data.append("thumbnail", thumbnail);
+		updateTourismPlace(id, data)
+			.then((res) => {
+				Swal.fire("Berhasil!", "Wisata berhasil diperbarui", "success");
+				history.push("/wisata");
+			})
+			.catch((err) => {
+				Swal.fire("Gagal!", "Wisata gagal diperbarui", "error");
+			});
+	};
+
+   useEffect(() => {
+		if (id !== undefined) {
+			getTourismPlace(id)
+				.then((res) => {
+               console.log(res)
+               setNama(res.data.data.nama);
+               setDeskripsi(res.data.data.deskripsi);
+               setKategori(
+                  res.data.data.kategori.map((item) => ({
+                     value: item.id,
+                     label: item.nama,
+                  }))
+               );
+               setSubkategori(
+                  res.data.data.sub_kategori.map((item) => ({
+                     value: item.id,
+                     label: item.nama,
+                  }))
+               );
+               setHargaTiket(res.data.data.harga_tiket);
+               setIsActive(res.data.data.is_active);
+               setJamOperasional(
+                  res.data.data.jam_operasional.map((item) => ({
+                     mulai: item.mulai,
+                     akhir: item.akhir,
+                     hari: item.hari,
+                  }))
+               );
+               setLokasi({
+                  lat: res.data.data.lat,
+                  long: res.data.data.long,
+                  desa_id: res.data.data.desa_id,
+                  alamat: res.data.data.alamat,
+               });
+               setThumbnailPreview(res.data.data.thumbnail);
+				})
+				.catch((err) => {
+               console.log(err)
+					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+						history.push("/wisata");
+					});
+				});
+		}
+	}, [id]);
+
+	return (
+		<div className="h-80">
+			<div className="row">
+				<div className="col-xl-12 col-xxl-12">
+					<div className="card">
+						<div className="card-header">
+							<h4 className="card-title">{title}</h4>
+						</div>
+						<div className="card-body">
+							<div className="basic-form">
+								<form onSubmit={id !== undefined ? handleUpdate : handleCreate}>
+									<div className="row">
+										<div className="form-group mb-3">
+											<label>Nama Wisata</label>
+											<input
+												type="text"
+												className="form-control"
+												placeholder="Masukkan nama wisata"
+												value={nama}
+												onChange={(e) => setNama(e.target.value)}
+											/>
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-3">
+											<label>Cover</label>
+											<div className="input-group">
+												<div className="form-file">
+													<input
+														type="file"
+														className="custom-file-input form-control"
+														accept="image/*"
+														onChange={(event) => {
+															checkImageResolution(event.target.files[0])
+																.then((res) => {
+																	setThumbnail(event.target.files[0]);
+																})
+																.catch((err) => {
+																	console.log(err);
+																});
+														}}
+													/>
+												</div>
+												<span className="input-group-text">Upload</span>
+											</div>
+											{thumbnailPreview != "" && (
+												<img
+													src={
+														"http://127.0.0.1:8000/storage/wisata/" +
+														thumbnailPreview
+													}
+													alt="banner"
+													className="img-fluid border border-2 border-dark rounded-3"
+													style={{
+														width: "40%",
+														height: "auto",
+													}}
+												/>
+											)}
+											{thumbnail != "" && (
+												<img
+													src={URL.createObjectURL(thumbnail)}
+													alt="banner"
+													className="img-fluid border border-2 border-dark rounded-3"
+													style={{
+														width: "40%",
+														height: "auto",
+													}}
+												/>
+											)}
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-3">
+											<label>Deskripsi</label>
+											<textarea
+												className="form-control"
+												rows="2"
+												value={deskripsi}
+												onChange={(e) => {
+													setDeskripsi(e.target.value);
+												}}
+											></textarea>
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-3">
+											<label>Kategori</label>
+											<Select
+												closeMenuOnSelect={false}
+												components={{ ClearIndicator }}
+												styles={{ clearIndicator: ClearIndicatorStyles }}
+												value={kategori}
+												onChange={(e) => {
+													setKategori(e);
+												}}
+												isMulti
+												options={kategoriOption}
+											/>
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-3">
+											<label>Sub Kategori</label>
+											<Select
+												closeMenuOnSelect={false}
+												components={{ ClearIndicator }}
+												styles={{ clearIndicator: ClearIndicatorStyles }}
+												value={subkategori}
+												onChange={(e) => {
+													setSubkategori(e);
+												}}
+												isMulti
+												options={subkategoriOption}
+											/>
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-3 col-md-6">
+											<label>Harga</label>
+											<input
+												type="text"
+												className="form-control"
+												placeholder="Masukkan harga tiket"
+												value={hargaTiket}
+												onChange={(e) => setHargaTiket(e.target.value)}
+											/>
+										</div>
+										<div className="form-group mb-3 col-md-6">
+											<label>Status Aktif</label>
+											<select
+												value={isActive}
+												className="form-control"
+												onChange={(e) => setIsActive(e.target.value)}
+											>
+												<option value={""}>Pilih Status</option>
+												<option value={1}>Aktif</option>
+												<option value={0}>Tidak Aktif</option>
+											</select>
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-3 col-md-4">
+											<label>Desa</label>
+											<select
+												value={lokasi.desa_id}
+												onChange={(e) =>
+													setLokasi({ ...lokasi, desa_id: e.target.value })
+												}
+												className="form-control"
+											>
+												<option value="option">Pilih Desa</option>
+												<option value={"1101012001"}>KEUDE BAKONGAN</option>
+												<option value={"1101012002"}>UJONG MANGKI</option>
+											</select>
+										</div>
+										<div className="form-group mb-3 col-md-8">
+											<label>Alamat</label>
+											<textarea
+												className="form-control"
+												rows="2"
+												value={lokasi.alamat}
+												onChange={(e) =>
+													setLokasi({ ...lokasi, alamat: e.target.value })
+												}
+											></textarea>
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-3 col-md-3">
+											<div>
+												<label>Longitude</label>
+												<input
+													type="text"
+													className="form-control mb-3"
+													placeholder="Pilih pada peta"
+													value={lokasi.long}
+													disabled
+												/>
+											</div>
+											<div>
+												<label>Latitude</label>
+												<input
+													type="text"
+													className="form-control mb-3"
+													placeholder="Pilih pada peta"
+													value={lokasi.lat}
+													disabled
+												/>
+											</div>
+										</div>
+										<div className="form-group mb-3 col-md-9">
+											<RMap
+												width={"100%"}
+												height={"60vh"}
+												initial={{
+													center: fromLonLat([107.448914, -7.100948]),
+													zoom: 11,
+												}}
+												noDefaultControls={true}
+												onClick={useCallback((e) => {
+													const coords = e.map.getCoordinateFromPixel(e.pixel);
+													const lonlat = toLonLat(coords);
+													setLokasi({
+														...lokasi,
+														long: lonlat[0],
+														lat: lonlat[1],
+													});
+												}, [])}
+											>
+												<ROSM />
+												<RControl.RScaleLine />
+												<RControl.RAttribution />
+												<RControl.RZoom />
+												<RControl.RZoomSlider />
+											</RMap>
+										</div>
+									</div>
+									<hr />
+									{jamOperasional.map((item, index) => {
+										return (
+											<div className="row" key={index}>
+												<div className="col-md-4 mb-3">
+													<label>Hari</label>
+													<input
+														type="text"
+														className="form-control mb-3"
+														placeholder="Masukkan hari"
+														value={item.hari || ""}
+														onChange={(e) => {
+															console.log(lokasi);
+															let newJamOperasional = [...jamOperasional];
+															newJamOperasional[index].hari = e.target.value;
+															setJamOperasional(newJamOperasional);
+														}}
+													/>
+												</div>
+												<div className="col-md-3 mb-3">
+													<label>Waktu Buka</label>
+													<MuiPickersUtilsProvider utils={DateFnsUtils}>
+														<TimePicker
+															autoOk
+															label=""
+															value={
+																item.mulai
+																	? new Date(`01/01/1970 ${item.mulai}`)
+																	: null
+															}
+															onChange={(e) => {
+																const selectedTime =
+																	e instanceof Date ? e : new Date();
+																const newJamOperasional = [...jamOperasional];
+																newJamOperasional[index].mulai = format(
+																	selectedTime,
+																	"HH:mm"
+																);
+																setJamOperasional(newJamOperasional);
+															}}
+														/>
+													</MuiPickersUtilsProvider>
+												</div>
+												<div className="col-md-3 mb-3">
+													<label>Waktu Tutup</label>
+													<MuiPickersUtilsProvider utils={DateFnsUtils}>
+														<TimePicker
+															autoOk
+															label=""
+															value={
+																item.akhir
+																	? new Date(`01/01/1970 ${item.akhir}`)
+																	: null
+															}
+															onChange={(e) => {
+																const selectedTime =
+																	e instanceof Date ? e : new Date();
+																const newJamOperasional = [...jamOperasional];
+																newJamOperasional[index].akhir = format(
+																	selectedTime,
+																	"HH:mm"
+																);
+																setJamOperasional(newJamOperasional);
+															}}
+														/>
+													</MuiPickersUtilsProvider>
+												</div>
+												{index ? (
+													<div className="col-md-2 mb-3">
+														<button
+															type="button"
+															className="btn btn-danger mt-3"
+															onClick={() => {
+																let newJamOperasional = [...jamOperasional];
+																newJamOperasional.splice(index, 1);
+																setJamOperasional(newJamOperasional);
+															}}
+														>
+															<i className="fa fa-trash color-danger"></i>
+														</button>
+													</div>
+												) : null}
+											</div>
+										);
+									})}
+									<button
+										type="button"
+										className="me-2 btn btn-info"
+										onClick={() => {
+											setJamOperasional([
+												...jamOperasional,
+												{ hari: "", mulai: "", akhir: "" },
+											]);
+										}}
+									>
+										<span className="btn-icon-start text-info">
+											<i className="fa fa-plus color-info"></i>
+										</span>
+										Add
+									</button>
+									<button type="submit" className="btn btn-primary me-2">
+										{button}
+									</button>
+									<Link to="/wisata">
+										<button type="button" className="btn btn-warning">
+											Kembali
+										</button>
+									</Link>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
 
 export default WisataForm;

@@ -12,7 +12,7 @@ import {
 import Swal from "sweetalert2";
 import { capitalizeEachFirstLetter } from "../../../utils/stringFormatter";
 
-const colourOptions = [
+const tagsOption = [
 	{ value: "wisata", label: "Wisata", color: "#00B8D9" },
 	{ value: "indonesia", label: "Indonesia", color: "#0052CC" },
 ];
@@ -233,7 +233,7 @@ const ArticleForm = () => {
 												setTag(e);
 											}}
 											isMulti
-											options={colourOptions}
+											options={tagsOption}
 										/>
 									</div>
 								</div>

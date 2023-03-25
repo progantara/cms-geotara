@@ -13,7 +13,7 @@ export const getAllTourismPlace = () => {
 
 export const getTourismPlace = (id) => {
   return axios
-    .get(`http://127.0.0.1:8000/api/master/wisata` + id, {
+    .get(`http://127.0.0.1:8000/api/master/wisata/` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json"
@@ -34,7 +34,7 @@ export const createTourismPlace = (tourismPlace) => {
 
 export const updateTourismPlace = (id, tourismPlace) => {
   return axios
-    .post(`http://127.0.0.1:8000/api/master/wisata` + id, tourismPlace, {
+    .post(`http://127.0.0.1:8000/api/master/wisata/` + id, tourismPlace, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
@@ -45,7 +45,7 @@ export const updateTourismPlace = (id, tourismPlace) => {
 
 export const deleteTourismPlace = (id) => {
   return axios
-    .delete(`http://127.0.0.1:8000/api/master/wisata` + id, {
+    .delete(`http://127.0.0.1:8000/api/master/wisata/` + id, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
