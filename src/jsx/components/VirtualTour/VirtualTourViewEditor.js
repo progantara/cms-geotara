@@ -1,23 +1,49 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import PageTitle from "../../layouts/PageTitle";
 import ReactPannellum, {
-	getConfig,
-	getPitch,
 	mouseEventToCoords,
 	addHotSpot,
 	removeHotSpot,
 } from "react-pannellum";
+import styled from "styled-components";
 import Sample360 from "../../../images/360/1.jpg";
 
+const ContextMenu = styled.div`
+  border-radius: 4px;
+  box-sizing: border-box;
+  position: absolute;
+  width: 200px;
+  background-color: #383838;
+  box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.1);
+  ul {
+    list-style-type: none;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 10px;
+  }
+  ul li {
+    padding: 18px 12px;
+    border-radius: 4px;
+  }
+  ul li:hover {
+    cursor: pointer;
+    background-color: #4b4b4b;
+  }
+`;
+
+const ContextMenuProps = styled(ContextMenu)`
+  ${({ top, left }) => css`
+    top: ${top}px;
+    left: ${left}px;
+  `}
+`;
+
 const VirtualTourViewEditor = () => {
-	const panImage = useRef();
+	const [showContextMenu, setShowContextMenu] = useState(false);
 	const [mouseCoord, setMouseCoord] = useState(false);
 
-	const click = (event) => {
-		console.log(getPitch());
-	};
-
 	const [spotInfo, setSpotInfo] = useState({
+		type: "",
 		pitch: 0,
 		yaw: 0,
 		text: "",
@@ -39,6 +65,7 @@ const VirtualTourViewEditor = () => {
 		hotSpots: spotList,
 		compass: true,
 		showFullscreenCtrl: false,
+		escapeHTML: true,
 	};
 
 	const handleChange = (event) => {
@@ -69,12 +96,13 @@ const VirtualTourViewEditor = () => {
 												defaultValue={spotInfo.type}
 												className="form-control"
 												name="type"
+												onChange={handleChange}
 											>
-												<option value="option" disabled>
-													Choose...
+												<option>
+													Pilih...
 												</option>
-												<option value="info">Info</option>
-												<option value="custom">Custom</option>
+												<option value="scene">Transition</option>
+												<option value="info">Information</option>
 											</select>
 										</div>
 									</div>
@@ -90,32 +118,36 @@ const VirtualTourViewEditor = () => {
 												onChange={handleChange}
 											/>
 										</div>
-										<div className="form-group mb-3 col-md-12">
-											<label>Go To an URL</label>
-											<input
-												type="text"
-												className="form-control"
-												name="URL"
-												placeholder="https://"
-												value={spotInfo.URL}
-												onChange={handleChange}
-											/>
-										</div>
-										<div className="form-group mb-3 col-md-12">
-											<label>Go To a View</label>
-											<select
-												defaultValue={"option"}
-												className="form-control"
-												name="view"
-											>
-												<option value="option" disabled>
-													Choose...
-												</option>
-												<option value="">Info</option>
-												<option value="">Transition</option>
-												<option value="">Option 3</option>
-											</select>
-										</div>
+										{spotInfo.type === "info" && (
+											<div className="form-group mb-3 col-md-12">
+												<label>Go To an URL</label>
+												<input
+													type="text"
+													className="form-control"
+													name="URL"
+													placeholder="https://"
+													value={spotInfo.URL}
+													onChange={handleChange}
+												/>
+											</div>
+										)}
+										{spotInfo.type === "scene" && (
+											<div className="form-group mb-3 col-md-12">
+												<label>Go To a View</label>
+												<select
+													defaultValue={"option"}
+													className="form-control"
+													name="view"
+												>
+													<option value="option" disabled>
+														Choose...
+													</option>
+													<option value="">Info</option>
+													<option value="">Transition</option>
+													<option value="">Option 3</option>
+												</select>
+											</div>
+										)}
 									</div>
 									<div className="row">
 										<div className="form-group mb-3 col-md-6">
@@ -146,10 +178,11 @@ const VirtualTourViewEditor = () => {
 										onClick={(event) => {
 											addHotSpot({
 												id: 2,
-												type: "info",
+												type: "scene",
 												pitch: -107,
 												yaw: 31,
-												text: "Facebook",
+												text: "Change Scene",
+												sceneId: "2",
 												// URL: "https://gitlab.com",
 											});
 											addHotSpot({
@@ -164,10 +197,11 @@ const VirtualTourViewEditor = () => {
 												...spotList,
 												{
 													id: 2,
-													type: "info",
+													type: "scene",
 													pitch: -107,
 													yaw: 31,
-													text: "Facebook",
+													text: "Change Scene",
+													sceneId: "2",
 													// URL: "https://gitlab.com",
 												},
 												{
@@ -197,8 +231,8 @@ const VirtualTourViewEditor = () => {
 						</div>
 						<div className="card-body">
 							<ReactPannellum
-								ref={panImage}
 								id="1"
+								type="equirectangular"
 								sceneId="firstScene"
 								imageSource={Sample360}
 								style={{
@@ -211,14 +245,14 @@ const VirtualTourViewEditor = () => {
 									setMouseCoord({
 										x: coord[0],
 										y: coord[1],
-									})
+									});
 								}}
 								onPanoramaMouseUp={(event) => {
 									const coord = mouseEventToCoords(event);
 									const diffX = mouseCoord.x - coord[0];
 									const diffY = mouseCoord.y - coord[1];
 
-									if(diffX === 0 && diffY === 0) {
+									if (diffX === 0 && diffY === 0) {
 										if (event.which === 1) {
 											let coord = mouseEventToCoords(event);
 											addHotSpot({
@@ -229,19 +263,97 @@ const VirtualTourViewEditor = () => {
 												text: "Facebook",
 												clickHandlerArgs: { id: spotList.length + 1 },
 												clickHandlerFunc: (evt, args) => {
-													if(evt.which === 1) {
-														removeHotSpot(args.id)
+													console.log(evt)
+													if (evt.which === 1) {
+														removeHotSpot(args.id);
 														// TODO: Left Click to Edit Hotspot
 														// TODO: Delete Hotspot from SpotList State
 													}
 													// TODO: Right Click to Delete Hotspot
-												}
+												},
 												// URL: "https://gitlab.com",
 											});
 										}
 									}
 								}}
-							/>
+							>
+								{showContextMenu && <ContextMenu/>}
+								<div
+									style={{
+										position: "absolute",
+										bottom: "0",
+										zIndex: "2",
+										textAlign: "center",
+										width: "100%",
+										paddingBottom: "3px",
+									}}
+								>
+									<div
+										id="pan-up"
+										style={{
+											padding: "8px 5px",
+											width: "30px",
+											textAlign: "center",
+											background: "rgba(200, 200, 200, 0.8)",
+											display: "inline-block",
+											cursor: "pointer",
+											"&:hover": {
+												background: "rgba(200, 200, 200, 1)",
+											},
+										}}
+									>
+										&#9650;
+									</div>
+									<div
+										id="pan-up"
+										style={{
+											padding: "8px 5px",
+											width: "30px",
+											textAlign: "center",
+											background: "rgba(200, 200, 200, 0.8)",
+											display: "inline-block",
+											cursor: "pointer",
+											"&:hover": {
+												background: "rgba(200, 200, 200, 1)",
+											},
+										}}
+									>
+										&#9660;
+									</div>
+									<div
+										id="pan-up"
+										style={{
+											padding: "8px 5px",
+											width: "30px",
+											textAlign: "center",
+											background: "rgba(200, 200, 200, 0.8)",
+											display: "inline-block",
+											cursor: "pointer",
+											"&:hover": {
+												background: "rgba(200, 200, 200, 1)",
+											},
+										}}
+									>
+										&#9664;
+									</div>
+									<div
+										id="pan-up"
+										style={{
+											padding: "8px 5px",
+											width: "30px",
+											textAlign: "center",
+											background: "rgba(200, 200, 200, 0.8)",
+											display: "inline-block",
+											cursor: "pointer",
+											"&:hover": {
+												background: "rgba(200, 200, 200, 1)",
+											},
+										}}
+									>
+										&#9654;
+									</div>
+								</div>
+							</ReactPannellum>
 						</div>
 					</div>
 				</div>

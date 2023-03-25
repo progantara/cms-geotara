@@ -27,18 +27,18 @@ export const createTourismPlace = (tourismPlace) => {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Content-Type": "multipart/form-data"
       },
     })
 };
 
 export const updateTourismPlace = (id, tourismPlace) => {
   return axios
-    .put(`http://127.0.0.1:8000/api/master/wisata` + id, tourismPlace, {
+    .post(`http://127.0.0.1:8000/api/master/wisata` + id, tourismPlace, {
       headers: {
         'Authorization': `Bearer ${getAccessToken()}`,
         "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Content-Type": "multipart/form-data"
       },
     })
 };

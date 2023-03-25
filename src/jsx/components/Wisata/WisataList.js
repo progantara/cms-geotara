@@ -1,10 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
+import { getAllTourismPlace } from "../../../services/TourismPlaceService";
 
 const WisataList = () => {
+	const history = useHistory();
+	const [data, setData] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+
 	const columns = [
 		{
 			name: "No",
@@ -37,7 +42,7 @@ const WisataList = () => {
 		},
 	];
 
-	const data = [
+	const dummy = [
 		{
 			id: 1,
 			no: "1",
@@ -119,7 +124,84 @@ const WisataList = () => {
 	};
 
 	// use effect
-	useEffect(() => {}, []);
+	useEffect(() => {
+		setIsLoading(true);
+		getAllTourismPlace()
+			.then((res) => {
+				res.data.data.map((item, index) => {
+					getUser(item.author_id)
+						.then((user) => {
+							setData((data) => [
+								...data,
+								{
+									id: item._id,
+									no: index + 1,
+									title: item.judul,
+									writer: user.data.data.name,
+									publication_date: moment(item.created_at).format("LL"),
+									action: (
+										<div className="d-flex">
+											<Link
+												to={`/wisata/detail/${item._id}`}
+												className="btn btn-primary shadow btn-xs sharp me-1"
+											>
+												<i className="fas fa-eye"></i>
+											</Link>
+											<Link
+												to={`/wisata/edit/${item._id}`}
+												className="btn btn-secondary shadow btn-xs sharp me-1"
+											>
+												<i className="fas fa-pen"></i>
+											</Link>
+											<Link
+												to="#"
+												className="btn btn-danger shadow btn-xs sharp"
+												onClick={() =>
+													Swal.fire({
+														title: "Anda yakin ingin menghapus wisata ini?",
+														text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+														icon: "warning",
+														showCancelButton: true,
+														confirmButtonColor: "#3085d6",
+														cancelButtonColor: "#d33",
+														confirmButtonText: "Ya, hapus!",
+													}).then((res) => {
+														if (res.isConfirmed) {
+															deleteArticle(item._id)
+																.then((res) => {
+																	Swal.fire(
+																		"Dihapus!",
+																		"Wisata telah dihapus.",
+																		"success"
+																	);
+																	history.push("/wisata");
+																})
+																.catch((err) => {
+																	Swal.fire("Gagal!", "Wisata gagal dihapus", "error");
+																});
+														}
+													})
+												}
+											>
+												<i className="fa fa-trash"></i>
+											</Link>
+										</div>
+									),
+								},
+							]);
+							setIsLoading(false);
+						})
+						.catch((errUser) => {
+							Swal.fire('Gagal!', 'Wisata gagal dimuat, silahkan refresh', 'error');
+							setIsLoading(false);
+						});
+				});
+			})
+			.catch((err) => {
+				Swal.fire('Gagal!', 'Wisata gagal dimuat', 'error');
+				setIsLoading(false);
+			});
+	}, []);
 
 	return (
 		<div className="col-12">
