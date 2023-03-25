@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import MaterialTime from './MaterialTime';
 import Swal from 'sweetalert2';
 import { useHistory, useParams } from 'react-router-dom';
 import { createRestaurant, getRestaurant, updateRestaurant } from '../../../services/RestaurantService';
@@ -13,7 +12,6 @@ export default function UserForm() {
 
 	const [desa, setDesa] = useState([]);
 	const [inputResturant, setInputRestaurant] = useState({
-		_id: '',
 		banner_image: '',
 		nama: '',
 		lat: '',
@@ -27,10 +25,10 @@ export default function UserForm() {
 		jam_tutup: '',
 	});
 
-	let title = 'Tambah Pengguna';
+	let title = 'Tambah Restaurant';
 	let button = 'Simpan';
 	if (id !== undefined) {
-		title = 'Edit Pengguna';
+		title = 'Edit Restaurant';
 		button = 'Update';
 	}
 
@@ -43,18 +41,42 @@ export default function UserForm() {
 		if (id !== undefined) {
 			getRestaurant(id)
 				.then((res) => {
-					setName(res.data.data.name);
-					setEmail(res.data.data.email);
-					setRole(res.data.data.role);
+					// alert(res.data.data);
+					let data = res.data.data;
+					setInputRestaurant({
+						nama: data.nama,
+						lat: data.lokasi.lat,
+						long: data.lokasi.long,
+						desa_id: data.lokasi.desa_id,
+						alamat: data.lokasi.alamat,
+						no_telp: data.no_telp,
+						email: data.email,
+						rating: data.rating,
+						jam_buka: data.jam_buka,
+						jam_tutup: data.jam_tutup,
+					});
+					// console.log(inputResturant);
 				})
 				.catch((err) => {
-					setError(err);
+					Swal.fire('Gagal!', 'Restaurant gagal dimuat', 'error').then(() => {
+						history.push('/restaurant');
+					});
 				});
 		}
 	}, [id, setDesa]);
 
 	const handleChange = (e) => {
 		const value = e.target.value;
+		setInputRestaurant({
+			...inputResturant,
+			[e.target.name]: value,
+		});
+		// alert(value + ' ' + e.target.name);
+		console.log(inputResturant);
+	};
+
+	const handleImageChange = (e) => {
+		const value = e.target.files[0];
 		setInputRestaurant({
 			...inputResturant,
 			[e.target.name]: value,
@@ -75,19 +97,19 @@ export default function UserForm() {
 
 	const handleCreate = (e) => {
 		e.preventDefault();
-		createRestaurant({
-			banner_image: inputResturant.banner_image,
-			nama: inputResturant.nama,
-			lat: inputResturant.lat,
-			long: inputResturant.long,
-			desa_id: inputResturant.desa_id,
-			alamat: inputResturant.alamat,
-			no_telp: inputResturant.no_telp,
-			email: inputResturant.email,
-			rating: inputResturant.rating,
-			jam_buka: inputResturant.jam_buka,
-			jam_tutup: inputResturant.jam_tutup,
-		})
+		let data = new FormData();
+		data.append('banner_image', inputResturant.banner_image);
+		data.append('nama', inputResturant.nama);
+		data.append('lat', inputResturant.lat);
+		data.append('long', inputResturant.long);
+		data.append('desa_id', inputResturant.desa_id);
+		data.append('alamat', inputResturant.alamat);
+		data.append('no_telp', inputResturant.no_telp);
+		data.append('email', inputResturant.email);
+		data.append('rating', inputResturant.rating);
+		data.append('jam_buka', inputResturant.jam_buka);
+		data.append('jam_tutup', inputResturant.jam_tutup);
+		createRestaurant(data)
 			.then((res) => {
 				Swal.fire('Berhasil!', 'Restaurant berhasil ditambahkan', 'success');
 				history.push('/restaurant');
@@ -100,17 +122,31 @@ export default function UserForm() {
 
 	const handleUpdate = (e) => {
 		e.preventDefault();
-		updateRestaurant(id, {
-			name,
-			email,
-			role,
-		})
+		let data = new FormData();
+		data.append('_method', 'put');
+		if (inputResturant.banner_image !== '') data.append('banner_image', inputResturant.banner_image);
+		data.append('nama', inputResturant.nama);
+		data.append('lat', inputResturant.lat);
+		data.append('long', inputResturant.long);
+		data.append('desa_id', inputResturant.desa_id);
+		data.append('alamat', inputResturant.alamat);
+		data.append('no_telp', inputResturant.no_telp);
+		data.append('email', inputResturant.email);
+		data.append('rating', inputResturant.rating);
+		data.append('jam_buka', inputResturant.jam_buka);
+		data.append('jam_tutup', inputResturant.jam_tutup);
+
+		// for (const [key, value] of data.entries()) {
+		// 	console.log(key + ': ' + value);
+		// }
+		updateRestaurant(id, data)
 			.then((res) => {
-				swal('Berhasil!', 'Pengguna berhasil diupdate', 'success');
-				history.push('/pengguna');
+				Swal.fire('Berhasil!', 'Restaurant berhasil diubah', 'success');
+				history.push('/restaurant');
 			})
 			.catch((err) => {
-				swal('Gagal!', 'Pengguna gagal diupdate', 'error');
+				Swal.fire('Gagal!', 'Restaurant gagal diubah.', 'error');
+				console.log(err);
 			});
 	};
 
@@ -146,11 +182,9 @@ export default function UserForm() {
 																type="file"
 																className="form-file-input form-control"
 																name="banner_image"
+																accept="image/*"
 																onChange={
-																	handleChange
-																}
-																value={
-																	inputResturant.banner_image
+																	handleImageChange
 																}
 															/>
 														</div>
@@ -213,10 +247,11 @@ export default function UserForm() {
 															Desa
 														</label>
 														<select
-															defaultValue={
-																'option'
+															value={
+																inputResturant.desa_id
+																	? inputResturant.desa_id
+																	: 'option'
 															}
-															id="inputState"
 															className="form-control"
 															name="desa_id"
 															onChange={
