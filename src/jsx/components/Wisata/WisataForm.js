@@ -1,10 +1,8 @@
 // TODO:
-// 1. Dapatin lat long dari Maps -> OpenLayer
-// 2. Dapatin id desa dari Database
+// 1. Dapatin id desa dari Database
 
-import React, { Component, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
-import MaterialTime from "./MaterialTime";
 import "react-dropzone-uploader/dist/styles.css";
 import { checkImageResolution } from "../../../utils/checkImageWidth";
 import Select from "react-select";
@@ -13,7 +11,7 @@ import { TimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import { fromLonLat, toLonLat } from "ol/proj";
 import "ol/ol.css";
-import { RControl, RLayerTile, RMap, ROSM } from "rlayers";
+import { RControl, RMap, ROSM } from "rlayers";
 import { createTourismPlace, getTourismPlace, updateTourismPlace } from "../../../services/TourismPlaceService";
 import { format } from "date-fns";
 import Swal from "sweetalert2";
@@ -71,7 +69,7 @@ const WisataForm = () => {
 		{
 			mulai: "",
 			akhir: "",
-			hari: "Senin",
+			hari: "",
 		},
 	]);
 	const [lokasi, setLokasi] = useState({

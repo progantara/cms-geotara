@@ -2,6 +2,7 @@
   "name": "cms-geotara",
   "version": "0.1.0",
   "private": true,
+  "publicUrl": "/",
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
     "@fullcalendar/core": "^5.4.0",

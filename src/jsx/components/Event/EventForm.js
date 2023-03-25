@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import MaterialTime from "./MaterialTime";
 import { Link } from "react-router-dom";
-import DropFile from "../Wisata/DropFile";
 
 class EventForm extends Component {
    render() {
@@ -21,7 +20,7 @@ class EventForm extends Component {
                                     <form onSubmit={(e) => e.preventDefault()}>
                                        <div className="row">
                                           <label>Cover</label>
-                                          <DropFile />
+                                          
                                           <div className="form-group mb-3 col-md-6">
                                              <label>Judul</label>
                                              <input
