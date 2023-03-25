@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import MaterialTime from './MaterialTime';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+import { useHistory, useParams } from 'react-router-dom';
+import { createRestaurant, getRestaurant, updateRestaurant } from '../../../services/RestaurantService';
+import { getAllDesaSelect } from '../../../services/DesaService';
+import { TimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
-export default function RestaurantForm() {
+export default function UserForm() {
 	const history = useHistory();
 	const { id } = useParams();
 
+	const [desa, setDesa] = useState([]);
 	const [inputResturant, setInputRestaurant] = useState({
-		_id: '',
 		banner_image: '',
 		nama: '',
 		lat: '',
@@ -21,12 +25,45 @@ export default function RestaurantForm() {
 		jam_tutup: '',
 	});
 
-	let title = 'Tambah Pengguna';
+	let title = 'Tambah Restaurant';
 	let button = 'Simpan';
 	if (id !== undefined) {
-		title = 'Edit Pengguna';
+		title = 'Edit Restaurant';
 		button = 'Update';
 	}
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await getAllDesaSelect();
+			setDesa(result);
+		};
+		fetchData();
+		if (id !== undefined) {
+			getRestaurant(id)
+				.then((res) => {
+					// alert(res.data.data);
+					let data = res.data.data;
+					setInputRestaurant({
+						nama: data.nama,
+						lat: data.lokasi.lat,
+						long: data.lokasi.long,
+						desa_id: data.lokasi.desa_id,
+						alamat: data.lokasi.alamat,
+						no_telp: data.no_telp,
+						email: data.email,
+						rating: data.rating,
+						jam_buka: data.jam_buka,
+						jam_tutup: data.jam_tutup,
+					});
+					// console.log(inputResturant);
+				})
+				.catch((err) => {
+					Swal.fire('Gagal!', 'Restaurant gagal dimuat', 'error').then(() => {
+						history.push('/restaurant');
+					});
+				});
+		}
+	}, [id, setDesa]);
 
 	const handleChange = (e) => {
 		const value = e.target.value;
@@ -34,33 +71,82 @@ export default function RestaurantForm() {
 			...inputResturant,
 			[e.target.name]: value,
 		});
+		// alert(value + ' ' + e.target.name);
+		console.log(inputResturant);
+	};
+
+	const handleImageChange = (e) => {
+		const value = e.target.files[0];
+		setInputRestaurant({
+			...inputResturant,
+			[e.target.name]: value,
+		});
+		// alert(value + ' ' + e.target.name);
+		console.log(inputResturant);
+	};
+
+	const handleDateChange = (time, fieldName) => {
+		const selectedTime = time.toLocaleTimeString('en-US');
+		setInputRestaurant((prevInput) => ({
+			...prevInput,
+			[fieldName]: selectedTime,
+		}));
+		// alert(fieldName + ' ' + selectedTime);
+		console.log(inputResturant);
 	};
 
 	const handleCreate = (e) => {
 		e.preventDefault();
-		createUser(inputResturant)
+		let data = new FormData();
+		data.append('banner_image', inputResturant.banner_image);
+		data.append('nama', inputResturant.nama);
+		data.append('lat', inputResturant.lat);
+		data.append('long', inputResturant.long);
+		data.append('desa_id', inputResturant.desa_id);
+		data.append('alamat', inputResturant.alamat);
+		data.append('no_telp', inputResturant.no_telp);
+		data.append('email', inputResturant.email);
+		data.append('rating', inputResturant.rating);
+		data.append('jam_buka', inputResturant.jam_buka);
+		data.append('jam_tutup', inputResturant.jam_tutup);
+		createRestaurant(data)
 			.then((res) => {
-				swal('Berhasil!', 'Pengguna berhasil ditambahkan', 'success');
-				history.push('/pengguna');
+				Swal.fire('Berhasil!', 'Restaurant berhasil ditambahkan', 'success');
+				history.push('/restaurant');
 			})
 			.catch((err) => {
-				swal('Gagal!', 'Pengguna gagal ditambahkan', 'error');
+				Swal.fire('Gagal!', 'Restaurant gagal ditambahkan.', 'error');
+				console.log(err);
 			});
 	};
 
 	const handleUpdate = (e) => {
 		e.preventDefault();
-		updateUser(id, {
-			name,
-			email,
-			role,
-		})
+		let data = new FormData();
+		data.append('_method', 'put');
+		if (inputResturant.banner_image !== '') data.append('banner_image', inputResturant.banner_image);
+		data.append('nama', inputResturant.nama);
+		data.append('lat', inputResturant.lat);
+		data.append('long', inputResturant.long);
+		data.append('desa_id', inputResturant.desa_id);
+		data.append('alamat', inputResturant.alamat);
+		data.append('no_telp', inputResturant.no_telp);
+		data.append('email', inputResturant.email);
+		data.append('rating', inputResturant.rating);
+		data.append('jam_buka', inputResturant.jam_buka);
+		data.append('jam_tutup', inputResturant.jam_tutup);
+
+		// for (const [key, value] of data.entries()) {
+		// 	console.log(key + ': ' + value);
+		// }
+		updateRestaurant(id, data)
 			.then((res) => {
-				swal('Berhasil!', 'Pengguna berhasil diupdate', 'success');
-				history.push('/pengguna');
+				Swal.fire('Berhasil!', 'Restaurant berhasil diubah', 'success');
+				history.push('/restaurant');
 			})
 			.catch((err) => {
-				swal('Gagal!', 'Pengguna gagal diupdate', 'error');
+				Swal.fire('Gagal!', 'Restaurant gagal diubah.', 'error');
+				console.log(err);
 			});
 	};
 
@@ -95,6 +181,11 @@ export default function RestaurantForm() {
 															<input
 																type="file"
 																className="form-file-input form-control"
+																name="banner_image"
+																accept="image/*"
+																onChange={
+																	handleImageChange
+																}
 															/>
 														</div>
 													</div>
@@ -156,30 +247,44 @@ export default function RestaurantForm() {
 															Desa
 														</label>
 														<select
-															defaultValue={
-																'option'
+															value={
+																inputResturant.desa_id
+																	? inputResturant.desa_id
+																	: 'option'
 															}
-															id="inputState"
 															className="form-control"
+															name="desa_id"
+															onChange={
+																handleChange
+															}
 														>
 															<option
 																value="option"
 																disabled
 															>
-																Choose...
+																Pilih
+																Desa...
 															</option>
-															<option>
-																Option
-																1
-															</option>
-															<option>
-																Option
-																2
-															</option>
-															<option>
-																Option
-																3
-															</option>
+															{desa.map(
+																(
+																	item
+																) => {
+																	return (
+																		<option
+																			key={
+																				item.kode
+																			}
+																			value={
+																				item.kode
+																			}
+																		>
+																			{
+																				item.nama
+																			}
+																		</option>
+																	);
+																}
+															)}
 														</select>
 													</div>
 													<div className="mb-3 form-group">
@@ -190,6 +295,13 @@ export default function RestaurantForm() {
 															className="form-control"
 															id="alamat"
 															placeholder="Masukkan alamat"
+															name="alamat"
+															onChange={
+																handleChange
+															}
+															value={
+																inputResturant.alamat
+															}
 														></textarea>
 													</div>
 												</div>
@@ -203,6 +315,13 @@ export default function RestaurantForm() {
 															type="text"
 															className="form-control"
 															placeholder="Masukkan nomor telepon"
+															name="no_telp"
+															onChange={
+																handleChange
+															}
+															value={
+																inputResturant.no_telp
+															}
 														/>
 													</div>
 													<div className="mb-3 form-group col-md-4">
@@ -213,6 +332,13 @@ export default function RestaurantForm() {
 															type="email"
 															className="form-control"
 															placeholder="Masukkan email"
+															name="email"
+															onChange={
+																handleChange
+															}
+															value={
+																inputResturant.email
+															}
 														/>
 													</div>
 													<div className="mb-3 form-group col-md-4">
@@ -226,6 +352,13 @@ export default function RestaurantForm() {
 															step="0.5"
 															className="form-control"
 															placeholder="Masukkan rating"
+															name="rating"
+															onChange={
+																handleChange
+															}
+															value={
+																inputResturant.rating
+															}
 														/>
 													</div>
 												</div>
@@ -235,14 +368,52 @@ export default function RestaurantForm() {
 															Jam
 															Buka
 														</label>
-														<MaterialTime />
+														<MuiPickersUtilsProvider
+															utils={
+																DateFnsUtils
+															}
+														>
+															<TimePicker
+																name="jam_buka"
+																value={
+																	new Date()
+																}
+																onChange={(
+																	time
+																) =>
+																	handleDateChange(
+																		time,
+																		'jam_buka'
+																	)
+																}
+															/>
+														</MuiPickersUtilsProvider>
 													</div>
 													<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
 														<label>
 															Jam
 															Tutup
 														</label>
-														<MaterialTime />
+														<MuiPickersUtilsProvider
+															utils={
+																DateFnsUtils
+															}
+														>
+															<TimePicker
+																name="jam_tutup"
+																value={
+																	new Date()
+																}
+																onChange={(
+																	time
+																) =>
+																	handleDateChange(
+																		time,
+																		'jam_tutup'
+																	)
+																}
+															/>
+														</MuiPickersUtilsProvider>
 													</div>
 												</div>
 												{/* <div className="row mb-3">

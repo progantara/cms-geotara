@@ -24,17 +24,17 @@ export const createRestaurant = (restaurant) => {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
-			'Content-Type': 'application/json',
+			'Content-Type': 'multipart/form-data',
 		},
 	});
 };
 
 export const updateRestaurant = (id, restaurant) => {
-	return axios.put(`http://127.0.0.1:8000/api/master/sponsorship/restoran/` + id, restaurant, {
+	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/restoran/` + id, restaurant, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
-			'Content-Type': 'application/json',
+			'Content-Type': 'multipart/form-data',
 		},
 	});
 };

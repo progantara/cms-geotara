@@ -146,11 +146,13 @@ const RestaurantList = () => {
 					]);
 				});
 				setIsLoading(false);
+				console.log(data);
 			})
 			.catch((err) => {
 				console.log(err);
 				setIsLoading(false);
 			});
+		console.log(data);
 	}, [setData]);
 
 	return (
