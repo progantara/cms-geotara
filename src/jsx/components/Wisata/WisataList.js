@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
 import { deleteTourismPlace, getAllTourismPlace } from "../../../services/TourismPlaceService";
 import ClipLoader from "react-spinners/ClipLoader";
+import { capitalizeEachFirstLetter } from "../../../utils/stringFormatter";
 
 const WisataList = () => {
 	const history = useHistory();
@@ -79,12 +80,12 @@ const WisataList = () => {
 							id: item._id,
 							no: index + 1,
 							name: item.nama,
-							category: item.kategori,
-							location: item.lokasi.alamat,
+							category: item.kategori.map((item) => capitalizeEachFirstLetter(item)).join(", "),
+							location: capitalizeEachFirstLetter(item.lokasi.alamat),
 							action: (
 								<div className="d-flex">
 									<Link
-										to={`/wisata/detail/${item._id}`}
+										// to={`/wisata/detail/${item._id}`}
 										className="btn btn-primary shadow btn-xs sharp me-1"
 									>
 										<i className="fas fa-eye"></i>
@@ -111,7 +112,9 @@ const WisataList = () => {
 												if (res.isConfirmed) {
 													deleteTourismPlace(item._id)
 														.then((res) => {
-															setData(data.filter((item) => item.id !== res.data.data._id));
+															console.log(res);
+															console.log(data);
+															setData(data.filter((element) => element._id !== res.data.data._id));
 															Swal.fire(
 																"Dihapus!",
 																"Wisata telah dihapus.",

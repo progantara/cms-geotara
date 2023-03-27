@@ -1,20 +1,25 @@
-// TODO:
-// 1. Dapatin id desa dari Database
-
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
 import "react-dropzone-uploader/dist/styles.css";
 import { checkImageResolution } from "../../../utils/checkImageWidth";
 import Select from "react-select";
-import { currencyFormatter } from "../../../utils/stringFormatter";
+import {
+	capitalizeEachFirstLetter,
+	currencyFormatter,
+} from "../../../utils/stringFormatter";
 import { TimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import { fromLonLat, toLonLat } from "ol/proj";
 import "ol/ol.css";
 import { RControl, RMap, ROSM } from "rlayers";
-import { createTourismPlace, getTourismPlace, updateTourismPlace } from "../../../services/TourismPlaceService";
+import {
+	createTourismPlace,
+	getTourismPlace,
+	updateTourismPlace,
+} from "../../../services/TourismPlaceService";
 import { format } from "date-fns";
 import Swal from "sweetalert2";
+import ReactPannellum from "react-pannellum";
 
 const kategoriOption = [{ value: "alam", label: "Wisata", color: "#00B8D9" }];
 
@@ -72,12 +77,12 @@ const WisataForm = () => {
 			hari: "",
 		},
 	]);
-	const [lokasi, setLokasi] = useState({
-		lat: "",
-		long: "",
-		desa_id: "",
-		alamat: "",
-	});
+	const [lat, setLat] = useState("");
+	const [long, setLong] = useState("");
+	const [desaId, setDesaId] = useState("");
+	const [alamat, setAlamat] = useState("");
+	const [file360, setFile360] = useState("");
+	const [file360Preview, setFile360Preview] = useState("");
 
 	const handleCreate = (e) => {
 		e.preventDefault();
@@ -101,11 +106,12 @@ const WisataForm = () => {
 			data.append(`jam_operasional[${index}][mulai]`, item.mulai);
 			data.append(`jam_operasional[${index}][akhir]`, item.akhir);
 		});
-		data.append("lat", lokasi.lat);
-		data.append("long", lokasi.long);
-		data.append("desa_id", lokasi.desa_id);
-		data.append("alamat", lokasi.alamat);
+		data.append("lat", lat);
+		data.append("long", long);
+		data.append("desa_id", desaId);
+		data.append("alamat", alamat);
 		data.append("thumbnail", thumbnail);
+		data.append("file_360", file360);
 		createTourismPlace(data)
 			.then((res) => {
 				Swal.fire("Berhasil!", "Wisata berhasil ditambahkan", "success");
@@ -119,6 +125,7 @@ const WisataForm = () => {
 	const handleUpdate = (e) => {
 		e.preventDefault();
 		const data = new FormData();
+		data.append("_method", "PUT");
 		data.append("nama", nama);
 		data.append("deskripsi", deskripsi);
 		kategori
@@ -138,11 +145,12 @@ const WisataForm = () => {
 			data.append(`jam_operasional[${index}][mulai]`, item.mulai);
 			data.append(`jam_operasional[${index}][akhir]`, item.akhir);
 		});
-		data.append("lat", lokasi.lat);
-		data.append("long", lokasi.long);
-		data.append("desa_id", lokasi.desa_id);
-		data.append("alamat", lokasi.alamat);
-		if(thumbnail !== "") data.append("thumbnail", thumbnail);
+		data.append("lat", lat);
+		data.append("long", long);
+		data.append("desa_id", desaId);
+		data.append("alamat", alamat);
+		if (thumbnail !== "") data.append("thumbnail", thumbnail);
+		if (file360 !== "") data.append("file360", file360);
 		updateTourismPlace(id, data)
 			.then((res) => {
 				Swal.fire("Berhasil!", "Wisata berhasil diperbarui", "success");
@@ -153,44 +161,47 @@ const WisataForm = () => {
 			});
 	};
 
-   useEffect(() => {
+	useEffect(() => {
 		if (id !== undefined) {
 			getTourismPlace(id)
 				.then((res) => {
-               console.log(res)
-               setNama(res.data.data.nama);
-               setDeskripsi(res.data.data.deskripsi);
-               setKategori(
-                  res.data.data.kategori.map((item) => ({
-                     value: item.id,
-                     label: item.nama,
-                  }))
-               );
-               setSubkategori(
-                  res.data.data.sub_kategori.map((item) => ({
-                     value: item.id,
-                     label: item.nama,
-                  }))
-               );
-               setHargaTiket(res.data.data.harga_tiket);
-               setIsActive(res.data.data.is_active);
-               setJamOperasional(
-                  res.data.data.jam_operasional.map((item) => ({
-                     mulai: item.mulai,
-                     akhir: item.akhir,
-                     hari: item.hari,
-                  }))
-               );
-               setLokasi({
-                  lat: res.data.data.lat,
-                  long: res.data.data.long,
-                  desa_id: res.data.data.desa_id,
-                  alamat: res.data.data.alamat,
-               });
-               setThumbnailPreview(res.data.data.thumbnail);
+					setNama(res.data.data.nama);
+					setDeskripsi(res.data.data.deskripsi);
+					setKategori(
+						res.data.data.kategori.map((item) => {
+							return {
+								value: item,
+								label: capitalizeEachFirstLetter(item),
+								color: "#00B8D9",
+							};
+						})
+					);
+					setSubkategori(
+						res.data.data.sub_kategori.map((item) => {
+							return {
+								value: item,
+								label: capitalizeEachFirstLetter(item),
+								color: "#00B8D9",
+							};
+						})
+					);
+					setHargaTiket(res.data.data.harga_tiket);
+					setIsActive(res.data.data.is_active);
+					setJamOperasional(
+						res.data.data.jam_operasional.map((item) => ({
+							mulai: item.mulai,
+							akhir: item.akhir,
+							hari: item.hari,
+						}))
+					);
+					setLat(res.data.data.lokasi.lat);
+					setLong(res.data.data.lokasi.long);
+					setDesaId(res.data.data.lokasi.desa_id);
+					setAlamat(res.data.data.lokasi.alamat);
+					setThumbnailPreview(res.data.data.thumbnail);
+					setFile360Preview(res.data.data.file360);
 				})
 				.catch((err) => {
-               console.log(err)
 					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
 						history.push("/wisata");
 					});
@@ -210,7 +221,7 @@ const WisataForm = () => {
 							<div className="basic-form">
 								<form onSubmit={id !== undefined ? handleUpdate : handleCreate}>
 									<div className="row">
-										<div className="form-group mb-3">
+										<div className="form-group mb-4">
 											<label>Nama Wisata</label>
 											<input
 												type="text"
@@ -222,7 +233,7 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3">
+										<div className="form-group mb-4">
 											<label>Cover</label>
 											<div className="input-group">
 												<div className="form-file">
@@ -271,7 +282,53 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3">
+										<div className="form-group mb-4">
+											<label>File 360</label>
+											<div className="input-group">
+												<div className="form-file">
+													<input
+														type="file"
+														className="custom-file-input form-control"
+														accept="image/*"
+														onChange={(event) => {
+															setFile360(event.target.files[0]);
+														}}
+													/>
+												</div>
+												<span className="input-group-text">Upload</span>
+											</div>
+											{file360Preview != "" && (
+												<a
+													href={
+														"http://127.0.0.1:8000/storage/wisata/" +
+														file360Preview
+													}
+													target="_blank"
+												>
+													See Preview
+												</a>
+											)}
+											{file360 != "" && (
+												<ReactPannellum
+													id="1"
+													type="equirectangular"
+													sceneId="firstScene"
+													imageSource={URL.createObjectURL(file360)}
+													style={{
+														width: "40%",
+														height: "160px",
+													}}
+													config={{
+														autoLoad: true,
+														showFullscreenCtrl: false,
+														escapeHTML: true,
+													}}
+												></ReactPannellum>
+											)}
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-4">
 											<label>Deskripsi</label>
 											<textarea
 												className="form-control"
@@ -284,7 +341,7 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3">
+										<div className="form-group mb-4">
 											<label>Kategori</label>
 											<Select
 												closeMenuOnSelect={false}
@@ -300,7 +357,7 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3">
+										<div className="form-group mb-4">
 											<label>Sub Kategori</label>
 											<Select
 												closeMenuOnSelect={false}
@@ -316,8 +373,10 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3 col-md-6">
-											<label>Harga</label>
+										<div className="form-group mb-4 col-md-6">
+											<label>
+												Harga {currencyFormatter(hargaTiket, "id-ID")}
+											</label>
 											<input
 												type="text"
 												className="form-control"
@@ -326,7 +385,7 @@ const WisataForm = () => {
 												onChange={(e) => setHargaTiket(e.target.value)}
 											/>
 										</div>
-										<div className="form-group mb-3 col-md-6">
+										<div className="form-group mb-4 col-md-6">
 											<label>Status Aktif</label>
 											<select
 												value={isActive}
@@ -340,13 +399,11 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3 col-md-4">
+										<div className="form-group mb-4 col-md-4">
 											<label>Desa</label>
 											<select
-												value={lokasi.desa_id}
-												onChange={(e) =>
-													setLokasi({ ...lokasi, desa_id: e.target.value })
-												}
+												value={desaId}
+												onChange={(e) => setDesaId(e.target.value)}
 												className="form-control"
 											>
 												<option value="option">Pilih Desa</option>
@@ -354,27 +411,25 @@ const WisataForm = () => {
 												<option value={"1101012002"}>UJONG MANGKI</option>
 											</select>
 										</div>
-										<div className="form-group mb-3 col-md-8">
+										<div className="form-group mb-4 col-md-8">
 											<label>Alamat</label>
 											<textarea
 												className="form-control"
 												rows="2"
-												value={lokasi.alamat}
-												onChange={(e) =>
-													setLokasi({ ...lokasi, alamat: e.target.value })
-												}
+												value={alamat}
+												onChange={(e) => setAlamat(e.target.value)}
 											></textarea>
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3 col-md-3">
+										<div className="form-group mb-4 col-md-3">
 											<div>
 												<label>Longitude</label>
 												<input
 													type="text"
 													className="form-control mb-3"
 													placeholder="Pilih pada peta"
-													value={lokasi.long}
+													value={long}
 													disabled
 												/>
 											</div>
@@ -384,12 +439,12 @@ const WisataForm = () => {
 													type="text"
 													className="form-control mb-3"
 													placeholder="Pilih pada peta"
-													value={lokasi.lat}
+													value={lat}
 													disabled
 												/>
 											</div>
 										</div>
-										<div className="form-group mb-3 col-md-9">
+										<div className="form-group mb-4 col-md-9">
 											<RMap
 												width={"100%"}
 												height={"60vh"}
@@ -401,11 +456,8 @@ const WisataForm = () => {
 												onClick={useCallback((e) => {
 													const coords = e.map.getCoordinateFromPixel(e.pixel);
 													const lonlat = toLonLat(coords);
-													setLokasi({
-														...lokasi,
-														long: lonlat[0],
-														lat: lonlat[1],
-													});
+													setLong(lonlat[0]);
+													setLat(lonlat[1]);
 												}, [])}
 											>
 												<ROSM />
@@ -416,26 +468,24 @@ const WisataForm = () => {
 											</RMap>
 										</div>
 									</div>
-									<hr />
 									{jamOperasional.map((item, index) => {
 										return (
 											<div className="row" key={index}>
-												<div className="col-md-4 mb-3">
+												<div className="col-md-3">
 													<label>Hari</label>
 													<input
 														type="text"
-														className="form-control mb-3"
+														className="form-control"
 														placeholder="Masukkan hari"
 														value={item.hari || ""}
 														onChange={(e) => {
-															console.log(lokasi);
 															let newJamOperasional = [...jamOperasional];
 															newJamOperasional[index].hari = e.target.value;
 															setJamOperasional(newJamOperasional);
 														}}
 													/>
 												</div>
-												<div className="col-md-3 mb-3">
+												<div className="col-md-4">
 													<label>Waktu Buka</label>
 													<MuiPickersUtilsProvider utils={DateFnsUtils}>
 														<TimePicker
@@ -459,7 +509,7 @@ const WisataForm = () => {
 														/>
 													</MuiPickersUtilsProvider>
 												</div>
-												<div className="col-md-3 mb-3">
+												<div className="col-md-4">
 													<label>Waktu Tutup</label>
 													<MuiPickersUtilsProvider utils={DateFnsUtils}>
 														<TimePicker
@@ -484,10 +534,10 @@ const WisataForm = () => {
 													</MuiPickersUtilsProvider>
 												</div>
 												{index ? (
-													<div className="col-md-2 mb-3">
+													<div className="col-md-1">
 														<button
 															type="button"
-															className="btn btn-danger mt-3"
+															className="btn btn-danger mt-3 btn-sm"
 															onClick={() => {
 																let newJamOperasional = [...jamOperasional];
 																newJamOperasional.splice(index, 1);
@@ -501,21 +551,32 @@ const WisataForm = () => {
 											</div>
 										);
 									})}
-									<button
-										type="button"
-										className="me-2 btn btn-info"
-										onClick={() => {
-											setJamOperasional([
-												...jamOperasional,
-												{ hari: "", mulai: "", akhir: "" },
-											]);
-										}}
-									>
-										<span className="btn-icon-start text-info">
-											<i className="fa fa-plus color-info"></i>
-										</span>
-										Add
-									</button>
+									<div className="row">
+										<div className="col-md-12 mb-4">
+											<div
+												style={{
+													display: "flex",
+													justifyContent: "center",
+													alignItems: "center",
+												}}
+											>
+												<hr style={{ width: "100%", margin: "0 10px" }} />
+												<button
+													type="button"
+													className="btn btn-info btn-xxs"
+													onClick={() => {
+														setJamOperasional([
+															...jamOperasional,
+															{ hari: "", mulai: "", akhir: "" },
+														]);
+													}}
+												>
+													<i className="fa fa-plus color-info"></i>
+												</button>
+												<hr style={{ width: "100%", margin: "0 10px" }} />
+											</div>
+										</div>
+									</div>
 									<button type="submit" className="btn btn-primary me-2">
 										{button}
 									</button>

@@ -96,7 +96,7 @@ const ArticleList = () => {
 									action: (
 										<div className="d-flex">
 											<Link
-												to={`/artikel/detail/${item._id}`}
+												// to={`/artikel/detail/${item._id}`}
 												className="btn btn-primary shadow btn-xs sharp me-1"
 											>
 												<i className="fas fa-eye"></i>
