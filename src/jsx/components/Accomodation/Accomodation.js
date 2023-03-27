@@ -5,7 +5,7 @@ import AccomodationList from './AccomodationList';
 const Accomodation = () => {
 	return (
 		<Fragment>
-			<PageTitle activeMenu="Daftar" motherMenu="Akomodasi" pageContent="Daftar" />
+			<PageTitle activeMenu="Daftar" motherMenu="Accomodation" pageContent="Daftar" />
 			<div className="row">
 				<AccomodationList />
 			</div>

@@ -144,12 +144,18 @@ const SideBar = () => {
 						</Link>
 						<ul>
 							<li>
-								<Link className={`${path === 'akomodasi' ? 'mm-active' : ''}`} to="/akomodasi">
+								<Link
+									className={`${path === 'accomodation' ? 'mm-active' : ''}`}
+									to="/accomodation"
+								>
 									Akomodasi
 								</Link>
 							</li>
 							<li>
-								<Link className={`${path === 'atraksi' ? 'mm-active' : ''}`} to="/atraksi">
+								<Link
+									className={`${path === 'attraction' ? 'mm-active' : ''}`}
+									to="/attraction"
+								>
 									Atraksi
 								</Link>
 							</li>
