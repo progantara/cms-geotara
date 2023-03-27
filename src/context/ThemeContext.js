@@ -184,7 +184,7 @@ const ThemeContextProvider = (props) => {
 		body.setAttribute("data-theme-version", "light");
 		body.setAttribute("data-layout", "vertical");
 		body.setAttribute("data-primary", "color_9");
-		body.setAttribute("data-nav-headerbg", "color_9");
+		body.setAttribute("data-nav-headerbg", "color_1");
 		body.setAttribute("data-headerbg", "color_9");
 		body.setAttribute("data-sidebar-style", "overlay");
 		body.setAttribute("data-sibebarbg", "color_1");

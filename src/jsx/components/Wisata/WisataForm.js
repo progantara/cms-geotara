@@ -225,7 +225,7 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3">
+										<div className="form-group mb-4">
 											<label>Cover</label>
 											<div className="input-group">
 												<div className="form-file">
@@ -388,8 +388,14 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3 col-md-6">
-											<label>Harga</label>
+										<div className="form-group mb-4 col-md-6">
+											<label>
+												Harga{' '}
+												{currencyFormatter(
+													hargaTiket,
+													'id-ID'
+												)}
+											</label>
 											<input
 												type="text"
 												className="form-control"
@@ -455,7 +461,7 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3 col-md-4">
+										<div className="form-group mb-4 col-md-4">
 											<label>Desa</label>
 											<select
 												value={
@@ -523,7 +529,7 @@ const WisataForm = () => {
 										</div>
 									</div>
 									<div className="row">
-										<div className="form-group mb-3 col-md-3">
+										<div className="form-group mb-4 col-md-3">
 											<div>
 												<label>
 													Longitude
@@ -553,7 +559,7 @@ const WisataForm = () => {
 												/>
 											</div>
 										</div>
-										<div className="form-group mb-3 col-md-9">
+										<div className="form-group mb-4 col-md-9">
 											<RMap
 												width={
 													'100%'
@@ -604,7 +610,6 @@ const WisataForm = () => {
 											</RMap>
 										</div>
 									</div>
-									<hr />
 									{jamOperasional.map((item, index) => {
 										return (
 											<div
@@ -619,7 +624,7 @@ const WisataForm = () => {
 													</label>
 													<input
 														type="text"
-														className="form-control mb-3"
+														className="form-control"
 														placeholder="Masukkan hari"
 														value={
 															item.hari ||
@@ -738,10 +743,10 @@ const WisataForm = () => {
 													</MuiPickersUtilsProvider>
 												</div>
 												{index ? (
-													<div className="col-md-2 mb-3">
+													<div className="col-md-1">
 														<button
 															type="button"
-															className="btn btn-danger mt-3"
+															className="btn btn-danger mt-3 btn-sm"
 															onClick={() => {
 																let newJamOperasional =
 																	[
