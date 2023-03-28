@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getAccessToken } from './AuthService';
 
 export const getAllEvents = () => {
-  return axios.get(`http://127.0.0.1:8000/api/master/event`, {
+  return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/event`, {
     headers: {
       Authorization: `Bearer ${getAccessToken()}`,
       Accept: 'application/json',
@@ -11,7 +11,7 @@ export const getAllEvents = () => {
 };
 
 export const getEvent = (id) => {
-  return axios.get(`http://127.0.0.1:8000/api/master/event/` + id, {
+  return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/event/` + id, {
     headers: {
       Authorization: `Bearer ${getAccessToken()}`,
       Accept: 'application/json',
@@ -20,7 +20,7 @@ export const getEvent = (id) => {
 };
 
 export const createEvent = (event) => {
-  return axios.post(`http://127.0.0.1:8000/api/master/event`, event, {
+  return axios.post(process.env.REACT_APP_API_BASE_URL + `/master/event`, event, {
     headers: {
       Authorization: `Bearer ${getAccessToken()}`,
       Accept: 'application/json',
@@ -30,7 +30,7 @@ export const createEvent = (event) => {
 };
 
 export const updateEvent = (id, event) => {
-  return axios.post(`http://127.0.0.1:8000/api/master/event/` + id, event, {
+  return axios.post(process.env.REACT_APP_API_BASE_URL + `/master/event/` + id, event, {
     headers: {
       Authorization: `Bearer ${getAccessToken()}`,
       Accept: 'application/json',
@@ -40,7 +40,7 @@ export const updateEvent = (id, event) => {
 };
 
 export const deleteEvent = (id) => {
-  return axios.delete(`http://127.0.0.1:8000/api/master/event/` + id, {
+  return axios.delete(process.env.REACT_APP_API_BASE_URL + `/master/event/` + id, {
     headers: {
       Authorization: `Bearer ${getAccessToken()}`,
       Accept: 'application/json',

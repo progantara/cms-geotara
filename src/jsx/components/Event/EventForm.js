@@ -5,7 +5,11 @@ import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import { format } from "date-fns";
 import Select from "react-select";
-import { createEvent, getEvent, updateEvent } from "../../../services/EventService";
+import {
+	createEvent,
+	getEvent,
+	updateEvent,
+} from "../../../services/EventService";
 import Swal from "sweetalert2";
 import { getTourismPlace } from "../../../services/TourismPlaceService";
 
@@ -116,10 +120,11 @@ const EventForm = () => {
 							});
 						})
 						.catch((err) => {
-							console.log(err)
-							Swal.fire("Gagal!", "Wisata acara gagal dimuat", "error").then(() => {
-								history.push("/acara");
-							});
+							Swal.fire("Gagal!", "Wisata acara gagal dimuat", "error").then(
+								() => {
+									history.push("/acara");
+								}
+							);
 						});
 				})
 				.catch((err) => {
@@ -166,7 +171,11 @@ const EventForm = () => {
 																	setflyerImage(event.target.files[0]);
 																})
 																.catch((err) => {
-																	console.log(err);
+																	Swal.fire(
+																		"Gagal!",
+																		"Ukuran gambar terlalu besar",
+																		"error"
+																	);
 																});
 														}}
 													/>

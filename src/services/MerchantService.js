@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getAccessToken } from './AuthService';
 
 export const getAllMerchant = () => {
-	return axios.get(`http://127.0.0.1:8000/api/master/sponsorship/merchant/`, {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/sponsorship/merchant/`, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
@@ -11,7 +11,7 @@ export const getAllMerchant = () => {
 };
 
 export const getMerchant = (id) => {
-	return axios.get(`http://127.0.0.1:8000/api/master/sponsorship/merchant/` + id, {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/sponsorship/merchant/` + id, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
@@ -20,7 +20,7 @@ export const getMerchant = (id) => {
 };
 
 export const createMerchant = (restaurant) => {
-	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/merchant/`, restaurant, {
+	return axios.post(process.env.REACT_APP_API_BASE_URL + `/master/sponsorship/merchant/`, restaurant, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
@@ -30,7 +30,7 @@ export const createMerchant = (restaurant) => {
 };
 
 export const updateMerchant = (id, restaurant) => {
-	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/merchant/` + id, restaurant, {
+	return axios.post(process.env.REACT_APP_API_BASE_URL + `/master/sponsorship/merchant/` + id, restaurant, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
@@ -40,7 +40,7 @@ export const updateMerchant = (id, restaurant) => {
 };
 
 export const deleteMerchant = (id) => {
-	return axios.delete(`http://127.0.0.1:8000/api/master/sponsorship/merchant/` + id, {
+	return axios.delete(process.env.REACT_APP_API_BASE_URL + `/master/sponsorship/merchant/` + id, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',

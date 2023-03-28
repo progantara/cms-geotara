@@ -7,7 +7,7 @@ export const login = (email, password) => {
     email,
     password,
   };
-  return axios.post(`http://127.0.0.1:8000/api/master/auth/login`, postData, {
+  return axios.post(process.env.REACT_APP_API_BASE_URL + `/master/auth/login`, postData, {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",

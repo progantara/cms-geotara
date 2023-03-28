@@ -112,8 +112,6 @@ const WisataList = () => {
 												if (res.isConfirmed) {
 													deleteTourismPlace(item._id)
 														.then((res) => {
-															console.log(res);
-															console.log(data);
 															setData(data.filter((element) => element._id !== res.data.data._id));
 															Swal.fire(
 																"Dihapus!",
