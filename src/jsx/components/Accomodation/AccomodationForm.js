@@ -105,15 +105,11 @@ export default function UserForm() {
 							},
 						],
 					});
-					// console.log(inputAccomodation);
-					// console.log(lokasi);
-					// console.log(detail);
 				})
 				.catch((err) => {
 					Swal.fire('Gagal!', 'Accomodation gagal dimuat', 'error').then(() => {
 						history.push('/accomodation');
 					});
-					console.log(inputAccomodation);
 				});
 		}
 	}, [id, setDesa]);
