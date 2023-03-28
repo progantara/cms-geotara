@@ -111,7 +111,7 @@ const WisataForm = () => {
 		data.append("desa_id", desaId);
 		data.append("alamat", alamat);
 		data.append("thumbnail", thumbnail);
-		data.append("file_360", file360);
+		data.append("file360", file360);
 		createTourismPlace(data)
 			.then((res) => {
 				Swal.fire("Berhasil!", "Wisata berhasil ditambahkan", "success");
