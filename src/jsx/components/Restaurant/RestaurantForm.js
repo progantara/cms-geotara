@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import { useHistory, useParams } from 'react-router-dom';
 import { createRestaurant, getRestaurant, updateRestaurant } from '../../../services/RestaurantService';
 import { getAllDesaSelect } from '../../../services/DesaService';
 import { TimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import { format } from 'date-fns';
+import { fromLonLat, toLonLat } from 'ol/proj';
+import 'ol/ol.css';
+import Select from 'react-select';
+import { RControl, RLayerTile, RMap, ROSM } from 'rlayers';
 
 export default function UserForm() {
 	const history = useHistory();
 	const { id } = useParams();
 
 	const [desa, setDesa] = useState([]);
+	const [thumbnailPreview, setThumbnailPreview] = useState('');
 	const [inputResturant, setInputRestaurant] = useState({
 		banner_image: '',
 		nama: '',
@@ -31,6 +37,25 @@ export default function UserForm() {
 		title = 'Edit Restaurant';
 		button = 'Update';
 	}
+
+	const ClearIndicator = (props) => {
+		const {
+			children = 'clear all',
+			getStyles,
+			innerProps: { ref, ...restInnerProps },
+		} = props;
+		return (
+			<div {...restInnerProps} ref={ref} style={getStyles('clearIndicator', props)}>
+				<div style={{ padding: '0px 5px' }}>{children}</div>
+			</div>
+		);
+	};
+
+	const ClearIndicatorStyles = (base, state) => ({
+		...base,
+		cursor: 'pointer',
+		color: state.isFocused ? 'blue' : 'black',
+	});
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -54,13 +79,15 @@ export default function UserForm() {
 						rating: data.rating,
 						jam_buka: data.jam_buka,
 						jam_tutup: data.jam_tutup,
+						banner_image: '',
 					});
-					// console.log(inputResturant);
+					setThumbnailPreview(data.banner_image);
 				})
 				.catch((err) => {
 					Swal.fire('Gagal!', 'Restaurant gagal dimuat', 'error').then(() => {
-						history.push('/restaurant');
+						// history.push('/restaurant');
 					});
+					console.log(inputResturant);
 				});
 		}
 	}, [id, setDesa]);
@@ -85,19 +112,12 @@ export default function UserForm() {
 		console.log(inputResturant);
 	};
 
-	const handleDateChange = (date, type) => {
-		const options = {
-			hour12: false,
-			timeZone: 'Asia/Jakarta',
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit',
-		};
-		const selectedTime = date.toLocaleString('id-ID', options);
-		console.log(selectedTime); // tambahkan log untuk memastikan format yang dihasilkan benar
+	const handleDateChange = (e, type) => {
+		const selectedTime = e instanceof Date ? e : new Date();
+		const newJamOperasional = format(selectedTime, 'HH:mm');
 		setInputRestaurant((prevInput) => ({
 			...prevInput,
-			[type]: selectedTime,
+			[type]: newJamOperasional,
 		}));
 	};
 
@@ -165,322 +185,368 @@ export default function UserForm() {
 							<h4 className="card-title">{title}</h4>
 						</div>
 						<div className="card-body">
-							<div className="summernote">
-								<div className="card">
-									<div className="card-body">
-										<div className="basic-form">
-											<form
-												onSubmit={
-													id !==
-													undefined
-														? handleUpdate
-														: handleCreate
+							<div className="basic-form">
+								<form onSubmit={id !== undefined ? handleUpdate : handleCreate}>
+									<div className="row">
+										<div className="mb-3 form-group">
+											<label>
+												Nama
+												Restaurant
+											</label>
+											<input
+												type="text"
+												className="form-control"
+												placeholder="Masukkan nama restaurant"
+												name="nama"
+												value={
+													inputResturant.nama
 												}
-											>
-												<div className="row mb-3">
-													<div className="form-group col-md-6">
-														<label>
-															Banner
-															Image
-														</label>
-														<div className="from-file">
-															<input
-																type="file"
-																className="form-file-input form-control"
-																name="banner_image"
-																accept="image/*"
-																onChange={
-																	handleImageChange
-																}
-															/>
-														</div>
-													</div>
-													<div className="form-group col-md-6">
-														<label>
-															Nama
-														</label>
-														<input
-															type="text"
-															className="form-control"
-															placeholder="Masukkan nama"
-															name="nama"
-															onChange={
-																handleChange
-															}
-															value={
-																inputResturant.nama
-															}
-														/>
-													</div>
-												</div>
-												<div className="row">
-													<div className="mb-3 form-group col-md-4">
-														<label>
-															Latitude
-														</label>
-														<input
-															type="text"
-															className="form-control"
-															placeholder="Masukkan latitude"
-															name="lat"
-															onChange={
-																handleChange
-															}
-															value={
-																inputResturant.lat
-															}
-														/>
-													</div>
-													<div className="mb-3 form-group col-md-4">
-														<label>
-															Longitude
-														</label>
-														<input
-															type="text"
-															className="form-control"
-															placeholder="Masukkan longitude"
-															name="long"
-															onChange={
-																handleChange
-															}
-															value={
-																inputResturant.long
-															}
-														/>
-													</div>
-													<div className="mb-3 form-group col-md-4">
-														<label>
-															Desa
-														</label>
-														<select
-															value={
-																inputResturant.desa_id
-																	? inputResturant.desa_id
-																	: 'option'
-															}
-															className="form-control"
-															name="desa_id"
-															onChange={
-																handleChange
-															}
-														>
-															<option
-																value="option"
-																disabled
-															>
-																Pilih
-																Desa...
-															</option>
-															{desa.map(
-																(
-																	item
-																) => {
-																	return (
-																		<option
-																			key={
-																				item.kode
-																			}
-																			value={
-																				item.kode
-																			}
-																		>
-																			{
-																				item.nama
-																			}
-																		</option>
-																	);
-																}
-															)}
-														</select>
-													</div>
-													<div className="mb-3 form-group">
-														<label>
-															Alamat
-														</label>
-														<textarea
-															className="form-control"
-															id="alamat"
-															placeholder="Masukkan alamat"
-															name="alamat"
-															onChange={
-																handleChange
-															}
-															value={
-																inputResturant.alamat
-															}
-														></textarea>
-													</div>
-												</div>
-												<div className="row">
-													<div className="mb-3 form-group col-md-4">
-														<label>
-															No
-															Telp
-														</label>
-														<input
-															type="text"
-															className="form-control"
-															placeholder="Masukkan nomor telepon"
-															name="no_telp"
-															onChange={
-																handleChange
-															}
-															value={
-																inputResturant.no_telp
-															}
-														/>
-													</div>
-													<div className="mb-3 form-group col-md-4">
-														<label>
-															Email
-														</label>
-														<input
-															type="email"
-															className="form-control"
-															placeholder="Masukkan email"
-															name="email"
-															onChange={
-																handleChange
-															}
-															value={
-																inputResturant.email
-															}
-														/>
-													</div>
-													<div className="mb-3 form-group col-md-4">
-														<label>
-															Rating
-														</label>
-														<input
-															type="number"
-															min="0"
-															max="5"
-															step="0.5"
-															className="form-control"
-															placeholder="Masukkan rating"
-															name="rating"
-															onChange={
-																handleChange
-															}
-															value={
-																inputResturant.rating
-															}
-														/>
-													</div>
-												</div>
-												<div className="row">
-													<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
-														<label>
-															Jam
-															Buka
-														</label>
-														<MuiPickersUtilsProvider
-															utils={
-																DateFnsUtils
-															}
-														>
-															<TimePicker
-																name="jam_buka"
-																value={
-																	inputResturant.jam_buka
-																		? inputResturant.jam_buka
-																		: new Date()
-																}
-																onChange={(
-																	time
-																) =>
-																	handleDateChange(
-																		time,
-																		'jam_buka'
-																	)
-																}
-																format="HH:mm:ss a"
-															/>
-														</MuiPickersUtilsProvider>
-													</div>
-													<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
-														<label>
-															Jam
-															Tutup
-														</label>
-														<MuiPickersUtilsProvider
-															utils={
-																DateFnsUtils
-															}
-														>
-															<TimePicker
-																name="jam_tutup"
-																value={
-																	inputResturant.jam_tutup
-																		? inputResturant.jam_tutup
-																		: new Date()
-																}
-																onChange={(
-																	time
-																) =>
-																	handleDateChange(
-																		time,
-																		'jam_tutup'
-																	)
-																}
-																format="HH:mm:ss a"
-															/>
-														</MuiPickersUtilsProvider>
-													</div>
-												</div>
-												{/* <div className="row mb-3">
-														<div className=" col-md-12">
-															<h5>
-																Makanan
-																1
-															</h5>
-														</div>
-														<div className="mb-3 form-group col-md-4">
-															<label>
-																Nama
-															</label>
-															<input
-																type="text"
-																className="form-control"
-																placeholder="Masukkan Nama Makanan 1"
-															/>
-														</div>
-														<div className="mb-3 form-group col-md-4">
-															<label>
-																Rating
-															</label>
-															<input
-																type="number"
-																min="0"
-																max="5"
-																step="0.5"
-																className="form-control"
-																placeholder="Masukkan Rating Makanan 1"
-															/>
-														</div>
-														<div className="mb-3 form-group col-md-4">
-															<label>
-																Harga
-															</label>
-															<input
-																type="number"
-																className="form-control"
-																placeholder="Masukkan Harga Makanan 1"
-															/>
-														</div>
-													</div> */}
-												<button
-													type="submit"
-													className="btn btn-primary me-2"
-												>
-													{
-														button
-													}
-												</button>
-											</form>
+												onChange={
+													handleChange
+												}
+											/>
 										</div>
 									</div>
-								</div>
+									<div className="row">
+										<div className="mb-3 form-group">
+											<label>
+												Banner
+											</label>
+											<div className="input-group">
+												<div className="form-file">
+													<input
+														type="file"
+														className="form-file-input form-control"
+														name="banner_image"
+														accept="image/*"
+														onChange={
+															handleImageChange
+														}
+													/>
+												</div>
+												<span className="input-group-text">
+													Upload
+												</span>
+											</div>
+											{thumbnailPreview !=
+												'' && (
+												<img
+													src={
+														'http://127.0.0.1:8000/storage/restaurant/' +
+														thumbnailPreview
+													}
+													alt="banner"
+													className="border border-2 img-fluid border-dark rounded-3"
+													style={{
+														width: '40%',
+														height: 'auto',
+													}}
+												/>
+											)}
+											{inputResturant.banner_image !=
+												'' && (
+												<img
+													src={URL.createObjectURL(
+														inputResturant.banner_image
+													)}
+													alt="banner"
+													className="border border-2 img-fluid border-dark rounded-3"
+													style={{
+														width: '40%',
+														height: 'auto',
+													}}
+												/>
+											)}
+										</div>
+									</div>
+									<div className="row">
+										<div className="mb-3 form-group col-md-4">
+											<label>Desa</label>
+											{/* <Select
+												closeMenuOnSelect={
+													false
+												}
+												components={{
+													ClearIndicator,
+												}}
+												styles={{
+													clearIndicator: ClearIndicatorStyles,
+												}}
+												value={
+													inputResturant.desa_id
+														? inputResturant.desa_id
+														: 'option'
+												}
+												className="form-control"
+												name="desa_id"
+												onChange={
+													handleChange
+												}
+												options={
+													desa
+												}
+											/> */}
+											<select
+												value={
+													inputResturant.desa_id
+														? inputResturant.desa_id
+														: 'option'
+												}
+												className="form-control"
+												name="desa_id"
+												onChange={
+													handleChange
+												}
+											>
+												<option
+													value="option"
+													disabled
+												>
+													Pilih
+													Desa...
+												</option>
+												{desa.map(
+													(
+														item
+													) => {
+														return (
+															<option
+																key={
+																	item.kode
+																}
+																value={
+																	item.kode
+																}
+															>
+																{
+																	item.nama
+																}
+															</option>
+														);
+													}
+												)}
+											</select>
+										</div>
+										<div className="mb-3 form-group col-md-8">
+											<label>
+												Alamat
+											</label>
+											<textarea
+												className="form-control"
+												rows="2"
+												name="alamat"
+												value={
+													inputResturant.alamat
+												}
+												onChange={
+													handleChange
+												}
+											></textarea>
+										</div>
+									</div>
+									<div className="row">
+										<div className="mb-3 form-group col-md-3">
+											<div>
+												<label>
+													Longitude
+												</label>
+												<input
+													type="text"
+													className="mb-3 form-control"
+													placeholder="Pilih pada peta"
+													value={
+														inputResturant.long
+													}
+													disabled
+												/>
+											</div>
+											<div>
+												<label>
+													Latitude
+												</label>
+												<input
+													type="text"
+													className="mb-3 form-control"
+													placeholder="Pilih pada peta"
+													value={
+														inputResturant.lat
+													}
+													disabled
+												/>
+											</div>
+										</div>
+										<div className="mb-3 form-group col-md-9">
+											<RMap
+												width={
+													'100%'
+												}
+												height={
+													'60vh'
+												}
+												initial={{
+													center: fromLonLat(
+														[
+															107.448914,
+															-7.100948,
+														]
+													),
+													zoom: 11,
+												}}
+												noDefaultControls={
+													true
+												}
+												onClick={useCallback(
+													(
+														e
+													) => {
+														const coords =
+															e.map.getCoordinateFromPixel(
+																e.pixel
+															);
+														const lonlat =
+															toLonLat(
+																coords
+															);
+														setInputRestaurant(
+															{
+																...inputResturant,
+																long: lonlat[0],
+																lat: lonlat[1],
+															}
+														);
+													},
+													[]
+												)}
+											>
+												<ROSM />
+												<RControl.RScaleLine />
+												<RControl.RAttribution />
+												<RControl.RZoom />
+												<RControl.RZoomSlider />
+											</RMap>
+										</div>
+									</div>
+									<div className="row">
+										<div className="mb-3 form-group col-md-4">
+											<label>
+												No
+												Telp
+											</label>
+											<input
+												type="text"
+												className="form-control"
+												placeholder="Masukkan nomor telepon"
+												name="no_telp"
+												onChange={
+													handleChange
+												}
+												value={
+													inputResturant.no_telp
+												}
+											/>
+										</div>
+										<div className="mb-3 form-group col-md-4">
+											<label>Email</label>
+											<input
+												type="email"
+												className="form-control"
+												placeholder="Masukkan email"
+												name="email"
+												onChange={
+													handleChange
+												}
+												value={
+													inputResturant.email
+												}
+											/>
+										</div>
+										<div className="mb-3 form-group col-md-4">
+											<label>
+												Rating
+											</label>
+											<input
+												type="number"
+												min="0"
+												max="5"
+												step="0.5"
+												className="form-control"
+												placeholder="Masukkan rating"
+												name="rating"
+												onChange={
+													handleChange
+												}
+												value={
+													inputResturant.rating
+												}
+											/>
+										</div>
+									</div>
+									<div className="row">
+										<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
+											<label>
+												Jam
+												Buka
+											</label>
+											<MuiPickersUtilsProvider
+												utils={
+													DateFnsUtils
+												}
+											>
+												<TimePicker
+													name="jam_buka"
+													value={
+														inputResturant.jam_buka
+															? new Date(
+																	`01/01/1970 ${inputResturant.jam_buka}`
+															  )
+															: null
+													}
+													onChange={(
+														e
+													) =>
+														handleDateChange(
+															e,
+															'jam_buka'
+														)
+													}
+												/>
+											</MuiPickersUtilsProvider>
+										</div>
+										<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
+											<label>
+												Jam
+												Tutup
+											</label>
+											<MuiPickersUtilsProvider
+												utils={
+													DateFnsUtils
+												}
+											>
+												<TimePicker
+													name="jam_tutup"
+													value={
+														inputResturant.jam_tutup
+															? new Date(
+																	`01/01/1970 ${inputResturant.jam_tutup}`
+															  )
+															: null
+													}
+													onChange={(
+														time
+													) =>
+														handleDateChange(
+															time,
+															'jam_tutup'
+														)
+													}
+												/>
+											</MuiPickersUtilsProvider>
+										</div>
+									</div>
+									<button type="submit" className="btn btn-primary me-2">
+										{button}
+									</button>
+								</form>
 							</div>
 						</div>
 					</div>

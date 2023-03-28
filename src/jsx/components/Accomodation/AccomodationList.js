@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import Swal from "sweetalert2";
-import DataTable from "react-data-table-component";
-import { getAllAccomodation } from "../../../services/AccomodationService";
+import React, { useEffect, useState } from 'react';
+import { Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import DataTable from 'react-data-table-component';
+import { getAllAccomodation, deleteAccomodation } from '../../../services/AccomodationService';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { currencyFormatter } from '../../../utils/stringFormatter';
 
 const AccomodationList = () => {
 	const [data, setData] = useState([]);
@@ -11,61 +13,66 @@ const AccomodationList = () => {
 
 	const columns = [
 		{
-			name: "No",
+			name: 'No',
 			selector: (row) => row.no,
 			sortable: true,
-      width: '10%',
+			width: '10%',
 		},
 		{
-			name: "Nama",
-			selector: (row) => row.name,
+			name: 'Nama',
+			selector: (row) => row.nama,
 			sortable: true,
-      width: '20%',
+			width: '20%',
 		},
 		{
-			name: "Harga",
-			selector: (row) => row.price,
+			name: 'Alamat',
+			selector: (row) => row.alamat,
 			sortable: true,
-      width: '20%',
+			width: '25%',
 		},
 		{
-			name: "Lokasi",
-			selector: (row) => row.location,
+			name: 'Rating',
+			selector: (row) => row.rating,
 			sortable: true,
-      width: '30%',
+			width: '10%',
 		},
 		{
-			name: "Aksi",
+			name: 'Harga',
+			selector: (row) => row.harga,
+			sortable: true,
+			width: '20%',
+		},
+		{
+			name: 'Aksi',
 			selector: (row) => row.action,
-      width: '20%',
+			width: '15%',
 		},
 	];
 
 	const customStyles = {
 		headCells: {
 			style: {
-				borderBottom: "0.125rem solid #F2F2F2",
-				borderTop: "0",
-				color: "#000",
-				whiteSpace: "nowrap",
-				fontSize: "1.125rem",
-				textTransform: "capitalize",
-				fontWeight: "600",
-				padding: "1.25rem 0.9375rem",
+				borderBottom: '0.125rem solid #F2F2F2',
+				borderTop: '0',
+				color: '#000',
+				whiteSpace: 'nowrap',
+				fontSize: '1.125rem',
+				textTransform: 'capitalize',
+				fontWeight: '600',
+				padding: '1.25rem 0.9375rem',
 			},
 		},
 		rows: {
 			style: {
-				background: "transparent !important",
-				padding: "1.25rem 0.9375rem",
-				fontSize: "1rem",
-				fontWeight: "400",
-				borderBottom: "0",
+				background: 'transparent !important',
+				padding: '1.25rem 0.9375rem',
+				fontSize: '1rem',
+				fontWeight: '400',
+				borderBottom: '0',
 			},
 		},
 	};
 
-	// use effect
 	useEffect(() => {
 		setIsLoading(true);
 		getAllAccomodation()
@@ -75,19 +82,20 @@ const AccomodationList = () => {
 						...data,
 						{
 							no: index + 1,
-							name: item.nama,
-							price: item.harga,
-							location: item.lokasi,
+							nama: item.nama,
+							alamat: item.lokasi.alamat,
+							rating: item.rating,
+							harga: currencyFormatter(item.harga),
 							action: (
 								<div className="d-flex">
 									<Link
-										to={`/akomodasi/detail/${item._id}`}
+										to={'/accomodation/detail/' + item._id}
 										className="btn btn-primary shadow btn-xs sharp me-1"
 									>
 										<i className="fas fa-eye"></i>
 									</Link>
 									<Link
-										to={`/akomodasi/edit/${item._id}`}
+										to={'/accomodation/edit/' + item._id}
 										className="btn btn-secondary shadow btn-xs sharp me-1"
 									>
 										<i className="fas fa-pen"></i>
@@ -97,20 +105,36 @@ const AccomodationList = () => {
 										className="btn btn-danger shadow btn-xs sharp"
 										onClick={() =>
 											Swal.fire({
-												title: "Anda yakin ingin menghapus akomodasi ini?",
-												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-												icon: "warning",
+												title: 'Anda yakin ingin menghapus accomodation ini?',
+												text: 'Setelah dihapus, Anda tidak akan dapat memulihkannya',
+												icon: 'warning',
 												showCancelButton: true,
-												confirmButtonColor: "#3085d6",
-												cancelButtonColor: "#d33",
-												confirmButtonText: "Ya, hapus!",
+												confirmButtonColor: '#3085d6',
+												cancelButtonColor: '#d33',
+												confirmButtonText: 'Ya, hapus!',
 											}).then((res) => {
-												if (res.isConfirmed) {
+												if (
+													res.isConfirmed
+												) {
+													deleteAccomodation(
+														item._id
+													);
+													let newData =
+														data.filter(
+															(
+																e
+															) =>
+																e._id !==
+																item._id
+														);
+													setData(
+														newData
+													);
 													Swal.fire(
 														'Dihapus!',
-														'Akomodasi telah dihapus.',
+														'Accomodation telah dihapus.',
 														'success'
-													)
+													);
 												}
 											})
 										}
@@ -123,19 +147,21 @@ const AccomodationList = () => {
 					]);
 				});
 				setIsLoading(false);
+				console.log(data);
 			})
 			.catch((err) => {
 				console.log(err);
 				setIsLoading(false);
 			});
-	}, []);
+		console.log(data);
+	}, [setData]);
 
 	return (
 		<div className="col-12">
 			<div className="card">
 				<div className="card-header">
-					<h4 className="card-title">Daftar Akomodasi</h4>
-					<Link to="/akomodasi/tambah">
+					<h4 className="card-title">Daftar Accomodation</h4>
+					<Link to="/accomodation/tambah">
 						<Button className="me-2" variant="primary btn-rounded">
 							<span className="btn-icon-start text-primary">
 								<i className="fa fa-plus color-primary" />
@@ -151,8 +177,16 @@ const AccomodationList = () => {
 								columns={columns}
 								data={data}
 								pagination
-								paginationPerPage={5}
+								paginationPerPage={10}
 								customStyles={customStyles}
+								progressPending={isLoading}
+								progressComponent={
+									<ClipLoader
+										color={'#20c997'}
+										loading={isLoading}
+										aria-label="Loading Spinner"
+									/>
+								}
 							/>
 						</div>
 					</div>
