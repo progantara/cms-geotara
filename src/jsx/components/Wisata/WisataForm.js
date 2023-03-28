@@ -22,8 +22,8 @@ import Swal from "sweetalert2";
 import ReactPannellum from "react-pannellum";
 import { getAllProvinsi } from "../../../services/ProvinsiService";
 import { getAllKotaByCode } from "../../../services/KotaService";
-import { getAllDistrikByCode } from "../../../services/DistrikService";
-import { getAllDesaByCode } from "../../../services/DesaService";
+import { getAllDistrikByCode, getDistrik } from "../../../services/DistrikService";
+import { getAllDesaByCode, getDesa } from "../../../services/DesaService";
 
 const kategoriOption = [{ value: "alam", label: "Wisata", color: "#00B8D9" }];
 
@@ -176,6 +176,8 @@ const WisataForm = () => {
 		if (id !== undefined) {
 			getTourismPlace(id)
 				.then((res) => {
+
+
 					setNama(res.data.data.nama);
 					setDeskripsi(res.data.data.deskripsi);
 					setKategori(
@@ -207,7 +209,6 @@ const WisataForm = () => {
 					);
 					setLat(res.data.data.lokasi.lat);
 					setLong(res.data.data.lokasi.long);
-					setDesaId(res.data.data.lokasi.desa_id);
 					setAlamat(res.data.data.lokasi.alamat);
 					setThumbnailPreview(res.data.data.thumbnail);
 					setFile360Preview(res.data.data.file360);

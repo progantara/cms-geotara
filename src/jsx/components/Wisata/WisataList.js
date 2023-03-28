@@ -3,7 +3,10 @@ import { Button } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
-import { deleteTourismPlace, getAllTourismPlace } from "../../../services/TourismPlaceService";
+import {
+	deleteTourismPlace,
+	getAllTourismPlace,
+} from "../../../services/TourismPlaceService";
 import ClipLoader from "react-spinners/ClipLoader";
 import { capitalizeEachFirstLetter } from "../../../utils/stringFormatter";
 
@@ -16,7 +19,8 @@ const WisataList = () => {
 		{
 			name: "No",
 			selector: (row) => row.no,
-			sortable: true,
+			sortable: false,
+			cell: (row, index) => index + 1,
 			width: "10%",
 		},
 		{
@@ -39,8 +43,45 @@ const WisataList = () => {
 		},
 		{
 			name: "Aksi",
-			selector: (row) => row.action,
 			width: "25%",
+			cell: (row) => (
+				<div className="d-flex">
+					<Link
+						to="#"
+						// to={"/wisata/detail/" + row._id}
+						className="btn btn-primary shadow btn-xs sharp me-1"
+					>
+						<i className="fas fa-eye"></i>
+					</Link>
+					<Link
+						to={"/wisata/edit/" + row._id}
+						className="btn btn-secondary shadow btn-xs sharp me-1"
+					>
+						<i className="fas fa-pen"></i>
+					</Link>
+					<Link
+						to="#"
+						className="btn btn-danger shadow btn-xs sharp"
+						onClick={() =>
+							Swal.fire({
+								title: "Anda yakin ingin menghapus wisata ini?",
+								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+								icon: "warning",
+								showCancelButton: true,
+								confirmButtonColor: "#3085d6",
+								cancelButtonColor: "#d33",
+								confirmButtonText: "Ya, hapus!",
+							}).then((res) => {
+								if (res.isConfirmed) {
+									handleDelete(row._id);
+								}
+							})
+						}
+					>
+						<i className="fa fa-trash"></i>
+					</Link>
+				</div>
+			),
 		},
 	];
 
@@ -68,83 +109,39 @@ const WisataList = () => {
 		},
 	};
 
-	// use effect
+	const handleDelete = async (id) => {
+		const response = await deleteTourismPlace(id);
+		if (response.status === 200) {
+			const newData = data.filter((item) => item._id !== id);
+			setData(newData);
+			Swal.fire("Berhasil!", "Wisata berhasil dihapus", "success");
+		} else {
+			Swal.fire("Gagal!", "Wisata gagal dihapus", "error");
+		}
+	};
+
 	useEffect(() => {
 		setIsLoading(true);
-		getAllTourismPlace()
-			.then((res) => {
-				res.data.data.map((item, index) => {
-					setData((data) => [
-						...data,
-						{
-							id: item._id,
-							no: index + 1,
-							name: item.nama,
-							category: item.kategori.map((item) => capitalizeEachFirstLetter(item)).join(", "),
-							location: capitalizeEachFirstLetter(item.lokasi.alamat),
-							action: (
-								<div className="d-flex">
-									<Link
-										// to={`/wisata/detail/${item._id}`}
-										className="btn btn-primary shadow btn-xs sharp me-1"
-									>
-										<i className="fas fa-eye"></i>
-									</Link>
-									<Link
-										to={`/wisata/edit/${item._id}`}
-										className="btn btn-secondary shadow btn-xs sharp me-1"
-									>
-										<i className="fas fa-pen"></i>
-									</Link>
-									<Link
-										to="#"
-										className="btn btn-danger shadow btn-xs sharp"
-										onClick={() =>
-											Swal.fire({
-												title: "Anda yakin ingin menghapus wisata ini?",
-												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-												icon: "warning",
-												showCancelButton: true,
-												confirmButtonColor: "#3085d6",
-												cancelButtonColor: "#d33",
-												confirmButtonText: "Ya, hapus!",
-											}).then((res) => {
-												if (res.isConfirmed) {
-													deleteTourismPlace(item._id)
-														.then((res) => {
-															setData(data.filter((element) => element._id !== res.data.data._id));
-															Swal.fire(
-																"Dihapus!",
-																"Wisata telah dihapus.",
-																"success"
-															);
-															history.push("/wisata");
-														})
-														.catch((err) => {
-															Swal.fire(
-																"Gagal!",
-																"Wisata gagal dihapus",
-																"error"
-															);
-														});
-												}
-											})
-										}
-									>
-										<i className="fa fa-trash"></i>
-									</Link>
-								</div>
-							),
-						},
-					]);
-					setIsLoading(false);
-				});
-			})
-			.catch((err) => {
-				Swal.fire("Gagal!", "Wisata gagal dimuat", "error");
-				setIsLoading(false);
-			});
+		fetchData();
 	}, []);
+
+	const fetchData = async () => {
+		const response = await getAllTourismPlace();
+		if (response.status === 200) {
+			const data = response.data.data.map((item) => {
+				return {
+					...item,
+					name: item.nama,
+					category: item.kategori
+						.map((cat) => capitalizeEachFirstLetter(cat))
+						.join(", "),
+					location: capitalizeEachFirstLetter(item.lokasi.alamat),
+				};
+			});
+			setData(data);
+		}
+		setIsLoading(false);
+	};
 
 	return (
 		<div className="col-12">

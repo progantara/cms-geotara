@@ -18,3 +18,12 @@ export const getAllDistrikByCode = (code) => {
     },
   });
 };
+
+export const getDistrik = (id) => {
+  return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/lokasi/distrik/` + id, {
+    headers: {
+      Authorization: `Bearer ${getAccessToken()}`,
+      Accept: 'application/json',
+    },
+  });
+};
