@@ -77,7 +77,6 @@ export default function UserForm() {
 		if (id !== undefined) {
 			getMerchant(id)
 				.then((res) => {
-					// alert(res.data.data);
 					let data = res.data.data;
 					setInputMerchant({
 						nama: data.nama,
@@ -135,8 +134,6 @@ export default function UserForm() {
 			...inputMerchant,
 			[e.target.name]: value,
 		});
-		// alert(value + ' ' + e.target.name);
-		console.log(inputMerchant);
 	};
 
 	const handleDateChange = (e, type) => {
@@ -169,7 +166,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Merchant gagal ditambahkan.', 'error');
-				console.log(err);
 			});
 	};
 

@@ -82,7 +82,6 @@ export default function UserForm() {
 		if (id !== undefined) {
 			getTour(id)
 				.then((res) => {
-					// alert(res.data.data);
 					let data = res.data.data;
 					setInputTour({
 						thumbnail: '',
@@ -119,7 +118,6 @@ export default function UserForm() {
 					Swal.fire('Gagal!', 'Tour gagal dimuat', 'error').then(() => {
 						history.push('/tour');
 					});
-					console.log(inputTour);
 				});
 		}
 	}, [id, setDesa]);
@@ -130,7 +128,6 @@ export default function UserForm() {
 			...inputTour,
 			[e.target.name]: value,
 		});
-		console.log(inputTour);
 	};
 
 	const handleChangeLokasi = (e) => {
@@ -139,8 +136,6 @@ export default function UserForm() {
 			...lokasi,
 			[e.target.name]: value,
 		});
-		// alert(value + ' ' + e.target.name);
-		console.log(lokasi);
 	};
 
 	const handleImageChange = (e) => {
@@ -149,13 +144,11 @@ export default function UserForm() {
 			...inputTour,
 			[e.target.name]: value,
 		});
-		console.log(inputTour);
 	};
 
 	const handleDateChange = (e, type) => {
 		const selectedTime = e instanceof Date ? e : new Date();
 		const newJamOperasional = format(selectedTime, 'HH:mm');
-		console.log(type + ' ' + newJamOperasional);
 		setDetail((prevState) => ({
 			...prevState,
 			jurusan: [
@@ -196,7 +189,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Tour gagal ditambahkan.', 'error');
-				console.log(err);
 			});
 	};
 
@@ -230,7 +222,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Tour gagal diubah.', 'error');
-				console.log(err);
 			});
 	};
 

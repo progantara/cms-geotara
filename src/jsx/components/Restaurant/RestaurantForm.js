@@ -77,7 +77,6 @@ export default function UserForm() {
 		if (id !== undefined) {
 			getRestaurant(id)
 				.then((res) => {
-					// alert(res.data.data);
 					let data = res.data.data;
 					setInputRestaurant({
 						nama: data.nama,
@@ -107,9 +106,8 @@ export default function UserForm() {
 				})
 				.catch((err) => {
 					Swal.fire('Gagal!', 'Restaurant gagal dimuat', 'error').then(() => {
-						// history.push('/restaurant');
+						history.push('/restaurant');
 					});
-					console.log(inputRestaurant);
 				});
 		}
 	}, [id, setDesa]);
@@ -136,7 +134,6 @@ export default function UserForm() {
 			...inputRestaurant,
 			[e.target.name]: value,
 		});
-		console.log(inputRestaurant);
 	};
 
 	const handleDateChange = (e, type) => {
@@ -172,7 +169,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Restaurant gagal ditambahkan.', 'error');
-				console.log(err);
 			});
 	};
 
@@ -202,7 +198,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Restaurant gagal diubah.', 'error');
-				console.log(err);
 			});
 	};
 

@@ -76,7 +76,6 @@ export default function UserForm() {
 		if (id !== undefined) {
 			getAccomodation(id)
 				.then((res) => {
-					// alert(res.data.data);
 					let data = res.data.data;
 					setInputAccomodation({
 						thumbnail: '',
@@ -163,7 +162,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Accomodation gagal ditambahkan.', 'error');
-				console.log(err);
 			});
 	};
 
@@ -194,8 +192,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Accomodation gagal diubah.', 'error');
-				console.log(err);
-				console.log(data);
 			});
 	};
 

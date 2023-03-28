@@ -14,7 +14,6 @@ export default function UserForm() {
 	const { id } = useParams();
 
 	const [desa, setDesa] = useState([]);
-	const [thumbnailPreview, setThumbnailPreview] = useState('');
 	const [inputAttraction, setInputAttraction] = useState({
 		nama: '',
 		thumbnail: '',
@@ -96,7 +95,6 @@ export default function UserForm() {
 					Swal.fire('Gagal!', 'Attraction gagal dimuat', 'error').then(() => {
 						history.push('/attraction');
 					});
-					console.log(inputAttraction);
 				});
 		}
 	}, [id, setDesa]);
@@ -131,8 +129,6 @@ export default function UserForm() {
 			...inputAttraction,
 			[e.target.name]: value,
 		});
-		// alert(value + ' ' + e.target.name);
-		console.log(inputAttraction);
 	};
 
 	const handleCreate = (e) => {
@@ -157,7 +153,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Attraction gagal ditambahkan.', 'error');
-				console.log(err);
 			});
 	};
 
@@ -184,7 +179,6 @@ export default function UserForm() {
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Attraction gagal diubah.', 'error');
-				console.log(err);
 			});
 	};
 
@@ -240,12 +234,12 @@ export default function UserForm() {
 													Upload
 												</span>
 											</div>
-											{thumbnailPreview !=
+											{inputAttraction.thumbnail_preview !=
 												'' && (
 												<img
 													src={
 														'http://127.0.0.1:8000/storage/attraction/' +
-														thumbnailPreview
+														inputAttraction.thumbnail_preview
 													}
 													alt="banner"
 													className="img-fluid border border-2 border-dark rounded-3"
