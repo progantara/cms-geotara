@@ -11,11 +11,10 @@ import {
 	updateEvent,
 } from "../../../services/EventService";
 import Swal from "sweetalert2";
-import { getTourismPlace } from "../../../services/TourismPlaceService";
-
-const wisataOption = [
-	{ value: "64213529eb7c0000630075c2", label: "Pantai Jawa", color: "#00B8D9" },
-];
+import {
+	getAllTourismPlace,
+	getTourismPlace,
+} from "../../../services/TourismPlaceService";
 
 const ClearIndicator = (props) => {
 	const {
@@ -59,6 +58,7 @@ const EventForm = () => {
 	const [wisata, setWisata] = useState({});
 	const [tanggal_mulai, setTanggalMulai] = useState("");
 	const [tanggal_selesai, setTanggalSelesai] = useState("");
+	const [wisataList, setWisataList] = useState([]);
 
 	const handleCreate = (e) => {
 		e.preventDefault();
@@ -105,6 +105,23 @@ const EventForm = () => {
 		if (id !== undefined) {
 			getEvent(id)
 				.then((res) => {
+					getAllTourismPlace()
+						.then((res) => {
+							setWisataList(
+								res.data.data.map((wisata) => {
+									return {
+										value: wisata._id,
+										label: wisata.nama,
+										color: "#00B8D9",
+									};
+								})
+							);
+						})
+						.catch((err) => {
+							Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+								history.push("/acara");
+							});
+						});
 					setNama(res.data.data.nama);
 					setDeskripsi(res.data.data.deskripsi);
 					setPenyelenggara(res.data.data.organizer);
@@ -129,6 +146,24 @@ const EventForm = () => {
 				})
 				.catch((err) => {
 					Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
+						history.push("/acara");
+					});
+				});
+		} else {
+			getAllTourismPlace()
+				.then((res) => {
+					setWisataList(
+						res.data.data.map((wisata) => {
+							return {
+								value: wisata._id,
+								label: wisata.nama,
+								color: "#00B8D9",
+							};
+						})
+					);
+				})
+				.catch((err) => {
+					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
 						history.push("/acara");
 					});
 				});
@@ -223,7 +258,7 @@ const EventForm = () => {
 											<input
 												type="text"
 												className="form-control"
-												placeholder="Nama acara"
+												placeholder="Penyelanggara acara"
 												value={penyelenggara}
 												onChange={(e) => setPenyelenggara(e.target.value)}
 											/>
@@ -238,7 +273,7 @@ const EventForm = () => {
 												onChange={(e) => {
 													setWisata(e);
 												}}
-												options={wisataOption}
+												options={wisataList}
 											/>
 										</div>
 									</div>
