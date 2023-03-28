@@ -89,13 +89,13 @@ const MerchantList = () => {
 							action: (
 								<div className="d-flex">
 									<Link
-										to={'/restaurant/detail/' + item._id}
+										to={'/merchant/detail/' + item._id}
 										className="shadow btn btn-primary btn-xs sharp me-1"
 									>
 										<i className="fas fa-eye"></i>
 									</Link>
 									<Link
-										to={'/restaurant/edit/' + item._id}
+										to={'/merchant/edit/' + item._id}
 										className="shadow btn btn-secondary btn-xs sharp me-1"
 									>
 										<i className="fas fa-pen"></i>
@@ -105,7 +105,7 @@ const MerchantList = () => {
 										className="shadow btn btn-danger btn-xs sharp"
 										onClick={() =>
 											Swal.fire({
-												title: 'Anda yakin ingin menghapus restaurant ini?',
+												title: 'Anda yakin ingin menghapus merchant ini?',
 												text: 'Setelah dihapus, Anda tidak akan dapat memulihkannya',
 												icon: 'warning',
 												showCancelButton: true,
@@ -161,7 +161,7 @@ const MerchantList = () => {
 			<div className="card">
 				<div className="card-header">
 					<h4 className="card-title">Daftar Merchant</h4>
-					<Link to="/restaurant/tambah">
+					<Link to="/merchant/tambah">
 						<Button className="me-2" variant="primary btn-rounded">
 							<span className="btn-icon-start text-primary">
 								<i className="fa fa-plus color-primary" />

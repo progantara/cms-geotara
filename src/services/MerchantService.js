@@ -19,8 +19,8 @@ export const getMerchant = (id) => {
 	});
 };
 
-export const createMerchant = (restaurant) => {
-	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/merchant/`, restaurant, {
+export const createMerchant = (merchant) => {
+	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/merchant/`, merchant, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
@@ -29,8 +29,8 @@ export const createMerchant = (restaurant) => {
 	});
 };
 
-export const updateMerchant = (id, restaurant) => {
-	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/merchant/` + id, restaurant, {
+export const updateMerchant = (id, merchant) => {
+	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/merchant/` + id, merchant, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
