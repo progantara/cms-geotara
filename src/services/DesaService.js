@@ -10,6 +10,15 @@ export const getAllDesa = () => {
 	});
 };
 
+export const getAllDesaByCode = (code) => {
+	return axios.get(`http://127.0.0.1:8000/api/master/lokasi/desa/` + code, {
+		headers: {
+			Authorization: `Bearer ${getAccessToken()}`,
+			Accept: 'application/json',
+		},
+	});
+};
+
 export const getAllDesaSelect = async () => {
 	const response = await axios.get('http://127.0.0.1:8000/api/master/lokasi/desa/', {
 		headers: {
