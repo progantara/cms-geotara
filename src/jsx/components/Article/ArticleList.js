@@ -84,7 +84,6 @@ const ArticleList = () => {
 				res.data.data.map((item, index) => {
 					getUser(item.author_id)
 						.then((user) => {
-							console.log(user)
 							setData((data) => [
 								...data,
 								{
@@ -147,7 +146,6 @@ const ArticleList = () => {
 							setIsLoading(false);
 						})
 						.catch((errUser) => {
-							console.log(errUser)
 							Swal.fire('Gagal!', 'Artikel gagal dimuat, silahkan refresh', 'error');
 							setIsLoading(false);
 						});
