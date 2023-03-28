@@ -1,10 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import DataTable from 'react-data-table-component';
+import { getAllTour, deleteTour } from '../../../services/TourService';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { currencyFormatter } from '../../../utils/stringFormatter';
 
 const TourList = () => {
+	const [data, setData] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+
 	const columns = [
 		{
 			name: 'No',
@@ -19,100 +25,27 @@ const TourList = () => {
 			width: '20%',
 		},
 		{
-			name: 'Kontak',
-			selector: (row) => row.kontak,
-			sortable: true,
-			width: '20%',
-		},
-		{
 			name: 'Alamat',
 			selector: (row) => row.alamat,
 			sortable: true,
-			width: '30%',
+			width: '25%',
+		},
+		{
+			name: 'Rating',
+			selector: (row) => row.rating,
+			sortable: true,
+			width: '10%',
+		},
+		{
+			name: 'Harga',
+			selector: (row) => row.harga,
+			sortable: true,
+			width: '20%',
 		},
 		{
 			name: 'Aksi',
-			selector: (row) => row.aksi,
-			width: '20%',
-		},
-	];
-
-	const data = [
-		{
-			id: 1,
-			no: '1',
-			nama: 'Toko Souvenir Ciletuh Pass',
-			kontak: '081222954662',
-			alamat: 'Bandung, Jawa Barat',
-			aksi: (
-				<div className="d-flex">
-					<Link to="/merchant/detail/1" className="shadow btn btn-primary btn-xs sharp me-1">
-						<i className="fas fa-eye"></i>
-					</Link>
-					<Link to="/merchant/edit/1" className="shadow btn btn-secondary btn-xs sharp me-1">
-						<i className="fas fa-pen"></i>
-					</Link>
-					<Link
-						to="#"
-						className="shadow btn btn-danger btn-xs sharp"
-						onClick={() =>
-							Swal.fire({
-								title: 'Anda yakin ingin menghapus merchant ini?',
-								text: 'Setelah dihapus, Anda tidak akan dapat memulihkannya',
-								icon: 'warning',
-								showCancelButton: true,
-								confirmButtonColor: '#3085d6',
-								cancelButtonColor: '#d33',
-								confirmButtonText: 'Ya, hapus!',
-							}).then((res) => {
-								if (res.isConfirmed) {
-									Swal.fire('Dihapus!', 'Tour telah dihapus.', 'success');
-								}
-							})
-						}
-					>
-						<i className="fa fa-trash"></i>
-					</Link>
-				</div>
-			),
-		},
-		{
-			id: 2,
-			no: '2',
-			nama: 'Homestay Ciletuh Pass',
-			harga: 'Rp. 25.000,00 s.d Rp. 50.000,00',
-			lokasi: 'Bandung, Jawa Barat',
-			aksi: (
-				<div className="d-flex">
-					<Link to="/merchant/detail/1" className="shadow btn btn-primary btn-xs sharp me-1">
-						<i className="fas fa-eye"></i>
-					</Link>
-					<Link to="/merchant/edit/1" className="shadow btn btn-secondary btn-xs sharp me-1">
-						<i className="fas fa-pen"></i>
-					</Link>
-					<Link
-						to="#"
-						className="shadow btn btn-danger btn-xs sharp"
-						onClick={() =>
-							swal({
-								title: 'Anda yakin ingin menghapus akomodasi ini?',
-								text: 'Setelah dihapus, Anda tidak akan dapat memulihkannya',
-								icon: 'warning',
-								buttons: true,
-								dangerMode: true,
-							}).then((willDelete) => {
-								if (willDelete) {
-									swal('Akomodasi telah dihapus!', {
-										icon: 'success',
-									});
-								}
-							})
-						}
-					>
-						<i className="fa fa-trash"></i>
-					</Link>
-				</div>
-			),
+			selector: (row) => row.action,
+			width: '15%',
 		},
 	];
 
@@ -140,15 +73,95 @@ const TourList = () => {
 		},
 	};
 
-	// use effect
-	useEffect(() => {}, []);
+	useEffect(() => {
+		setIsLoading(true);
+		getAllTour()
+			.then((res) => {
+				res.data.data.map((item, index) => {
+					setData((data) => [
+						...data,
+						{
+							no: index + 1,
+							nama: item.nama,
+							alamat: item.lokasi.alamat,
+							rating: item.rating,
+							harga: currencyFormatter(item.harga),
+							action: (
+								<div className="d-flex">
+									<Link
+										to={'/tour/detail/' + item._id}
+										className="shadow btn btn-primary btn-xs sharp me-1"
+									>
+										<i className="fas fa-eye"></i>
+									</Link>
+									<Link
+										to={'/tour/edit/' + item._id}
+										className="shadow btn btn-secondary btn-xs sharp me-1"
+									>
+										<i className="fas fa-pen"></i>
+									</Link>
+									<Link
+										to="#"
+										className="shadow btn btn-danger btn-xs sharp"
+										onClick={() =>
+											Swal.fire({
+												title: 'Anda yakin ingin menghapus tour ini?',
+												text: 'Setelah dihapus, Anda tidak akan dapat memulihkannya',
+												icon: 'warning',
+												showCancelButton: true,
+												confirmButtonColor: '#3085d6',
+												cancelButtonColor: '#d33',
+												confirmButtonText: 'Ya, hapus!',
+											}).then((res) => {
+												if (
+													res.isConfirmed
+												) {
+													deleteTour(
+														item._id
+													);
+													let newData =
+														data.filter(
+															(
+																e
+															) =>
+																e._id !==
+																item._id
+														);
+													setData(
+														newData
+													);
+													Swal.fire(
+														'Dihapus!',
+														'Tour telah dihapus.',
+														'success'
+													);
+												}
+											})
+										}
+									>
+										<i className="fa fa-trash"></i>
+									</Link>
+								</div>
+							),
+						},
+					]);
+				});
+				setIsLoading(false);
+				console.log(data);
+			})
+			.catch((err) => {
+				console.log(err);
+				setIsLoading(false);
+			});
+		console.log(data);
+	}, [setData]);
 
 	return (
 		<div className="col-12">
 			<div className="card">
 				<div className="card-header">
 					<h4 className="card-title">Daftar Tour</h4>
-					<Link to="/merchant/tambah">
+					<Link to="/tour/tambah">
 						<Button className="me-2" variant="primary btn-rounded">
 							<span className="btn-icon-start text-primary">
 								<i className="fa fa-plus color-primary" />
@@ -164,8 +177,16 @@ const TourList = () => {
 								columns={columns}
 								data={data}
 								pagination
-								paginationPerPage={5}
+								paginationPerPage={10}
 								customStyles={customStyles}
+								progressPending={isLoading}
+								progressComponent={
+									<ClipLoader
+										color={'#20c997'}
+										loading={isLoading}
+										aria-label="Loading Spinner"
+									/>
+								}
 							/>
 						</div>
 					</div>
