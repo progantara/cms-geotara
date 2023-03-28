@@ -2,9 +2,8 @@
 // 1. Dapatin lat long dari Maps -> OpenLayer
 // 2. Dapatin id desa dari Database
 
-import React, { Component, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import MaterialTime from './MaterialTime';
 import 'react-dropzone-uploader/dist/styles.css';
 import { checkImageResolution } from '../../../utils/checkImageWidth';
 import Select from 'react-select';
