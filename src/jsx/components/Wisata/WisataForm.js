@@ -439,7 +439,11 @@ const WisataForm = () => {
 									<div className="row">
 										<div className="form-group mb-4 col-md-6">
 											<label>
-												Harga {currencyFormatter(hargaTiket, "id-ID")}
+												Harga{' '}
+												{currencyFormatter(
+													hargaTiket,
+													'id-ID'
+												)}
 											</label>
 											<input
 												type="text"
