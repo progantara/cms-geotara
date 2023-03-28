@@ -24,17 +24,17 @@ export const createAttraction = (attraction) => {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
-			'Content-Type': 'application/json',
+			'Content-Type': 'multipart/form-data',
 		},
 	});
 };
 
 export const updateAttraction = (id, attraction) => {
-	return axios.put(`http://127.0.0.1:8000/api/master/sponsorship/atraksi/` + id, attraction, {
+	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/atraksi/` + id, attraction, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
-			'Content-Type': 'application/json',
+			'Content-Type': 'multipart/form-data',
 		},
 	});
 };

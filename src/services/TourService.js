@@ -24,17 +24,17 @@ export const createTour = (tour) => {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
-			'Content-Type': 'application/json',
+			'Content-Type': 'multipart/form-data',
 		},
 	});
 };
 
 export const updateTour = (id, tour) => {
-	return axios.put(`http://127.0.0.1:8000/api/master/sponsorship/tour/` + id, tour, {
+	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/tour/` + id, tour, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
-			'Content-Type': 'application/json',
+			'Content-Type': 'multipart/form-data',
 		},
 	});
 };

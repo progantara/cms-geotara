@@ -105,13 +105,13 @@ export default function UserForm() {
 							},
 						],
 					});
-					console.log(inputAccomodation);
-					console.log(lokasi);
-					console.log(detail);
+					// console.log(inputAccomodation);
+					// console.log(lokasi);
+					// console.log(detail);
 				})
 				.catch((err) => {
 					Swal.fire('Gagal!', 'Accomodation gagal dimuat', 'error').then(() => {
-						// history.push('/accomodation');
+						history.push('/accomodation');
 					});
 					console.log(inputAccomodation);
 				});
@@ -124,10 +124,6 @@ export default function UserForm() {
 			...inputAccomodation,
 			[e.target.name]: value,
 		});
-		// alert(value + ' ' + e.target.name);
-		console.log(inputAccomodation);
-		console.log(lokasi);
-		console.log(detail);
 	};
 
 	const handleChangeLokasi = (e) => {
@@ -136,8 +132,6 @@ export default function UserForm() {
 			...lokasi,
 			[e.target.name]: value,
 		});
-		// alert(value + ' ' + e.target.name);
-		// console.log(lokasi);
 	};
 
 	const handleImageChange = (e) => {
@@ -146,8 +140,6 @@ export default function UserForm() {
 			...inputAccomodation,
 			[e.target.name]: value,
 		});
-		// alert(value + ' ' + e.target.name);
-		// console.log(inputAccomodation);
 	};
 
 	const handleCreate = (e) => {
@@ -186,14 +178,14 @@ export default function UserForm() {
 		if (inputAccomodation.thumbnail !== '') data.append('thumbnail', inputAccomodation.thumbnail);
 		data.append('nama', inputAccomodation.nama);
 		data.append('deskripsi', inputAccomodation.deskripsi);
-		data.append('no_telp', inputAccomodation.no_telp);
-		data.append('email', inputAccomodation.email);
-		data.append('harga', inputAccomodation.harga);
-		data.append('rating', inputAccomodation.rating);
 		data.append('lat', lokasi.lat);
 		data.append('long', lokasi.long);
 		data.append('desa_id', lokasi.desa_id);
 		data.append('alamat', lokasi.alamat);
+		data.append('no_telp', inputAccomodation.no_telp);
+		data.append('email', inputAccomodation.email);
+		data.append('harga', inputAccomodation.harga);
+		data.append('rating', inputAccomodation.rating);
 		data.append('fasilitas[0]', detail.fasilitas[0]);
 		data.append('kamar[0][tipe]', detail.kamar[0].tipe);
 		data.append('kamar[0][harga]', detail.kamar[0].harga);
@@ -207,6 +199,7 @@ export default function UserForm() {
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Accomodation gagal diubah.', 'error');
 				console.log(err);
+				console.log(data);
 			});
 	};
 

@@ -3,8 +3,6 @@ import Swal from 'sweetalert2';
 import { useHistory, useParams } from 'react-router-dom';
 import { createAttraction, getAttraction, updateAttraction } from '../../../services/AttractionService';
 import { getAllDesaSelect } from '../../../services/DesaService';
-import { TimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
 import { format } from 'date-fns';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import 'ol/ol.css';
@@ -17,18 +15,24 @@ export default function UserForm() {
 
 	const [desa, setDesa] = useState([]);
 	const [thumbnailPreview, setThumbnailPreview] = useState('');
-	const [inputResturant, setInputAttraction] = useState({
-		banner_image: '',
+	const [inputAttraction, setInputAttraction] = useState({
 		nama: '',
+		thumbnail: '',
+		thumbnail_preview: '',
+		harga_tiket: '',
+	});
+	const [lokasi, setLokasi] = useState({
 		lat: '',
 		long: '',
 		desa_id: '',
 		alamat: '',
-		no_telp: '',
-		email: '',
+	});
+	const [detail, setDetail] = useState({
+		tipe_atraksi: '',
 		rating: '',
-		jam_buka: '',
-		jam_tutup: '',
+		deskripsi: '',
+		durasi: '',
+		kapasitas: '',
 	});
 
 	let title = 'Tambah Attraction';
@@ -70,75 +74,86 @@ export default function UserForm() {
 					let data = res.data.data;
 					setInputAttraction({
 						nama: data.nama,
+						thumbnail: '',
+						thumbnail_preview: data.thumbnail,
+						harga_tiket: data.harga_tiket,
+					});
+					setLokasi({
 						lat: data.lokasi.lat,
 						long: data.lokasi.long,
 						desa_id: data.lokasi.desa_id,
 						alamat: data.lokasi.alamat,
-						no_telp: data.no_telp,
-						email: data.email,
-						rating: data.rating,
-						jam_buka: data.jam_buka,
-						jam_tutup: data.jam_tutup,
-						banner_image: '',
 					});
-					setThumbnailPreview(data.banner_image);
+					setDetail({
+						tipe_atraksi: data.detail.tipe_atraksi,
+						rating: data.detail.rating,
+						deskripsi: data.detail.deskripsi,
+						durasi: data.detail.durasi,
+						kapasitas: data.detail.kapasitas,
+					});
 				})
 				.catch((err) => {
 					Swal.fire('Gagal!', 'Attraction gagal dimuat', 'error').then(() => {
-						// history.push('/restaurant');
+						history.push('/attraction');
 					});
-					console.log(inputResturant);
+					console.log(inputAttraction);
 				});
 		}
 	}, [id, setDesa]);
 
-	const handleChange = (e) => {
+	const handleChangeAttraction = (e) => {
 		const value = e.target.value;
 		setInputAttraction({
-			...inputResturant,
+			...inputAttraction,
 			[e.target.name]: value,
 		});
-		// alert(value + ' ' + e.target.name);
-		console.log(inputResturant);
+	};
+
+	const handleChangeLokasi = (e) => {
+		const value = e.target.value;
+		setLokasi({
+			...lokasi,
+			[e.target.name]: value,
+		});
+	};
+
+	const handleChangeDetail = (e) => {
+		const value = e.target.value;
+		setDetail({
+			...detail,
+			[e.target.name]: value,
+		});
 	};
 
 	const handleImageChange = (e) => {
 		const value = e.target.files[0];
 		setInputAttraction({
-			...inputResturant,
+			...inputAttraction,
 			[e.target.name]: value,
 		});
 		// alert(value + ' ' + e.target.name);
-		console.log(inputResturant);
-	};
-
-	const handleDateChange = (e, type) => {
-		const selectedTime = e instanceof Date ? e : new Date();
-		const newJamOperasional = format(selectedTime, 'HH:mm');
-		setInputAttraction((prevInput) => ({
-			...prevInput,
-			[type]: newJamOperasional,
-		}));
+		console.log(inputAttraction);
 	};
 
 	const handleCreate = (e) => {
 		e.preventDefault();
 		let data = new FormData();
-		data.append('banner_image', inputResturant.banner_image);
-		data.append('nama', inputResturant.nama);
-		data.append('lat', inputResturant.lat);
-		data.append('long', inputResturant.long);
-		data.append('desa_id', inputResturant.desa_id);
-		data.append('alamat', inputResturant.alamat);
-		data.append('no_telp', inputResturant.no_telp);
-		data.append('email', inputResturant.email);
-		data.append('rating', inputResturant.rating);
-		data.append('jam_buka', inputResturant.jam_buka);
-		data.append('jam_tutup', inputResturant.jam_tutup);
+		data.append('thumbnail', inputAttraction.thumbnail);
+		data.append('nama', inputAttraction.nama);
+		data.append('harga_tiket', inputAttraction.harga_tiket);
+		data.append('lat', lokasi.lat);
+		data.append('long', lokasi.long);
+		data.append('desa_id', lokasi.desa_id);
+		data.append('alamat', lokasi.alamat);
+		data.append('tipe_atraksi', detail.tipe_atraksi);
+		data.append('rating', detail.rating);
+		data.append('deskripsi', detail.deskripsi);
+		data.append('durasi', detail.durasi);
+		data.append('kapasitas', detail.kapasitas);
 		createAttraction(data)
 			.then((res) => {
 				Swal.fire('Berhasil!', 'Attraction berhasil ditambahkan', 'success');
-				history.push('/restaurant');
+				history.push('/attraction');
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Attraction gagal ditambahkan.', 'error');
@@ -150,25 +165,22 @@ export default function UserForm() {
 		e.preventDefault();
 		let data = new FormData();
 		data.append('_method', 'put');
-		if (inputResturant.banner_image !== '') data.append('banner_image', inputResturant.banner_image);
-		data.append('nama', inputResturant.nama);
-		data.append('lat', inputResturant.lat);
-		data.append('long', inputResturant.long);
-		data.append('desa_id', inputResturant.desa_id);
-		data.append('alamat', inputResturant.alamat);
-		data.append('no_telp', inputResturant.no_telp);
-		data.append('email', inputResturant.email);
-		data.append('rating', inputResturant.rating);
-		data.append('jam_buka', inputResturant.jam_buka);
-		data.append('jam_tutup', inputResturant.jam_tutup);
-
-		// for (const [key, value] of data.entries()) {
-		// 	console.log(key + ': ' + value);
-		// }
+		if (inputAttraction.thumbnail !== '') data.append('thumbnail', inputAttraction.thumbnail);
+		data.append('nama', inputAttraction.nama);
+		data.append('harga_tiket', inputAttraction.harga_tiket);
+		data.append('lat', lokasi.lat);
+		data.append('long', lokasi.long);
+		data.append('desa_id', lokasi.desa_id);
+		data.append('alamat', lokasi.alamat);
+		data.append('tipe_atraksi', detail.tipe_atraksi);
+		data.append('rating', detail.rating);
+		data.append('deskripsi', detail.deskripsi);
+		data.append('durasi', detail.durasi);
+		data.append('kapasitas', detail.kapasitas);
 		updateAttraction(id, data)
 			.then((res) => {
 				Swal.fire('Berhasil!', 'Attraction berhasil diubah', 'success');
-				history.push('/restaurant');
+				history.push('/attraction');
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Attraction gagal diubah.', 'error');
@@ -196,13 +208,13 @@ export default function UserForm() {
 											<input
 												type="text"
 												className="form-control"
-												placeholder="Masukkan nama restaurant"
+												placeholder="Masukkan nama attraction"
 												name="nama"
 												value={
-													inputResturant.nama
+													inputAttraction.nama
 												}
 												onChange={
-													handleChange
+													handleChangeAttraction
 												}
 											/>
 										</div>
@@ -217,7 +229,7 @@ export default function UserForm() {
 													<input
 														type="file"
 														className="form-file-input form-control"
-														name="banner_image"
+														name="thumbnail"
 														accept="image/*"
 														onChange={
 															handleImageChange
@@ -232,7 +244,7 @@ export default function UserForm() {
 												'' && (
 												<img
 													src={
-														'http://127.0.0.1:8000/storage/restaurant/' +
+														'http://127.0.0.1:8000/storage/attraction/' +
 														thumbnailPreview
 													}
 													alt="banner"
@@ -243,11 +255,11 @@ export default function UserForm() {
 													}}
 												/>
 											)}
-											{inputResturant.banner_image !=
+											{inputAttraction.thumbnail !=
 												'' && (
 												<img
 													src={URL.createObjectURL(
-														inputResturant.banner_image
+														inputAttraction.thumbnail
 													)}
 													alt="banner"
 													className="img-fluid border border-2 border-dark rounded-3"
@@ -257,6 +269,26 @@ export default function UserForm() {
 													}}
 												/>
 											)}
+										</div>
+									</div>
+									<div className="row">
+										<div className="form-group mb-3">
+											<label>
+												Harga
+												Tiket
+											</label>
+											<input
+												type="number"
+												className="form-control"
+												placeholder="Masukkan harga_tiket attraction"
+												name="harga_tiket"
+												value={
+													inputAttraction.harga_tiket
+												}
+												onChange={
+													handleChangeAttraction
+												}
+											/>
 										</div>
 									</div>
 									<div className="row">
@@ -273,14 +305,14 @@ export default function UserForm() {
 													clearIndicator: ClearIndicatorStyles,
 												}}
 												value={
-													inputResturant.desa_id
-														? inputResturant.desa_id
+													inputAttraction.desa_id
+														? inputAttraction.desa_id
 														: 'option'
 												}
 												className="form-control"
 												name="desa_id"
 												onChange={
-													handleChange
+													handleChangeAttraction
 												}
 												options={
 													desa
@@ -288,14 +320,14 @@ export default function UserForm() {
 											/> */}
 											<select
 												value={
-													inputResturant.desa_id
-														? inputResturant.desa_id
+													lokasi.desa_id
+														? lokasi.desa_id
 														: 'option'
 												}
 												className="form-control"
 												name="desa_id"
 												onChange={
-													handleChange
+													handleChangeLokasi
 												}
 											>
 												<option
@@ -336,10 +368,10 @@ export default function UserForm() {
 												rows="2"
 												name="alamat"
 												value={
-													inputResturant.alamat
+													lokasi.alamat
 												}
 												onChange={
-													handleChange
+													handleChangeLokasi
 												}
 											></textarea>
 										</div>
@@ -355,7 +387,7 @@ export default function UserForm() {
 													className="form-control mb-3"
 													placeholder="Pilih pada peta"
 													value={
-														inputResturant.long
+														lokasi.long
 													}
 													disabled
 												/>
@@ -369,7 +401,7 @@ export default function UserForm() {
 													className="form-control mb-3"
 													placeholder="Pilih pada peta"
 													value={
-														inputResturant.lat
+														lokasi.lat
 													}
 													disabled
 												/>
@@ -407,9 +439,9 @@ export default function UserForm() {
 															toLonLat(
 																coords
 															);
-														setInputAttraction(
+														setLokasi(
 															{
-																...inputResturant,
+																...lokasi,
 																long: lonlat[0],
 																lat: lonlat[1],
 															}
@@ -426,121 +458,94 @@ export default function UserForm() {
 											</RMap>
 										</div>
 									</div>
+									<hr />
 									<div className="row">
-										<div className="mb-3 form-group col-md-4">
-											<label>
-												No
-												Telp
-											</label>
+										<h5>Detail</h5>
+										<div className="mb-3 form-group col-md-6">
+											<label>Tipe</label>
 											<input
 												type="text"
 												className="form-control"
-												placeholder="Masukkan nomor telepon"
-												name="no_telp"
-												onChange={
-													handleChange
-												}
+												placeholder="Masukkan tipe"
+												name="tipe_atraksi"
 												value={
-													inputResturant.no_telp
+													detail.tipe_atraksi
+												}
+												onChange={
+													handleChangeDetail
 												}
 											/>
 										</div>
-										<div className="mb-3 form-group col-md-4">
-											<label>Email</label>
-											<input
-												type="email"
-												className="form-control"
-												placeholder="Masukkan email"
-												name="email"
-												onChange={
-													handleChange
-												}
-												value={
-													inputResturant.email
-												}
-											/>
-										</div>
-										<div className="mb-3 form-group col-md-4">
+										<div className="mb-3 form-group col-md-6">
 											<label>
 												Rating
 											</label>
 											<input
 												type="number"
-												min="0"
-												max="5"
-												step="0.5"
 												className="form-control"
 												placeholder="Masukkan rating"
 												name="rating"
-												onChange={
-													handleChange
-												}
 												value={
-													inputResturant.rating
+													detail.rating
+												}
+												onChange={
+													handleChangeDetail
 												}
 											/>
 										</div>
 									</div>
 									<div className="row">
-										<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
+										<div className="form-group mb-3">
 											<label>
-												Jam
-												Buka
+												Deskripsi
 											</label>
-											<MuiPickersUtilsProvider
-												utils={
-													DateFnsUtils
+											<textarea
+												className="form-control"
+												rows="2"
+												name="deskripsi"
+												value={
+													detail.deskripsi
 												}
-											>
-												<TimePicker
-													name="jam_buka"
-													value={
-														inputResturant.jam_buka
-															? new Date(
-																	`01/01/1970 ${inputResturant.jam_buka}`
-															  )
-															: null
-													}
-													onChange={(
-														e
-													) =>
-														handleDateChange(
-															e,
-															'jam_buka'
-														)
-													}
-												/>
-											</MuiPickersUtilsProvider>
+												onChange={
+													handleChangeDetail
+												}
+											></textarea>
 										</div>
-										<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
+									</div>
+									<div className="row">
+										<div className="mb-3 form-group col-md-6">
 											<label>
-												Jam
-												Tutup
+												Durasi
 											</label>
-											<MuiPickersUtilsProvider
-												utils={
-													DateFnsUtils
+											<input
+												type="text"
+												className="form-control"
+												placeholder="Masukkan durasi"
+												name="durasi"
+												value={
+													detail.durasi
 												}
-											>
-												<TimePicker
-													name="jam_tutup"
-													value={
-														inputResturant.jam_tutup
-															? new Date(
-																	`01/01/1970 ${inputResturant.jam_tutup}`
-															  )
-															: null
-													}
-													onChange={(
-														time
-													) =>
-														handleDateChange(
-															time,
-															'jam_tutup'
-														)
-													}
-												/>
-											</MuiPickersUtilsProvider>
+												onChange={
+													handleChangeDetail
+												}
+											/>
+										</div>
+										<div className="mb-3 form-group col-md-6">
+											<label>
+												Kapasitas
+											</label>
+											<input
+												type="number"
+												className="form-control"
+												placeholder="Masukkan kapasitas"
+												name="kapasitas"
+												value={
+													detail.kapasitas
+												}
+												onChange={
+													handleChangeDetail
+												}
+											/>
 										</div>
 									</div>
 									<button type="submit" className="btn btn-primary me-2">

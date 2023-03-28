@@ -165,7 +165,8 @@ export default function UserForm() {
 		updateMerchant(id, data)
 			.then((res) => {
 				Swal.fire('Berhasil!', 'Merchant berhasil diubah', 'success');
-				history.push('/restaurant');
+				// history.push('/restaurant');
+				console.log(res);
 			})
 			.catch((err) => {
 				Swal.fire('Gagal!', 'Merchant gagal diubah.', 'error');

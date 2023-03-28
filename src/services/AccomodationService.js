@@ -24,17 +24,17 @@ export const createAccomodation = (accomodation) => {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
-			'Content-Type': 'application/json',
+			'Content-Type': 'multipart/form-data',
 		},
 	});
 };
 
 export const updateAccomodation = (id, accomodation) => {
-	return axios.put(`http://127.0.0.1:8000/api/master/sponsorship/penginapan/` + id, accomodation, {
+	return axios.post(`http://127.0.0.1:8000/api/master/sponsorship/penginapan/` + id, accomodation, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',
-			'Content-Type': 'application/json',
+			'Content-Type': 'multipart/form-data',
 		},
 	});
 };
