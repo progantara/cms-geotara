@@ -220,7 +220,7 @@ const EventForm = () => {
 											{flyerImagePreview != "" && (
 												<img
 													src={
-														process.env.REACT_APP_API_BASE_URL+"/storage/event/" +
+														process.env.REACT_APP_STORAGE_BASE_URL+"/event/" +
 														flyerImagePreview
 													}
 													alt="banner"
