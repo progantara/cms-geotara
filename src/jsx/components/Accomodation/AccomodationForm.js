@@ -2,7 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import { useHistory, useParams } from 'react-router-dom';
 import { createAccomodation, getAccomodation, updateAccomodation } from '../../../services/AccomodationService';
-import { getAllDesaSelect } from '../../../services/DesaService';
+import { getAllProvinsi } from '../../../services/ProvinsiService';
+import { getAllKotaByCode } from '../../../services/KotaService';
+import { getAllDistrikByCode, getDistrik } from '../../../services/DistrikService';
+import { getAllDesaByCode, getDesa } from '../../../services/DesaService';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import 'ol/ol.css';
 import Select from 'react-select';
@@ -12,7 +15,13 @@ export default function UserForm() {
 	const history = useHistory();
 	const { id } = useParams();
 
-	const [desa, setDesa] = useState([]);
+	const [provinsiId, setProvinsiId] = useState({});
+	const [provinsiList, setProvinsiList] = useState([]);
+	const [kotaId, setKotaId] = useState({});
+	const [kotaList, setKotaList] = useState([]);
+	const [distrikId, setDistrikId] = useState({});
+	const [distrikList, setDistrikList] = useState([]);
+	const [desaList, setDesaList] = useState([]);
 	const [inputAccomodation, setInputAccomodation] = useState({
 		thumbnail: '',
 		thumbnailPreview: '',
@@ -26,7 +35,7 @@ export default function UserForm() {
 	const [lokasi, setLokasi] = useState({
 		lat: '',
 		long: '',
-		desa_id: '',
+		desa_id: {},
 		alamat: '',
 	});
 	const [detail, setDetail] = useState({
@@ -68,11 +77,6 @@ export default function UserForm() {
 	});
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const result = await getAllDesaSelect();
-			setDesa(result);
-		};
-		fetchData();
 		if (id !== undefined) {
 			getAccomodation(id)
 				.then((res) => {
@@ -110,8 +114,24 @@ export default function UserForm() {
 						history.push('/accomodation');
 					});
 				});
+		} else {
+			getAllProvinsi()
+				.then((res) => {
+					setProvinsiList(
+						res.data.data.map((item) => {
+							return {
+								value: item.kode,
+								label: item.nama,
+								color: '#00B8D9',
+							};
+						})
+					);
+				})
+				.catch((err) => {
+					Swal.fire('Gagal!', 'Provinsi gagal dimuat', 'error');
+				});
 		}
-	}, [id, setDesa]);
+	}, [id, setProvinsiList]);
 
 	const handleChangeAccomodation = (e) => {
 		const value = e.target.value;
@@ -145,7 +165,7 @@ export default function UserForm() {
 		data.append('deskripsi', inputAccomodation.deskripsi);
 		data.append('lat', lokasi.lat);
 		data.append('long', lokasi.long);
-		data.append('desa_id', lokasi.desa_id);
+		data.append('desa_id', lokasi.desa_id.value);
 		data.append('alamat', lokasi.alamat);
 		data.append('no_telp', inputAccomodation.no_telp);
 		data.append('email', inputAccomodation.email);
@@ -174,7 +194,7 @@ export default function UserForm() {
 		data.append('deskripsi', inputAccomodation.deskripsi);
 		data.append('lat', lokasi.lat);
 		data.append('long', lokasi.long);
-		data.append('desa_id', lokasi.desa_id);
+		data.append('desa_id', lokasi.desa_id.value);
 		data.append('alamat', lokasi.alamat);
 		data.append('no_telp', inputAccomodation.no_telp);
 		data.append('email', inputAccomodation.email);
@@ -297,11 +317,13 @@ export default function UserForm() {
 										</div>
 									</div>
 									<div className="row">
-										<div className="mb-3 form-group col-md-4">
-											<label>Desa</label>
-											{/* <Select
+										<div className="form-group mb-4 col-md-4">
+											<label>
+												Provinsi
+											</label>
+											<Select
 												closeMenuOnSelect={
-													false
+													true
 												}
 												components={{
 													ClearIndicator,
@@ -310,61 +332,216 @@ export default function UserForm() {
 													clearIndicator: ClearIndicatorStyles,
 												}}
 												value={
-													inputAccomodation.desa_id
-														? inputAccomodation.desa_id
-														: 'option'
+													provinsiId
 												}
-												className="form-control"
-												name="desa_id"
-												onChange={
-													handleChangeAccomodation
-												}
+												onChange={(
+													e
+												) => {
+													setProvinsiId(
+														e
+													);
+													getAllKotaByCode(
+														e.value
+													)
+														.then(
+															(
+																res
+															) => {
+																setKotaList(
+																	res.data.data.map(
+																		(
+																			item
+																		) => {
+																			return {
+																				value: item.kode,
+																				label: item.nama,
+																				color: '#00B8D9',
+																			};
+																		}
+																	)
+																);
+															}
+														)
+														.catch(
+															(
+																err
+															) => {
+																Swal.fire(
+																	'Gagal!',
+																	'Kota gagal dimuat',
+																	'error'
+																);
+																history.push(
+																	'/wisata'
+																);
+															}
+														);
+												}}
 												options={
-													desa
+													provinsiList
 												}
-											/> */}
-											<select
+											/>
+										</div>
+										<div className="form-group mb-4 col-md-4">
+											<label>Kota</label>
+											<Select
+												closeMenuOnSelect={
+													true
+												}
+												components={{
+													ClearIndicator,
+												}}
+												styles={{
+													clearIndicator: ClearIndicatorStyles,
+												}}
+												value={
+													kotaId
+												}
+												onChange={(
+													e
+												) => {
+													setKotaId(
+														e
+													);
+													getAllDistrikByCode(
+														e.value
+													)
+														.then(
+															(
+																res
+															) => {
+																setDistrikList(
+																	res.data.data.map(
+																		(
+																			item
+																		) => {
+																			return {
+																				value: item.kode,
+																				label: item.nama,
+																				color: '#00B8D9',
+																			};
+																		}
+																	)
+																);
+															}
+														)
+														.catch(
+															(
+																err
+															) => {
+																Swal.fire(
+																	'Gagal!',
+																	'Distrik gagal dimuat',
+																	'error'
+																);
+																history.push(
+																	'/wisata'
+																);
+															}
+														);
+												}}
+												options={
+													kotaList
+												}
+											/>
+										</div>
+										<div className="form-group mb-4 col-md-4">
+											<label>
+												Distrik
+											</label>
+											<Select
+												closeMenuOnSelect={
+													true
+												}
+												components={{
+													ClearIndicator,
+												}}
+												styles={{
+													clearIndicator: ClearIndicatorStyles,
+												}}
+												value={
+													distrikId
+												}
+												onChange={(
+													e
+												) => {
+													setDistrikId(
+														e
+													);
+													getAllDesaByCode(
+														e.value
+													)
+														.then(
+															(
+																res
+															) => {
+																setDesaList(
+																	res.data.data.map(
+																		(
+																			item
+																		) => {
+																			return {
+																				value: item.kode,
+																				label: item.nama,
+																				color: '#00B8D9',
+																			};
+																		}
+																	)
+																);
+															}
+														)
+														.catch(
+															(
+																err
+															) => {
+																Swal.fire(
+																	'Gagal!',
+																	'Desa gagal dimuat',
+																	'error'
+																);
+																history.push(
+																	'/wisata'
+																);
+															}
+														);
+												}}
+												options={
+													distrikList
+												}
+											/>
+										</div>
+										<div className="form-group mb-4 col-md-4">
+											<label>Desa</label>
+											<Select
+												closeMenuOnSelect={
+													true
+												}
+												components={{
+													ClearIndicator,
+												}}
+												styles={{
+													clearIndicator: ClearIndicatorStyles,
+												}}
 												value={
 													lokasi.desa_id
-														? lokasi.desa_id
-														: 'option'
 												}
-												className="form-control"
+												options={
+													desaList
+												}
 												name="desa_id"
-												onChange={
-													handleChangeLokasi
-												}
-											>
-												<option
-													value="option"
-													disabled
-												>
-													Pilih
-													Desa...
-												</option>
-												{desa.map(
-													(
-														item
-													) => {
-														return (
-															<option
-																key={
-																	item.kode
-																}
-																value={
-																	item.kode
-																}
-															>
-																{
-																	item.nama
-																}
-															</option>
-														);
-													}
-												)}
-											</select>
+												onChange={(
+													e
+												) => {
+													setLokasi(
+														{
+															...lokasi,
+															desa_id: e,
+														}
+													);
+												}}
+											/>
 										</div>
-										<div className="mb-3 form-group col-md-8">
+										<div className="form-group mb-3 col-md-8">
 											<label>
 												Alamat
 											</label>
