@@ -220,7 +220,7 @@ const EventForm = () => {
 											{flyerImagePreview != "" && (
 												<img
 													src={
-														"http://127.0.0.1:8000/storage/event/" +
+														process.env.REACT_APP_API_BASE_URL+"/storage/event/" +
 														flyerImagePreview
 													}
 													alt="banner"
