@@ -301,7 +301,7 @@ export default function UserForm() {
 												'' && (
 												<img
 													src={
-														'http://127.0.0.1:8000/storage/tour/' +
+														process.env.REACT_APP_STORAGE_BASE_URL+'/tour/' +
 														inputTour.thumbnailPreview
 													}
 													alt="banner"
@@ -864,7 +864,7 @@ export default function UserForm() {
 												'' && (
 												<img
 													src={
-														'http://127.0.0.1:8000/storage/accomodation/detail' +
+														process.env.REACT_APP_STORAGE_BASE_URL+'/accomodation/detail' +
 														detail
 															.jurusan[0]
 															.thumbnailPreview
