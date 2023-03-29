@@ -60,7 +60,7 @@ const ArticleForm = () => {
 	const handleCreate = (e) => {
 		e.preventDefault();
 		const data = new FormData();
-		data.append('banner_image', banner);
+		data.append('thumbnail', banner);
 		data.append('judul', judul);
 		data.append('content', content);
 		tag.map((item) => item.value).forEach((item, index) => {
@@ -80,7 +80,7 @@ const ArticleForm = () => {
 		e.preventDefault();
 		let data = new FormData();
 		data.append('_method', 'put');
-		if (banner !== '') data.append('banner_image', banner);
+		if (banner !== '') data.append('thumbnail', banner);
 		data.append('judul', judul);
 		data.append('content', content);
 		tag.map((item) => item.value).forEach((item, index) => {
@@ -100,7 +100,7 @@ const ArticleForm = () => {
 		if (id !== undefined) {
 			getArticle(id)
 				.then((res) => {
-					setBannerPreview(res.data.data.banner_image);
+					setBannerPreview(res.data.data.thumbnail);
 					setJudul(res.data.data.judul);
 					setContent(res.data.data.content);
 					setTag(

@@ -1,8 +1,3 @@
-/**
- * TODO:
- * 
- */
-
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
@@ -24,7 +19,8 @@ const ArticleList = () => {
 		{
 			name: "No",
 			selector: (row) => row.no,
-			sortable: true,
+			sortable: false,
+			cell: (row, index) => index + 1,
 			width: "10%",
 		},
 		{
@@ -47,8 +43,45 @@ const ArticleList = () => {
 		},
 		{
 			name: "Aksi",
-			selector: (row) => row.action,
 			width: "20%",
+			cell: (row) => (
+				<div className="d-flex">
+					<Link
+						to="#"
+						// to={"/artikel/detail/" + row._id}
+						className="btn btn-primary shadow btn-xs sharp me-1"
+					>
+						<i className="fas fa-eye"></i>
+					</Link>
+					<Link
+						to={"/artikel/edit/" + row._id}
+						className="btn btn-secondary shadow btn-xs sharp me-1"
+					>
+						<i className="fas fa-pen"></i>
+					</Link>
+					<Link
+						to="#"
+						className="btn btn-danger shadow btn-xs sharp"
+						onClick={() =>
+							Swal.fire({
+								title: "Anda yakin ingin menghapus artikel ini?",
+								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+								icon: "warning",
+								showCancelButton: true,
+								confirmButtonColor: "#3085d6",
+								cancelButtonColor: "#d33",
+								confirmButtonText: "Ya, hapus!",
+							}).then((res) => {
+								if (res.isConfirmed) {
+									handleDelete(row._id);
+								}
+							})
+						}
+					>
+						<i className="fa fa-trash"></i>
+					</Link>
+				</div>
+			),
 		},
 	];
 
@@ -76,87 +109,38 @@ const ArticleList = () => {
 		},
 	};
 
+	const handleDelete = async (id) => {
+		const response = await deleteArticle(id);
+		if (response.status === 200) {
+			const newData = data.filter((item) => item._id !== id);
+			setData(newData);
+			Swal.fire("Berhasil!", "Artikel berhasil dihapus", "success");
+		} else {
+			Swal.fire("Gagal!", "Artikel gagal dihapus", "error");
+		}
+	};
+
 	// use effect
 	useEffect(() => {
 		setIsLoading(true);
-		getAllArticle()
-			.then((res) => {
-				res.data.data.map((item, index) => {
-					getUser(item.author_id)
-						.then((user) => {
-							setData((data) => [
-								...data,
-								{
-									id: item._id,
-									no: index + 1,
-									title: item.judul,
-									writer: user.data.data.name,
-									publication_date: moment(item.created_at).format("LL"),
-									action: (
-										<div className="d-flex">
-											<Link
-												to="#"
-												// to={`/artikel/detail/${item._id}`}
-												className="btn btn-primary shadow btn-xs sharp me-1"
-											>
-												<i className="fas fa-eye"></i>
-											</Link>
-											<Link
-												to={`/artikel/edit/${item._id}`}
-												className="btn btn-secondary shadow btn-xs sharp me-1"
-											>
-												<i className="fas fa-pen"></i>
-											</Link>
-											<Link
-												to="#"
-												className="btn btn-danger shadow btn-xs sharp"
-												onClick={() =>
-													Swal.fire({
-														title: "Anda yakin ingin menghapus artikel ini?",
-														text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
-														icon: "warning",
-														showCancelButton: true,
-														confirmButtonColor: "#3085d6",
-														cancelButtonColor: "#d33",
-														confirmButtonText: "Ya, hapus!",
-													}).then((res) => {
-														if (res.isConfirmed) {
-															deleteArticle(item._id)
-																.then((res) => {
-																	setData(data.filter((item) => item.id !== res.data.data._id));
-																	Swal.fire(
-																		"Dihapus!",
-																		"Artikel telah dihapus.",
-																		"success"
-																	);
-																	history.push("/artikel");
-																})
-																.catch((err) => {
-																	Swal.fire("Gagal!", "Artikel gagal dihapus", "error");
-																});
-														}
-													})
-												}
-											>
-												<i className="fa fa-trash"></i>
-											</Link>
-										</div>
-									),
-								},
-							]);
-							setIsLoading(false);
-						})
-						.catch((errUser) => {
-							Swal.fire('Gagal!', 'Artikel gagal dimuat, silahkan refresh', 'error');
-							setIsLoading(false);
-						});
-				});
-			})
-			.catch((err) => {
-				Swal.fire('Gagal!', 'Artikel gagal dimuat', 'error');
-				setIsLoading(false);
-			});
+		fetchData();
 	}, []);
+
+	const fetchData = async () => {
+		const response = await getAllArticle();
+		if (response.status === 200) {
+			const data = response.data.data.map((item) => {
+				return {
+					...item,
+					title: item.judul,
+					writer: item.author_id,
+					publication_date: moment(item.created_at).format("LL"),
+				};
+			});
+			setData(data);
+		}
+		setIsLoading(false);
+	};
 
 	return (
 		<div className="col-12">
