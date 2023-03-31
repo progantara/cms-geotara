@@ -296,7 +296,7 @@ const EventForm = () => {
 													</div>
 													<span className="input-group-text">Upload</span>
 												</div>
-												{formEvent.flyerImagePreview != "" && (
+												{formEvent.flyerImagePreview?.length > 0 && (
 													<img
 														src={
 															process.env.REACT_APP_STORAGE_BASE_URL +
@@ -311,7 +311,7 @@ const EventForm = () => {
 														}}
 													/>
 												)}
-												{formEvent.flyerImage != "" && (
+												{formEvent.flyerImage?.length > 0 && (
 													<img
 														src={URL.createObjectURL(formEvent.flyerImage)}
 														alt="flyer"

@@ -52,7 +52,7 @@ const TrendingGeosite = () =>{
 		<>
       <div className="card">
 				<div className="card-header border-0">
-					<h4 className="card-title">Trending Geosite</h4>
+					<h4 className="card-title">Trending Wisata</h4>
 					<Dropdown className="dropdown">
 						<Dropdown.Toggle as="div" className="btn-link i-false" >
 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

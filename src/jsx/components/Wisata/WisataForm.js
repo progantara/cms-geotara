@@ -207,7 +207,6 @@ const WisataForm = () => {
 			getTourismPlace(id)
 				.then((res) => {
 					setFormWisata({
-						thumbnail: res.data.data.thumbnail,
 						thumbnailPreview: res.data.data.thumbnail,
 						nama: res.data.data.nama,
 						deskripsi: res.data.data.deskripsi,
@@ -235,12 +234,30 @@ const WisataForm = () => {
 						lat: res.data.data.lokasi.lat,
 						long: res.data.data.lokasi.long,
 						alamat: res.data.data.lokasi.alamat,
-						file360: res.data.data.file360,
+						file360Preview: res.data.data.file360,
 					});
 				})
 				.catch(() => {
 					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
 						history.push("/wisata");
+					});
+				});
+			getAllKategori()
+				.then((res) => {
+					setKategoriList(
+						res.data.data.map((kategori) => {
+							return {
+								...kategoriList,
+								value: kategori.nama,
+								label: kategori.nama,
+								color: "#00B8D9",
+							};
+						})
+					);
+				})
+				.catch(() => {
+					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+						history.push("/acara");
 					});
 				});
 		} else {
@@ -349,7 +366,7 @@ const WisataForm = () => {
 													</div>
 													<span className="input-group-text">Upload</span>
 												</div>
-												{formWisata.thumbnailPreview != "" && (
+												{formWisata.thumbnailPreview?.length > 0 && (
 													<img
 														src={
 															process.env.REACT_APP_STORAGE_BASE_URL +
@@ -364,7 +381,7 @@ const WisataForm = () => {
 														}}
 													/>
 												)}
-												{formWisata.thumbnail != "" && (
+												{formWisata.thumbnail?.length > 0 && (
 													<img
 														src={URL.createObjectURL(formWisata.thumbnail)}
 														alt="thumbnail"
@@ -396,7 +413,7 @@ const WisataForm = () => {
 													</div>
 													<span className="input-group-text">Upload</span>
 												</div>
-												{formWisata.file360Preview != "" && (
+												{formWisata.file360Preview?.length > 0 && (
 													<a
 														href={
 															process.env.REACT_APP_STORAGE_BASE_URL +
@@ -408,7 +425,7 @@ const WisataForm = () => {
 														See Preview
 													</a>
 												)}
-												{formWisata.file360 != "" && (
+												{formWisata.file360?.length > 0 && (
 													<ReactPannellum
 														id="1"
 														type="equirectangular"
@@ -459,16 +476,36 @@ const WisataForm = () => {
 													value={formWisata.kategori}
 													onChange={(e) => {
 														setFormWisata({ ...formWisata, kategori: e });
-														getAllSubKategoriByKategori(e.value)
-															.then((res) => {
-																setSubKategoriList(res.data);
+														Promise.all(
+															e.map((item) => {
+																return getAllSubKategoriByKategori(item.value)
+																	.then((res) => {
+																		return res.data.data.map((subkategori) => {
+																			return {
+																				value: subkategori.nama,
+																				label: subkategori.nama,
+																				color: "#00B8D9",
+																			};
+																		});
+																	})
+																	.catch((error) => {
+																		Swal.fire(
+																			"Gagal!",
+																			"Wisata gagal dimuat",
+																			"error"
+																		).then(() => {
+																			history.push("/wisata");
+																		});
+																		throw error;
+																	});
 															})
-															.catch((err) => {
-																Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
-																	history.push("/acara");
-																});
-															}
-														);
+														)
+															.then((subKategoriList) => {
+																setSubKategoriList(subKategoriList.flat());
+															})
+															.catch((error) => {
+																console.error(error);
+															});
 													}}
 													isMulti
 													options={kategoriList}
