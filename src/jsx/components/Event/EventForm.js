@@ -15,6 +15,7 @@ import {
 	getAllTourismPlace,
 	getTourismPlace,
 } from "../../../services/TourismPlaceService";
+import BeatLoader from "react-spinners/BeatLoader";
 
 const ClearIndicator = (props) => {
 	const {
@@ -43,61 +44,82 @@ const EventForm = () => {
 	const history = useHistory();
 	const { id } = useParams();
 
-	let title = "Tambah Wisata";
+	let title = "Tambah Acara";
 	let button = "Tambah";
 	if (id !== undefined) {
-		title = "Edit Wisata";
+		title = "Edit Acara";
 		button = "Perbarui";
 	}
 
-	const [nama, setNama] = useState("");
-	const [flyerImage, setflyerImage] = useState("");
-	const [flyerImagePreview, setflyerImagePreview] = useState("");
-	const [deskripsi, setDeskripsi] = useState("");
-	const [penyelenggara, setPenyelenggara] = useState("");
-	const [wisata, setWisata] = useState({});
-	const [tanggal_mulai, setTanggalMulai] = useState("");
-	const [tanggal_selesai, setTanggalSelesai] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
+	const [formEvent, setFormEvent] = useState({
+		flyerImage: "",
+		flyerImagePreview: "",
+		nama: "",
+		deskripsi: "",
+		organizer: "",
+		wisata: {},
+		startEvent: "",
+		endEvent: "",
+	});
 	const [wisataList, setWisataList] = useState([]);
 
 	const handleCreate = (e) => {
 		e.preventDefault();
+		setIsLoading(true);
 		const formData = new FormData();
-		formData.append("nama", nama);
-		formData.append("flyer_image", flyerImage);
-		formData.append("deskripsi", deskripsi);
-		formData.append("organizer", penyelenggara);
-		formData.append("wisata_id", wisata.value);
-		formData.append("start_date", tanggal_mulai);
-		formData.append("end_date", tanggal_selesai);
+		formData.append("nama", formEvent.nama);
+		formData.append("flyer_image", formEvent.flyerImage);
+		formData.append("deskripsi", formEvent.deskripsi);
+		formData.append("organizer", formEvent.organizer);
+		formData.append("wisata_id", formEvent.wisata.value);
+		formData.append("start_date", formEvent.startEvent);
+		formData.append("end_date", formEvent.endEvent);
 		createEvent(formData)
-			.then((res) => {
+			.then(() => {
+				setIsLoading(false);
 				Swal.fire("Berhasil!", "Acara berhasil ditambahkan", "success");
 				history.push("/acara");
 			})
 			.catch((err) => {
-				Swal.fire("Gagal!", "Acara gagal ditambahkan", "error");
+				setIsLoading(false);
+				if (err.response) {
+					Swal.fire("Gagal!", err.response.data.message, "error");
+				} else if (err.request) {
+					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
+				} else {
+					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
+				}
 			});
 	};
 
 	const handleUpdate = (e) => {
 		e.preventDefault();
+		setIsLoading(true);
 		const formData = new FormData();
 		formData.append("_method", "PUT");
-		formData.append("nama", nama);
-		if (flyerImage !== "") formData.append("flyer_img", flyerImage);
-		formData.append("deskripsi", deskripsi);
-		formData.append("organizer", penyelenggara);
-		formData.append("wisata_id", wisata.value);
-		formData.append("start_date", tanggal_mulai);
-		formData.append("end_date", tanggal_selesai);
+		formData.append("nama", formEvent.nama);
+		if (flyerImage !== "") formData.append("flyer_img", formEvent.flyerImage);
+		formData.append("deskripsi", formEvent.deskripsi);
+		formData.append("organizer", formEvent.organizer);
+		formData.append("wisata_id", formEvent.wisata.value);
+		formData.append("start_date", formEvent.startEvent);
+		formData.append("end_date", formEvent.endEvent);
 		updateEvent(id, formData)
-			.then((res) => {
+			.then(() => {
+				setIsLoading(false);
 				Swal.fire("Berhasil!", "Acara berhasil diperbarui", "success");
 				history.push("/acara");
 			})
 			.catch((err) => {
-				Swal.fire("Gagal!", "Acara gagal diperbarui", "error");
+				setIsLoading(false);
+				if (err.response) {
+					Swal.fire("Gagal!", err.response.data.message, "error");
+				} else if (err.request) {
+					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
+				} else {
+					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
+				}
 			});
 	};
 
@@ -118,33 +140,37 @@ const EventForm = () => {
 							);
 						})
 						.catch((err) => {
-							Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+							Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
 								history.push("/acara");
 							});
 						});
-					setNama(res.data.data.nama);
-					setDeskripsi(res.data.data.deskripsi);
-					setPenyelenggara(res.data.data.organizer);
-					setTanggalMulai(res.data.data.start_date);
-					setTanggalSelesai(res.data.data.end_date);
-					setflyerImagePreview(res.data.data.flyer_image);
+					setFormEvent({
+						...formEvent,
+						nama: res.data.data.nama,
+						deskripsi: res.data.data.deskripsi,
+						organizer: res.data.data.organizer,
+						startEvent: res.data.data.start_date,
+						endEvent: res.data.data.end_date,
+						flyerImagePreview: res.data.data.flyer_image,
+					});
 					getTourismPlace(res.data.data.wisata_id)
 						.then((wisata) => {
-							setWisata({
-								value: res.data.data.wisata_id,
-								label: wisata.data.data.nama,
-								color: "#00B8D9",
+							setFormEvent({
+								...formEvent,
+								wisata: {
+									value: res.data.data.wisata_id,
+									label: wisata.data.data.nama,
+									color: "#00B8D9",
+								},
 							});
 						})
-						.catch((err) => {
-							Swal.fire("Gagal!", "Wisata acara gagal dimuat", "error").then(
-								() => {
-									history.push("/acara");
-								}
-							);
+						.catch(() => {
+							Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
+								history.push("/acara");
+							});
 						});
 				})
-				.catch((err) => {
+				.catch(() => {
 					Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
 						history.push("/acara");
 					});
@@ -162,8 +188,8 @@ const EventForm = () => {
 						})
 					);
 				})
-				.catch((err) => {
-					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+				.catch(() => {
+					Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
 						history.push("/acara");
 					});
 				});
@@ -179,150 +205,197 @@ const EventForm = () => {
 							<h4 className="card-title">Tambah Acara</h4>
 						</div>
 						<div className="card-body">
+							{isLoading && (
+								<BeatLoader
+									color="#36d7b7"
+									cssOverride={{
+										position: "absolute",
+										top: "50%",
+										left: "50%",
+										zIndex: "999",
+									}}
+									size={30}
+								/>
+							)}
 							<div className="basic-form">
 								<form onSubmit={id !== undefined ? handleUpdate : handleCreate}>
-									<div className="row">
-										<div className="form-group mb-3 col-md-12">
-											<label>Nama</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Nama acara"
-												value={nama}
-												onChange={(e) => setNama(e.target.value)}
-											/>
-										</div>
-										<div className="form-group mb-3">
-											<label>Flyer Image</label>
-											<div className="input-group">
-												<div className="form-file">
-													<input
-														type="file"
-														className="custom-file-input form-control"
-														accept="image/*"
-														onChange={(event) => {
-															checkImageResolution(event.target.files[0])
-																.then((res) => {
-																	setflyerImage(event.target.files[0]);
-																})
-																.catch((err) => {
-																	Swal.fire(
-																		"Gagal!",
-																		"Ukuran gambar terlalu besar",
-																		"error"
-																	);
-																});
+									<fieldset
+										{...(isLoading && { disabled: true })}
+										{...(isLoading && { style: { filter: "blur(2px)" } })}
+									>
+										<div className="row">
+											<div className="form-group mb-3 col-md-12">
+												<label>Nama</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Nama acara"
+													value={formEvent.nama}
+													onChange={(e) =>
+														setFormEvent({ ...formEvent, nama: e.target.value })
+													}
+												/>
+											</div>
+											<div className="form-group mb-3">
+												<label>Flyer Image</label>
+												<div className="input-group">
+													<div className="form-file">
+														<input
+															type="file"
+															className="custom-file-input form-control"
+															accept="image/*"
+															onChange={(event) => {
+																checkImageResolution(event.target.files[0])
+																	.then((res) => {
+																		setFormEvent({
+																			...formEvent,
+																			flyerImage: event.target.files[0],
+																		});
+																	})
+																	.catch((err) => {
+																		Swal.fire(
+																			"Gagal!",
+																			"Ukuran gambar terlalu besar",
+																			"error"
+																		);
+																	});
+															}}
+														/>
+													</div>
+													<span className="input-group-text">Upload</span>
+												</div>
+												{formEvent.flyerImagePreview != "" && (
+													<img
+														src={
+															process.env.REACT_APP_STORAGE_BASE_URL +
+															"/event/" +
+															formEvent.flyerImagePreview
+														}
+														alt="banner"
+														className="img-fluid border border-2 border-dark rounded-3"
+														style={{
+															width: "40%",
+															height: "auto",
 														}}
 													/>
-												</div>
-												<span className="input-group-text">Upload</span>
+												)}
+												{formEvent.flyerImage != "" && (
+													<img
+														src={URL.createObjectURL(formEvent.flyerImage)}
+														alt="flyer"
+														className="img-fluid border border-2 border-dark rounded-3"
+														style={{
+															width: "40%",
+															height: "auto",
+														}}
+													/>
+												)}
 											</div>
-											{flyerImagePreview != "" && (
-												<img
-													src={
-														process.env.REACT_APP_STORAGE_BASE_URL+"/event/" +
-														flyerImagePreview
+											<div className="form-group mb-3 col-md-12">
+												<label>Deskripsi</label>
+												<textarea
+													className="form-control"
+													rows="4"
+													placeholder="Description"
+													value={formEvent.deskripsi}
+													onChange={(e) =>
+														setFormEvent({
+															...formEvent,
+															deskripsi: e.target.value,
+														})
 													}
-													alt="banner"
-													className="img-fluid border border-2 border-dark rounded-3"
-													style={{
-														width: "40%",
-														height: "auto",
-													}}
+												></textarea>
+											</div>
+											<div className="form-group mb-3 col-md-6">
+												<label>Penyelenggara</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Penyelanggara acara"
+													value={formEvent.organizer}
+													onChange={(e) =>
+														setFormEvent({
+															...formEvent,
+															organizer: e.target.value,
+														})
+													}
 												/>
-											)}
-											{flyerImage != "" && (
-												<img
-													src={URL.createObjectURL(flyerImage)}
-													alt="flyer"
-													className="img-fluid border border-2 border-dark rounded-3"
-													style={{
-														width: "40%",
-														height: "auto",
+											</div>
+											<div className="form-group mb-3 col-md-6">
+												<label>Wisata</label>
+												<Select
+													closeMenuOnSelect={true}
+													components={{ ClearIndicator }}
+													styles={{ clearIndicator: ClearIndicatorStyles }}
+													value={formEvent.wisata}
+													onChange={(e) => {
+														setFormEvent({ ...formEvent, wisata: e });
 													}}
+													options={wisataList}
 												/>
-											)}
+											</div>
 										</div>
-										<div className="form-group mb-3 col-md-12">
-											<label>Deskripsi</label>
-											<textarea
-												className="form-control"
-												rows="4"
-												placeholder="Description"
-												value={deskripsi}
-												onChange={(e) => setDeskripsi(e.target.value)}
-											></textarea>
+										<div className="row">
+											<div className="col-xl-3 col-xxl-6 col-md-6 mb-3">
+												<label>Tanggal Mulai</label>
+												<MuiPickersUtilsProvider utils={DateFnsUtils}>
+													<DatePicker
+														autoOk
+														label=""
+														clearable
+														format="yyyy-MM-dd"
+														value={
+															formEvent.tanggal_mulai
+																? formEvent.tanggal_mulai
+																: null
+														}
+														onChange={(date) => {
+															const formattedDate = date
+																? format(date, "yyyy-MM-dd")
+																: null;
+															setFormEvent({
+																...formEvent,
+																tanggal_mulai: formattedDate,
+															});
+														}}
+													/>
+												</MuiPickersUtilsProvider>
+											</div>
+											<div className="col-xl-3 col-xxl-6 col-md-6 mb-3">
+												<label>Tanggal Selesai</label>
+												<MuiPickersUtilsProvider utils={DateFnsUtils}>
+													<DatePicker
+														autoOk
+														label=""
+														clearable
+														format="yyyy-MM-dd"
+														value={
+															formEvent.tanggal_selesai
+																? formEvent.tanggal_selesai
+																: null
+														}
+														onChange={(date) => {
+															const formattedDate = date
+																? format(date, "yyyy-MM-dd")
+																: null;
+															setFormEvent({
+																...formEvent,
+																tanggal_selesai: formattedDate,
+															});
+														}}
+													/>
+												</MuiPickersUtilsProvider>
+											</div>
 										</div>
-										<div className="form-group mb-3 col-md-6">
-											<label>Penyelenggara</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Penyelanggara acara"
-												value={penyelenggara}
-												onChange={(e) => setPenyelenggara(e.target.value)}
-											/>
-										</div>
-										<div className="form-group mb-3 col-md-6">
-											<label>Wisata</label>
-											<Select
-												closeMenuOnSelect={true}
-												components={{ ClearIndicator }}
-												styles={{ clearIndicator: ClearIndicatorStyles }}
-												value={wisata}
-												onChange={(e) => {
-													setWisata(e);
-												}}
-												options={wisataList}
-											/>
-										</div>
-									</div>
-									<div className="row">
-										<div className="col-xl-3 col-xxl-6 col-md-6 mb-3">
-											<label>Tanggal Mulai</label>
-											<MuiPickersUtilsProvider utils={DateFnsUtils}>
-												<DatePicker
-													autoOk
-													label=""
-													clearable
-													format="yyyy-MM-dd"
-													value={tanggal_mulai ? tanggal_mulai : null}
-													onChange={(date) => {
-														const formattedDate = date
-															? format(date, "yyyy-MM-dd")
-															: null;
-														setTanggalMulai(formattedDate);
-													}}
-												/>
-											</MuiPickersUtilsProvider>
-										</div>
-										<div className="col-xl-3 col-xxl-6 col-md-6 mb-3">
-											<label>Tanggal Selesai</label>
-											<MuiPickersUtilsProvider utils={DateFnsUtils}>
-												<DatePicker
-													autoOk
-													label=""
-													clearable
-													format="yyyy-MM-dd"
-													value={tanggal_selesai ? tanggal_selesai : null}
-													onChange={(date) => {
-														const formattedDate = date
-															? format(date, "yyyy-MM-dd")
-															: null;
-														setTanggalSelesai(formattedDate);
-													}}
-												/>
-											</MuiPickersUtilsProvider>
-										</div>
-									</div>
-									<button type="submit" className="btn btn-primary me-3">
-										Submit
-									</button>
-									<Link to="/acara">
-										<button type="button" className="btn btn-warning">
-											Kembali
+										<button type="submit" className="btn btn-primary me-3">
+											Submit
 										</button>
-									</Link>
+										<Link to="/acara">
+											<button type="button" className="btn btn-warning">
+												Kembali
+											</button>
+										</Link>
+									</fieldset>
 								</form>
 							</div>
 						</div>

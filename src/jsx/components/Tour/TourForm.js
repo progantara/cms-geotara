@@ -1,23 +1,28 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Swal from 'sweetalert2';
-import { useHistory, useParams } from 'react-router-dom';
-import { createTour, getTour, updateTour } from '../../../services/TourService';
-import { getAllProvinsi } from '../../../services/ProvinsiService';
-import { getAllKotaByCode } from '../../../services/KotaService';
-import { getAllDistrikByCode, getDistrik } from '../../../services/DistrikService';
-import { getAllDesaByCode, getDesa } from '../../../services/DesaService';
-import { format } from 'date-fns';
-import { fromLonLat, toLonLat } from 'ol/proj';
-import 'ol/ol.css';
-import Select from 'react-select';
-import { RControl, RLayerTile, RMap, ROSM } from 'rlayers';
-import { TimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
+import React, { useState, useEffect, useCallback } from "react";
+import Swal from "sweetalert2";
+import { Link, useHistory, useParams } from "react-router-dom";
+import { createTour, getTour, updateTour } from "../../../services/TourService";
+import { getAllProvinsi } from "../../../services/ProvinsiService";
+import { getAllKotaByCode } from "../../../services/KotaService";
+import {
+	getAllDistrikByCode,
+	getDistrik,
+} from "../../../services/DistrikService";
+import { getAllDesaByCode, getDesa } from "../../../services/DesaService";
+import { format } from "date-fns";
+import { fromLonLat, toLonLat } from "ol/proj";
+import "ol/ol.css";
+import Select from "react-select";
+import { RControl, RLayerTile, RMap, ROSM } from "rlayers";
+import { TimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import BeatLoader from "react-spinners/BeatLoader";
 
 export default function UserForm() {
 	const history = useHistory();
 	const { id } = useParams();
 
+	const [isLoading, setIsLoading] = useState(false);
 	const [provinsiId, setProvinsiId] = useState({});
 	const [provinsiList, setProvinsiList] = useState([]);
 	const [kotaId, setKotaId] = useState({});
@@ -26,60 +31,64 @@ export default function UserForm() {
 	const [distrikList, setDistrikList] = useState([]);
 	const [desaList, setDesaList] = useState([]);
 	const [inputTour, setInputTour] = useState({
-		nama: '',
-		thumbnail: '',
-		thumbnailPreview: '',
-		no_telp: '',
-		email: '',
-		rating: '',
-		harga: '',
+		nama: "",
+		thumbnail: "",
+		thumbnailPreview: "",
+		no_telp: "",
+		email: "",
+		rating: "",
+		harga: "",
 	});
 	const [lokasi, setLokasi] = useState({
-		lat: '',
-		long: '',
+		lat: "",
+		long: "",
 		desa_id: {},
-		alamat: '',
+		alamat: "",
 	});
 	const [detail, setDetail] = useState({
-		fasilitas: [''],
+		fasilitas: [""],
 		jurusan: [
 			{
-				tipe: '',
-				harga: '',
-				thumbnail: '',
-				thumbnailPreview: '',
-				keberangkatan: '',
-				jam_keberangkatan: '',
-				tujuan: '',
-				estimasi_sampai: '',
+				tipe: "",
+				harga: "",
+				thumbnail: "",
+				thumbnailPreview: "",
+				keberangkatan: "",
+				jam_keberangkatan: "",
+				tujuan: "",
+				estimasi_sampai: "",
 			},
 		],
 	});
 
-	let title = 'Tambah Tour';
-	let button = 'Simpan';
+	let title = "Tambah Tour";
+	let button = "Simpan";
 	if (id !== undefined) {
-		title = 'Edit Tour';
-		button = 'Update';
+		title = "Edit Tour";
+		button = "Update";
 	}
 
 	const ClearIndicator = (props) => {
 		const {
-			children = 'clear all',
+			children = "clear all",
 			getStyles,
 			innerProps: { ref, ...restInnerProps },
 		} = props;
 		return (
-			<div {...restInnerProps} ref={ref} style={getStyles('clearIndicator', props)}>
-				<div style={{ padding: '0px 5px' }}>{children}</div>
+			<div
+				{...restInnerProps}
+				ref={ref}
+				style={getStyles("clearIndicator", props)}
+			>
+				<div style={{ padding: "0px 5px" }}>{children}</div>
 			</div>
 		);
 	};
 
 	const ClearIndicatorStyles = (base, state) => ({
 		...base,
-		cursor: 'pointer',
-		color: state.isFocused ? 'blue' : 'black',
+		cursor: "pointer",
+		color: state.isFocused ? "blue" : "black",
 	});
 
 	useEffect(() => {
@@ -88,7 +97,7 @@ export default function UserForm() {
 				.then((res) => {
 					let data = res.data.data;
 					setInputTour({
-						thumbnail: '',
+						thumbnail: "",
 						thumbnailPreview: data.thumbnail,
 						nama: data.nama,
 						no_telp: data.no_telp,
@@ -108,7 +117,7 @@ export default function UserForm() {
 							{
 								tipe: data.detail.jurusan[0].tipe,
 								harga: data.detail.jurusan[0].harga,
-								thumbnail: '',
+								thumbnail: "",
 								thumbnailPreview: data.detail.jurusan[0].thumbnail,
 								keberangkatan: data.detail.jurusan[0].keberangkatan,
 								jam_keberangkatan: data.detail.jurusan[0].jam_keberangkatan,
@@ -119,8 +128,8 @@ export default function UserForm() {
 					});
 				})
 				.catch((err) => {
-					Swal.fire('Gagal!', 'Tour gagal dimuat', 'error').then(() => {
-						history.push('/tour');
+					Swal.fire("Gagal!", "Tour gagal dimuat", "error").then(() => {
+						history.push("/tour");
 					});
 				});
 		} else {
@@ -131,13 +140,13 @@ export default function UserForm() {
 							return {
 								value: item.kode,
 								label: item.nama,
-								color: '#00B8D9',
+								color: "#00B8D9",
 							};
 						})
 					);
 				})
 				.catch((err) => {
-					Swal.fire('Gagal!', 'Provinsi gagal dimuat', 'error');
+					Swal.fire("Gagal!", "Provinsi gagal dimuat", "error");
 				});
 		}
 	}, [id, setProvinsiList]);
@@ -168,7 +177,7 @@ export default function UserForm() {
 
 	const handleDateChange = (e, type) => {
 		const selectedTime = e instanceof Date ? e : new Date();
-		const newJamOperasional = format(selectedTime, 'HH:mm');
+		const newJamOperasional = format(selectedTime, "HH:mm");
 		setDetail((prevState) => ({
 			...prevState,
 			jurusan: [
@@ -183,65 +192,97 @@ export default function UserForm() {
 
 	const handleCreate = (e) => {
 		e.preventDefault();
+		setIsLoading(true);
 		let data = new FormData();
-		data.append('nama', inputTour.nama);
-		data.append('thumbnail', inputTour.thumbnail);
-		data.append('lat', lokasi.lat);
-		data.append('long', lokasi.long);
-		data.append('desa_id', lokasi.desa_id.value);
-		data.append('alamat', lokasi.alamat);
-		data.append('no_telp', inputTour.no_telp);
-		data.append('email', inputTour.email);
-		data.append('rating', inputTour.rating);
-		data.append('harga', inputTour.rating);
-		data.append('fasilitas[0]', detail.fasilitas[0]);
-		data.append('jurusan[0][tipe]', detail.jurusan[0].tipe);
-		data.append('jurusan[0][harga]', detail.jurusan[0].harga);
-		data.append('jurusan[0][thumbnail]', detail.jurusan[0].thumbnail);
-		data.append('jurusan[0][keberangkatan]', detail.jurusan[0].keberangkatan);
-		data.append('jurusan[0][jam_keberangkatan]', detail.jurusan[0].jam_keberangkatan);
-		data.append('jurusan[0][tujuan]', detail.jurusan[0].tujuan);
-		data.append('jurusan[0][estimasi_sampai]', detail.jurusan[0].estimasi_sampai);
+		data.append("nama", inputTour.nama);
+		data.append("thumbnail", inputTour.thumbnail);
+		data.append("lat", lokasi.lat);
+		data.append("long", lokasi.long);
+		data.append("desa_id", lokasi.desa_id.value);
+		data.append("alamat", lokasi.alamat);
+		data.append("no_telp", inputTour.no_telp);
+		data.append("email", inputTour.email);
+		data.append("rating", inputTour.rating);
+		data.append("harga", inputTour.rating);
+		data.append("fasilitas[0]", detail.fasilitas[0]);
+		data.append("jurusan[0][tipe]", detail.jurusan[0].tipe);
+		data.append("jurusan[0][harga]", detail.jurusan[0].harga);
+		data.append("jurusan[0][thumbnail]", detail.jurusan[0].thumbnail);
+		data.append("jurusan[0][keberangkatan]", detail.jurusan[0].keberangkatan);
+		data.append(
+			"jurusan[0][jam_keberangkatan]",
+			detail.jurusan[0].jam_keberangkatan
+		);
+		data.append("jurusan[0][tujuan]", detail.jurusan[0].tujuan);
+		data.append(
+			"jurusan[0][estimasi_sampai]",
+			detail.jurusan[0].estimasi_sampai
+		);
 		createTour(data)
-			.then((res) => {
-				Swal.fire('Berhasil!', 'Tour berhasil ditambahkan', 'success');
-				history.push('/tour');
+			.then(() => {
+				setIsLoading(false);
+				Swal.fire("Berhasil!", "Tour berhasil ditambahkan", "success");
+				history.push("/tour");
 			})
 			.catch((err) => {
-				Swal.fire('Gagal!', 'Tour gagal ditambahkan.', 'error');
+				setIsLoading(false);
+				if (err.response) {
+					Swal.fire("Gagal!", err.response.data.message, "error");
+				} else if (err.request) {
+					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
+				} else {
+					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
+				}
 			});
 	};
 
 	const handleUpdate = (e) => {
 		e.preventDefault();
+		setIsLoading(true);
 		let data = new FormData();
-		data.append('_method', 'put');
-		data.append('nama', inputTour.nama);
-		if (inputTour.thumbnail !== '') data.append('thumbnail', inputTour.thumbnail);
-		data.append('lat', lokasi.lat);
-		data.append('long', lokasi.long);
-		data.append('desa_id', lokasi.desa_id.value);
-		data.append('alamat', lokasi.alamat);
-		data.append('no_telp', inputTour.no_telp);
-		data.append('email', inputTour.email);
-		data.append('rating', inputTour.rating);
-		data.append('harga', inputTour.rating);
-		data.append('fasilitas[0]', detail.fasilitas[0]);
-		data.append('jurusan[0][tipe]', detail.jurusan[0].tipe);
-		data.append('jurusan[0][harga]', detail.jurusan[0].harga);
-		if (detail.jurusan[0].thumbnail !== '') data.append('jurusan[0][thumbnail]', detail.jurusan[0].thumbnail);
-		data.append('jurusan[0][keberangkatan]', detail.jurusan[0].keberangkatan);
-		data.append('jurusan[0][jam_keberangkatan]', detail.jurusan[0].jam_keberangkatan);
-		data.append('jurusan[0][tujuan]', detail.jurusan[0].tujuan);
-		data.append('jurusan[0][estimasi_sampai]', detail.jurusan[0].estimasi_sampai);
+		data.append("_method", "put");
+		data.append("nama", inputTour.nama);
+		if (inputTour.thumbnail !== "")
+			data.append("thumbnail", inputTour.thumbnail);
+		data.append("lat", lokasi.lat);
+		data.append("long", lokasi.long);
+		data.append("desa_id", lokasi.desa_id.value);
+		data.append("alamat", lokasi.alamat);
+		data.append("no_telp", inputTour.no_telp);
+		data.append("email", inputTour.email);
+		data.append("rating", inputTour.rating);
+		data.append("harga", inputTour.rating);
+		data.append("fasilitas[0]", detail.fasilitas[0]);
+		data.append("jurusan[0][tipe]", detail.jurusan[0].tipe);
+		data.append("jurusan[0][harga]", detail.jurusan[0].harga);
+		if (detail.jurusan[0].thumbnail !== "")
+			data.append("jurusan[0][thumbnail]", detail.jurusan[0].thumbnail);
+		data.append("jurusan[0][keberangkatan]", detail.jurusan[0].keberangkatan);
+		data.append(
+			"jurusan[0][jam_keberangkatan]",
+			detail.jurusan[0].jam_keberangkatan
+		);
+		data.append("jurusan[0][tujuan]", detail.jurusan[0].tujuan);
+		data.append(
+			"jurusan[0][estimasi_sampai]",
+			detail.jurusan[0].estimasi_sampai
+		);
 
 		updateTour(id, data)
-			.then((res) => {
-				Swal.fire('Berhasil!', 'Tour berhasil diubah', 'success');
-				history.push('/tour');
+			.then(() => {
+				setIsLoading(false);
+				Swal.fire("Berhasil!", "Tour berhasil diubah", "success");
+				history.push("/tour");
 			})
 			.catch((err) => {
-				Swal.fire('Gagal!', 'Tour gagal diubah.', 'error');
+				setIsLoading(false);
+				if (err.response) {
+					Swal.fire("Gagal!", err.response.data.message, "error");
+				} else if (err.request) {
+					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
+				} else {
+					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
+				}
 			});
 	};
 
@@ -254,797 +295,529 @@ export default function UserForm() {
 							<h4 className="card-title">{title}</h4>
 						</div>
 						<div className="card-body">
+							{isLoading && (
+								<BeatLoader
+									color="#36d7b7"
+									cssOverride={{
+										position: "absolute",
+										top: "50%",
+										left: "50%",
+										zIndex: "999",
+									}}
+									size={30}
+								/>
+							)}
 							<div className="basic-form">
 								<form onSubmit={id !== undefined ? handleUpdate : handleCreate}>
-									<div className="row">
-										<div className="form-group mb-3">
-											<label>
-												Nama
-												Tour
-											</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Masukkan nama tour"
-												name="nama"
-												value={
-													inputTour.nama
-												}
-												onChange={
-													handleChangeTour
-												}
-											/>
-										</div>
-									</div>
-									<div className="row">
-										<div className="form-group mb-3">
-											<label>
-												Thumbnail
-											</label>
-											<div className="input-group">
-												<div className="form-file">
-													<input
-														type="file"
-														className="form-file-input form-control"
-														name="thumbnail"
-														accept="image/*"
-														onChange={
-															handleImageChange
-														}
-													/>
-												</div>
-												<span className="input-group-text">
-													Upload
-												</span>
+									<fieldset
+										{...(isLoading && { disabled: true })}
+										{...(isLoading && { style: { filter: "blur(2px)" } })}
+									>
+										<div className="row">
+											<div className="form-group mb-3">
+												<label>Nama Tour</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Masukkan nama tour"
+													name="nama"
+													value={inputTour.nama}
+													onChange={handleChangeTour}
+												/>
 											</div>
-											{inputTour.thumbnailPreview !=
-												'' && (
-												<img
-													src={
-														process.env.REACT_APP_STORAGE_BASE_URL+'/tour/' +
-														inputTour.thumbnailPreview
-													}
-													alt="banner"
-													className="img-fluid border border-2 border-dark rounded-3"
-													style={{
-														width: '40%',
-														height: 'auto',
-													}}
-												/>
-											)}
-											{inputTour.thumbnail !=
-												'' && (
-												<img
-													src={URL.createObjectURL(
-														inputTour.thumbnail
-													)}
-													alt="banner"
-													className="img-fluid border border-2 border-dark rounded-3"
-													style={{
-														width: '40%',
-														height: 'auto',
-													}}
-												/>
-											)}
 										</div>
-									</div>
-									<div className="row">
-										<div className="form-group mb-4 col-md-4">
-											<label>
-												Provinsi
-											</label>
-											<Select
-												closeMenuOnSelect={
-													true
-												}
-												components={{
-													ClearIndicator,
-												}}
-												styles={{
-													clearIndicator: ClearIndicatorStyles,
-												}}
-												value={
-													provinsiId
-												}
-												onChange={(
-													e
-												) => {
-													setProvinsiId(
-														e
-													);
-													getAllKotaByCode(
-														e.value
-													)
-														.then(
-															(
-																res
-															) => {
+										<div className="row">
+											<div className="form-group mb-3">
+												<label>Thumbnail</label>
+												<div className="input-group">
+													<div className="form-file">
+														<input
+															type="file"
+															className="form-file-input form-control"
+															name="thumbnail"
+															accept="image/*"
+															onChange={handleImageChange}
+														/>
+													</div>
+													<span className="input-group-text">Upload</span>
+												</div>
+												{inputTour.thumbnailPreview != "" && (
+													<img
+														src={
+															process.env.REACT_APP_STORAGE_BASE_URL +
+															"/tour/" +
+															inputTour.thumbnailPreview
+														}
+														alt="banner"
+														className="img-fluid border border-2 border-dark rounded-3"
+														style={{
+															width: "40%",
+															height: "auto",
+														}}
+													/>
+												)}
+												{inputTour.thumbnail != "" && (
+													<img
+														src={URL.createObjectURL(inputTour.thumbnail)}
+														alt="banner"
+														className="img-fluid border border-2 border-dark rounded-3"
+														style={{
+															width: "40%",
+															height: "auto",
+														}}
+													/>
+												)}
+											</div>
+										</div>
+										<div className="row">
+											<div className="form-group mb-4 col-md-4">
+												<label>Provinsi</label>
+												<Select
+													closeMenuOnSelect={true}
+													components={{
+														ClearIndicator,
+													}}
+													styles={{
+														clearIndicator: ClearIndicatorStyles,
+													}}
+													value={provinsiId}
+													onChange={(e) => {
+														setProvinsiId(e);
+														getAllKotaByCode(e.value)
+															.then((res) => {
 																setKotaList(
-																	res.data.data.map(
-																		(
-																			item
-																		) => {
-																			return {
-																				value: item.kode,
-																				label: item.nama,
-																				color: '#00B8D9',
-																			};
-																		}
-																	)
+																	res.data.data.map((item) => {
+																		return {
+																			value: item.kode,
+																			label: item.nama,
+																			color: "#00B8D9",
+																		};
+																	})
 																);
-															}
-														)
-														.catch(
-															(
-																err
-															) => {
+															})
+															.catch((err) => {
 																Swal.fire(
-																	'Gagal!',
-																	'Kota gagal dimuat',
-																	'error'
+																	"Gagal!",
+																	"Kota gagal dimuat",
+																	"error"
 																);
-																history.push(
-																	'/wisata'
-																);
-															}
-														);
-												}}
-												options={
-													provinsiList
-												}
-											/>
-										</div>
-										<div className="form-group mb-4 col-md-4">
-											<label>Kota</label>
-											<Select
-												closeMenuOnSelect={
-													true
-												}
-												components={{
-													ClearIndicator,
-												}}
-												styles={{
-													clearIndicator: ClearIndicatorStyles,
-												}}
-												value={
-													kotaId
-												}
-												onChange={(
-													e
-												) => {
-													setKotaId(
-														e
-													);
-													getAllDistrikByCode(
-														e.value
-													)
-														.then(
-															(
-																res
-															) => {
+																history.push("/wisata");
+															});
+													}}
+													options={provinsiList}
+												/>
+											</div>
+											<div className="form-group mb-4 col-md-4">
+												<label>Kota</label>
+												<Select
+													closeMenuOnSelect={true}
+													components={{
+														ClearIndicator,
+													}}
+													styles={{
+														clearIndicator: ClearIndicatorStyles,
+													}}
+													value={kotaId}
+													onChange={(e) => {
+														setKotaId(e);
+														getAllDistrikByCode(e.value)
+															.then((res) => {
 																setDistrikList(
-																	res.data.data.map(
-																		(
-																			item
-																		) => {
-																			return {
-																				value: item.kode,
-																				label: item.nama,
-																				color: '#00B8D9',
-																			};
-																		}
-																	)
+																	res.data.data.map((item) => {
+																		return {
+																			value: item.kode,
+																			label: item.nama,
+																			color: "#00B8D9",
+																		};
+																	})
 																);
-															}
-														)
-														.catch(
-															(
-																err
-															) => {
+															})
+															.catch((err) => {
 																Swal.fire(
-																	'Gagal!',
-																	'Distrik gagal dimuat',
-																	'error'
+																	"Gagal!",
+																	"Distrik gagal dimuat",
+																	"error"
 																);
-																history.push(
-																	'/wisata'
-																);
-															}
-														);
-												}}
-												options={
-													kotaList
-												}
-											/>
-										</div>
-										<div className="form-group mb-4 col-md-4">
-											<label>
-												Distrik
-											</label>
-											<Select
-												closeMenuOnSelect={
-													true
-												}
-												components={{
-													ClearIndicator,
-												}}
-												styles={{
-													clearIndicator: ClearIndicatorStyles,
-												}}
-												value={
-													distrikId
-												}
-												onChange={(
-													e
-												) => {
-													setDistrikId(
-														e
-													);
-													getAllDesaByCode(
-														e.value
-													)
-														.then(
-															(
-																res
-															) => {
+																history.push("/wisata");
+															});
+													}}
+													options={kotaList}
+												/>
+											</div>
+											<div className="form-group mb-4 col-md-4">
+												<label>Distrik</label>
+												<Select
+													closeMenuOnSelect={true}
+													components={{
+														ClearIndicator,
+													}}
+													styles={{
+														clearIndicator: ClearIndicatorStyles,
+													}}
+													value={distrikId}
+													onChange={(e) => {
+														setDistrikId(e);
+														getAllDesaByCode(e.value)
+															.then((res) => {
 																setDesaList(
-																	res.data.data.map(
-																		(
-																			item
-																		) => {
-																			return {
-																				value: item.kode,
-																				label: item.nama,
-																				color: '#00B8D9',
-																			};
-																		}
-																	)
+																	res.data.data.map((item) => {
+																		return {
+																			value: item.kode,
+																			label: item.nama,
+																			color: "#00B8D9",
+																		};
+																	})
 																);
-															}
-														)
-														.catch(
-															(
-																err
-															) => {
+															})
+															.catch((err) => {
 																Swal.fire(
-																	'Gagal!',
-																	'Desa gagal dimuat',
-																	'error'
+																	"Gagal!",
+																	"Desa gagal dimuat",
+																	"error"
 																);
-																history.push(
-																	'/wisata'
-																);
-															}
-														);
-												}}
-												options={
-													distrikList
-												}
-											/>
-										</div>
-										<div className="form-group mb-4 col-md-4">
-											<label>Desa</label>
-											<Select
-												closeMenuOnSelect={
-													true
-												}
-												components={{
-													ClearIndicator,
-												}}
-												styles={{
-													clearIndicator: ClearIndicatorStyles,
-												}}
-												value={
-													lokasi.desa_id
-												}
-												options={
-													desaList
-												}
-												name="desa_id"
-												onChange={(
-													e
-												) => {
-													setLokasi(
-														{
+																history.push("/wisata");
+															});
+													}}
+													options={distrikList}
+												/>
+											</div>
+											<div className="form-group mb-4 col-md-4">
+												<label>Desa</label>
+												<Select
+													closeMenuOnSelect={true}
+													components={{
+														ClearIndicator,
+													}}
+													styles={{
+														clearIndicator: ClearIndicatorStyles,
+													}}
+													value={lokasi.desa_id}
+													options={desaList}
+													name="desa_id"
+													onChange={(e) => {
+														setLokasi({
 															...lokasi,
 															desa_id: e,
-														}
-													);
-												}}
-											/>
-										</div>
-										<div className="form-group mb-3 col-md-8">
-											<label>
-												Alamat
-											</label>
-											<textarea
-												className="form-control"
-												rows="2"
-												name="alamat"
-												value={
-													lokasi.alamat
-												}
-												onChange={
-													handleChangeLokasi
-												}
-											></textarea>
-										</div>
-									</div>
-									<div className="row">
-										<div className="form-group mb-3 col-md-3">
-											<div>
-												<label>
-													Longitude
-												</label>
-												<input
-													type="text"
-													className="form-control mb-3"
-													placeholder="Pilih pada peta"
-													value={
-														lokasi.long
-													}
-													disabled
+														});
+													}}
 												/>
 											</div>
-											<div>
-												<label>
-													Latitude
-												</label>
-												<input
-													type="text"
-													className="form-control mb-3"
-													placeholder="Pilih pada peta"
-													value={
-														lokasi.lat
-													}
-													disabled
-												/>
+											<div className="form-group mb-3 col-md-8">
+												<label>Alamat</label>
+												<textarea
+													className="form-control"
+													rows="2"
+													name="alamat"
+													value={lokasi.alamat}
+													onChange={handleChangeLokasi}
+												></textarea>
 											</div>
 										</div>
-										<div className="form-group mb-3 col-md-9">
-											<RMap
-												width={
-													'100%'
-												}
-												height={
-													'60vh'
-												}
-												initial={{
-													center: fromLonLat(
-														[
-															107.448914,
-															-7.100948,
-														]
-													),
-													zoom: 11,
-												}}
-												noDefaultControls={
-													true
-												}
-												onClick={useCallback(
-													(
-														e
-													) => {
-														const coords =
-															e.map.getCoordinateFromPixel(
-																e.pixel
-															);
-														const lonlat =
-															toLonLat(
-																coords
-															);
-														setLokasi(
-															{
-																...lokasi,
-																long: lonlat[0],
-																lat: lonlat[1],
-															}
+										<div className="row">
+											<div className="form-group mb-3 col-md-3">
+												<div>
+													<label>Longitude</label>
+													<input
+														type="text"
+														className="form-control mb-3"
+														placeholder="Pilih pada peta"
+														value={lokasi.long}
+														disabled
+													/>
+												</div>
+												<div>
+													<label>Latitude</label>
+													<input
+														type="text"
+														className="form-control mb-3"
+														placeholder="Pilih pada peta"
+														value={lokasi.lat}
+														disabled
+													/>
+												</div>
+											</div>
+											<div className="form-group mb-3 col-md-9">
+												<RMap
+													width={"100%"}
+													height={"60vh"}
+													initial={{
+														center: fromLonLat([107.448914, -7.100948]),
+														zoom: 11,
+													}}
+													noDefaultControls={true}
+													onClick={useCallback((e) => {
+														const coords = e.map.getCoordinateFromPixel(
+															e.pixel
 														);
-													},
-													[]
-												)}
-											>
-												<ROSM />
-												<RControl.RScaleLine />
-												<RControl.RAttribution />
-												<RControl.RZoom />
-												<RControl.RZoomSlider />
-											</RMap>
+														const lonlat = toLonLat(coords);
+														setLokasi({
+															...lokasi,
+															long: lonlat[0],
+															lat: lonlat[1],
+														});
+													}, [])}
+												>
+													<ROSM />
+													<RControl.RScaleLine />
+													<RControl.RAttribution />
+													<RControl.RZoom />
+													<RControl.RZoomSlider />
+												</RMap>
+											</div>
 										</div>
-									</div>
-									<div className="row">
-										<div className="mb-3 form-group col-md-4">
-											<label>
-												No
-												Telp
-											</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Masukkan nomor telepon"
-												name="no_telp"
-												onChange={
-													handleChangeTour
-												}
-												value={
-													inputTour.no_telp
-												}
-											/>
+										<div className="row">
+											<div className="mb-3 form-group col-md-4">
+												<label>No Telp</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Masukkan nomor telepon"
+													name="no_telp"
+													onChange={handleChangeTour}
+													value={inputTour.no_telp}
+												/>
+											</div>
+											<div className="mb-3 form-group col-md-4">
+												<label>Email</label>
+												<input
+													type="email"
+													className="form-control"
+													placeholder="Masukkan email"
+													name="email"
+													onChange={handleChangeTour}
+													value={inputTour.email}
+												/>
+											</div>
+											<div className="mb-3 form-group col-md-4">
+												<label>Rating</label>
+												<input
+													type="number"
+													min="0"
+													max="5"
+													step="0.5"
+													className="form-control"
+													placeholder="Masukkan rating"
+													name="rating"
+													onChange={handleChangeTour}
+													value={inputTour.rating}
+												/>
+											</div>
 										</div>
-										<div className="mb-3 form-group col-md-4">
-											<label>Email</label>
-											<input
-												type="email"
-												className="form-control"
-												placeholder="Masukkan email"
-												name="email"
-												onChange={
-													handleChangeTour
-												}
-												value={
-													inputTour.email
-												}
-											/>
-										</div>
-										<div className="mb-3 form-group col-md-4">
-											<label>
-												Rating
-											</label>
-											<input
-												type="number"
-												min="0"
-												max="5"
-												step="0.5"
-												className="form-control"
-												placeholder="Masukkan rating"
-												name="rating"
-												onChange={
-													handleChangeTour
-												}
-												value={
-													inputTour.rating
-												}
-											/>
-										</div>
-									</div>
-									<div className="row">
-										<h5>Fasilitas 1</h5>
-										<div className="mb-3 form-group col-md-4">
-											<label>
-												Fasilitas
-											</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Masukkan fasilitas"
-												name="fasilitas"
-												value={
-													detail
-														.fasilitas[0]
-												}
-												onChange={(
-													event
-												) =>
-													setDetail(
-														(
-															detail
-														) => ({
+										<div className="row">
+											<h5>Fasilitas 1</h5>
+											<div className="mb-3 form-group col-md-4">
+												<label>Fasilitas</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Masukkan fasilitas"
+													name="fasilitas"
+													value={detail.fasilitas[0]}
+													onChange={(event) =>
+														setDetail((detail) => ({
 															...detail,
 															fasilitas: [
-																event
-																	.target
-																	.value,
-																...detail.fasilitas.slice(
-																	1
-																),
+																event.target.value,
+																...detail.fasilitas.slice(1),
 															],
-														})
-													)
-												}
-											/>
-										</div>
-										<div className="mb-3 form-group col-md-4">
-											<label>Tipe</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Masukkan tipe"
-												name="tipe"
-												value={
-													detail
-														.jurusan[0]
-														.tipe
-												}
-												onChange={(
-													event
-												) =>
-													setDetail(
-														(
-															prevState
-														) => ({
+														}))
+													}
+												/>
+											</div>
+											<div className="mb-3 form-group col-md-4">
+												<label>Tipe</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Masukkan tipe"
+													name="tipe"
+													value={detail.jurusan[0].tipe}
+													onChange={(event) =>
+														setDetail((prevState) => ({
 															...prevState,
 															jurusan: [
 																{
-																	...prevState
-																		.jurusan[0],
-																	tipe: event
-																		.target
-																		.value,
+																	...prevState.jurusan[0],
+																	tipe: event.target.value,
 																},
-																...prevState.jurusan.slice(
-																	1
-																),
+																...prevState.jurusan.slice(1),
 															],
-														})
-													)
-												}
-											/>
-										</div>
-										<div className="mb-3 form-group col-md-4">
-											<label>Harga</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Masukkan harga"
-												name="harga"
-												value={
-													detail
-														.jurusan[0]
-														.harga
-												}
-												onChange={(
-													event
-												) =>
-													setDetail(
-														(
-															prevState
-														) => ({
+														}))
+													}
+												/>
+											</div>
+											<div className="mb-3 form-group col-md-4">
+												<label>Harga</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Masukkan harga"
+													name="harga"
+													value={detail.jurusan[0].harga}
+													onChange={(event) =>
+														setDetail((prevState) => ({
 															...prevState,
 															jurusan: [
 																{
-																	...prevState
-																		.jurusan[0],
-																	harga: event
-																		.target
-																		.value,
+																	...prevState.jurusan[0],
+																	harga: event.target.value,
 																},
-																...prevState.jurusan.slice(
-																	1
-																),
+																...prevState.jurusan.slice(1),
 															],
-														})
-													)
-												}
-											/>
+														}))
+													}
+												/>
+											</div>
 										</div>
-									</div>
-									<div className="row">
-										<div className="mb-3 form-group">
-											<label>
-												Thumbnail
-											</label>
-											<div className="input-group">
-												<div className="form-file">
-													<input
-														type="file"
-														className="form-file-input form-control"
-														name="thumbnail"
-														accept="image/*"
-														onChange={(
-															event
-														) =>
-															setDetail(
-																(
-																	prevState
-																) => ({
+										<div className="row">
+											<div className="mb-3 form-group">
+												<label>Thumbnail</label>
+												<div className="input-group">
+													<div className="form-file">
+														<input
+															type="file"
+															className="form-file-input form-control"
+															name="thumbnail"
+															accept="image/*"
+															onChange={(event) =>
+																setDetail((prevState) => ({
 																	...prevState,
 																	jurusan: [
 																		{
-																			...prevState
-																				.jurusan[0],
-																			thumbnail: event
-																				.target
-																				.files[0],
+																			...prevState.jurusan[0],
+																			thumbnail: event.target.files[0],
 																		},
-																		...prevState.jurusan.slice(
-																			1
-																		),
+																		...prevState.jurusan.slice(1),
 																	],
-																})
-															)
+																}))
+															}
+														/>
+													</div>
+													<span className="input-group-text">Upload</span>
+												</div>
+												{detail.jurusan[0].thumbnailPreview != "" && (
+													<img
+														src={
+															process.env.REACT_APP_STORAGE_BASE_URL +
+															"/accomodation/detail" +
+															detail.jurusan[0].thumbnailPreview
+														}
+														alt="banner"
+														className="border border-2 img-fluid border-dark rounded-3"
+														style={{
+															width: "40%",
+															height: "auto",
+														}}
+													/>
+												)}
+												{detail.jurusan[0].thumbnail != "" && (
+													<img
+														src={URL.createObjectURL(
+															detail.jurusan[0].thumbnail
+														)}
+														alt="banner"
+														className="border border-2 img-fluid border-dark rounded-3"
+														style={{
+															width: "40%",
+															height: "auto",
+														}}
+													/>
+												)}
+											</div>
+										</div>
+										<div className="row">
+											<div className="mb-3 form-group col-md-6">
+												<label>Keberangkatan</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Masukkan keberangkatan"
+													name="keberangkatan"
+													value={detail.jurusan[0].keberangkatan}
+													onChange={(event) =>
+														setDetail((prevState) => ({
+															...prevState,
+															jurusan: [
+																{
+																	...prevState.jurusan[0],
+																	keberangkatan: event.target.value,
+																},
+																...prevState.jurusan.slice(1),
+															],
+														}))
+													}
+												/>
+											</div>
+											<div className="mb-3 form-group col-md-6">
+												<label>Tujuan</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Masukkan tujuan"
+													name="tujuan"
+													value={detail.jurusan[0].tujuan}
+													onChange={(event) =>
+														setDetail((prevState) => ({
+															...prevState,
+															jurusan: [
+																{
+																	...prevState.jurusan[0],
+																	tujuan: event.target.value,
+																},
+																...prevState.jurusan.slice(1),
+															],
+														}))
+													}
+												/>
+											</div>
+										</div>
+										<div className="row">
+											<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
+												<label>Jam Keberangkatan</label>
+												<MuiPickersUtilsProvider utils={DateFnsUtils}>
+													<TimePicker
+														name="jam_keberangkatan"
+														value={
+															detail.jurusan[0].jam_keberangkatan
+																? new Date(
+																		`01/01/1970 ${detail.jurusan[0].jam_keberangkatan}`
+																  )
+																: null
+														}
+														onChange={(e) =>
+															handleDateChange(e, "jam_keberangkatan")
 														}
 													/>
-												</div>
-												<span className="input-group-text">
-													Upload
-												</span>
+												</MuiPickersUtilsProvider>
 											</div>
-											{detail.jurusan[0]
-												.thumbnailPreview !=
-												'' && (
-												<img
-													src={
-														process.env.REACT_APP_STORAGE_BASE_URL+'/accomodation/detail' +
-														detail
-															.jurusan[0]
-															.thumbnailPreview
-													}
-													alt="banner"
-													className="border border-2 img-fluid border-dark rounded-3"
-													style={{
-														width: '40%',
-														height: 'auto',
-													}}
-												/>
-											)}
-											{detail.jurusan[0]
-												.thumbnail !=
-												'' && (
-												<img
-													src={URL.createObjectURL(
-														detail
-															.jurusan[0]
-															.thumbnail
-													)}
-													alt="banner"
-													className="border border-2 img-fluid border-dark rounded-3"
-													style={{
-														width: '40%',
-														height: 'auto',
-													}}
-												/>
-											)}
+											<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
+												<label>Estimasi Sampai</label>
+												<MuiPickersUtilsProvider utils={DateFnsUtils}>
+													<TimePicker
+														name="estimasi_sampai"
+														value={
+															detail.jurusan[0].estimasi_sampai
+																? new Date(
+																		`01/01/1970 ${detail.jurusan[0].estimasi_sampai}`
+																  )
+																: null
+														}
+														onChange={(time) =>
+															handleDateChange(time, "estimasi_sampai")
+														}
+													/>
+												</MuiPickersUtilsProvider>
+											</div>
 										</div>
-									</div>
-									<div className="row">
-										<div className="mb-3 form-group col-md-6">
-											<label>
-												Keberangkatan
-											</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Masukkan keberangkatan"
-												name="keberangkatan"
-												value={
-													detail
-														.jurusan[0]
-														.keberangkatan
-												}
-												onChange={(
-													event
-												) =>
-													setDetail(
-														(
-															prevState
-														) => ({
-															...prevState,
-															jurusan: [
-																{
-																	...prevState
-																		.jurusan[0],
-																	keberangkatan: event
-																		.target
-																		.value,
-																},
-																...prevState.jurusan.slice(
-																	1
-																),
-															],
-														})
-													)
-												}
-											/>
-										</div>
-										<div className="mb-3 form-group col-md-6">
-											<label>
-												Tujuan
-											</label>
-											<input
-												type="text"
-												className="form-control"
-												placeholder="Masukkan tujuan"
-												name="tujuan"
-												value={
-													detail
-														.jurusan[0]
-														.tujuan
-												}
-												onChange={(
-													event
-												) =>
-													setDetail(
-														(
-															prevState
-														) => ({
-															...prevState,
-															jurusan: [
-																{
-																	...prevState
-																		.jurusan[0],
-																	tujuan: event
-																		.target
-																		.value,
-																},
-																...prevState.jurusan.slice(
-																	1
-																),
-															],
-														})
-													)
-												}
-											/>
-										</div>
-									</div>
-									<div className="row">
-										<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
-											<label>
-												Jam
-												Keberangkatan
-											</label>
-											<MuiPickersUtilsProvider
-												utils={
-													DateFnsUtils
-												}
-											>
-												<TimePicker
-													name="jam_keberangkatan"
-													value={
-														detail
-															.jurusan[0]
-															.jam_keberangkatan
-															? new Date(
-																	`01/01/1970 ${detail.jurusan[0].jam_keberangkatan}`
-															  )
-															: null
-													}
-													onChange={(
-														e
-													) =>
-														handleDateChange(
-															e,
-															'jam_keberangkatan'
-														)
-													}
-												/>
-											</MuiPickersUtilsProvider>
-										</div>
-										<div className="mb-3 col-xl-3 col-xxl-6 col-md-6">
-											<label>
-												Estimasi
-												Sampai
-											</label>
-											<MuiPickersUtilsProvider
-												utils={
-													DateFnsUtils
-												}
-											>
-												<TimePicker
-													name="estimasi_sampai"
-													value={
-														detail
-															.jurusan[0]
-															.estimasi_sampai
-															? new Date(
-																	`01/01/1970 ${detail.jurusan[0].estimasi_sampai}`
-															  )
-															: null
-													}
-													onChange={(
-														time
-													) =>
-														handleDateChange(
-															time,
-															'estimasi_sampai'
-														)
-													}
-												/>
-											</MuiPickersUtilsProvider>
-										</div>
-									</div>
-									<button type="submit" className="btn btn-primary me-2">
-										{button}
-									</button>
+										<button type="submit" className="btn btn-primary me-2">
+											{button}
+										</button>
+										<Link to="/tour">
+											<button type="button" className="btn btn-warning">
+												Kembali
+											</button>
+										</Link>
+									</fieldset>
 								</form>
 							</div>
 						</div>

@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
 import { deleteArticle, getAllArticle } from "../../../services/ArticleService";
 import ClipLoader from "react-spinners/ClipLoader";
+import BeatLoader from "react-spinners/BeatLoader"
 import moment from "moment";
 import "moment/locale/id";
 import { getUser } from "../../../services/UserService";
