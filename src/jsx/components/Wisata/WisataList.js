@@ -20,7 +20,6 @@ const WisataList = () => {
 			name: "No",
 			selector: (row) => row.no,
 			sortable: false,
-			cell: (row, index) => index + 1,
 			width: "10%",
 		},
 		{
@@ -115,6 +114,9 @@ const WisataList = () => {
 			const newData = data.filter((item) => item._id !== id);
 			setData(newData);
 			Swal.fire("Berhasil!", "Wisata berhasil dihapus", "success");
+			setIsLoading(true);
+			fetchData();
+			setIsLoading(false);
 		} else {
 			Swal.fire("Gagal!", "Wisata gagal dihapus", "error");
 		}

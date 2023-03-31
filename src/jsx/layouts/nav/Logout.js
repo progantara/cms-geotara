@@ -10,7 +10,7 @@ function LogoutPage(props) {
 
 	function onLogout() {
 		dispatch(logout(props.history));
-		// window.location.reload();
+		window.location.reload();
 	}
 	return (
 		<>

@@ -28,6 +28,7 @@ export function loginAction(email, password, history) {
 				runLogoutTimer(dispatch, 1000 * 60 * 60 * 24, history);
 				dispatch(loginConfirmedAction(response.data.data));
 				history.push('/dashboard');
+				window.location.reload();
 			})
 			.catch((error) => {
 				error = JSON.parse(JSON.stringify(error));

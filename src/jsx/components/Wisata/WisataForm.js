@@ -14,6 +14,8 @@ import "ol/ol.css";
 import { RControl, RMap, ROSM } from "rlayers";
 import {
 	createTourismPlace,
+	getAllKategori,
+	getAllSubKategoriByKategori,
 	getTourismPlace,
 	updateTourismPlace,
 } from "../../../services/TourismPlaceService";
@@ -101,6 +103,8 @@ const WisataForm = () => {
 	const [kotaList, setKotaList] = useState([]);
 	const [distrikList, setDistrikList] = useState([]);
 	const [desaList, setDesaList] = useState([]);
+	const [kategoriList, setKategoriList] = useState([]);
+	const [subKategoriList, setSubKategoriList] = useState([]);
 
 	const handleCreate = (e) => {
 		e.preventDefault();
@@ -254,6 +258,24 @@ const WisataForm = () => {
 				})
 				.catch(() => {
 					Swal.fire("Gagal!", "Provinsi gagal dimuat", "error");
+				});
+			getAllKategori()
+				.then((res) => {
+					setKategoriList(
+						res.data.data.map((kategori) => {
+							return {
+								...kategoriList,
+								value: kategori.nama,
+								label: kategori.nama,
+								color: "#00B8D9",
+							};
+						})
+					);
+				})
+				.catch(() => {
+					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+						history.push("/acara");
+					});
 				});
 		}
 	}, [id]);
@@ -437,9 +459,19 @@ const WisataForm = () => {
 													value={formWisata.kategori}
 													onChange={(e) => {
 														setFormWisata({ ...formWisata, kategori: e });
+														getAllSubKategoriByKategori(e.value)
+															.then((res) => {
+																setSubKategoriList(res.data);
+															})
+															.catch((err) => {
+																Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+																	history.push("/acara");
+																});
+															}
+														);
 													}}
 													isMulti
-													options={kategoriOption}
+													options={kategoriList}
 												/>
 											</div>
 										</div>
@@ -459,7 +491,7 @@ const WisataForm = () => {
 														setFormWisata({ ...formWisata, subkategori: e });
 													}}
 													isMulti
-													options={subkategoriOption}
+													options={subKategoriList}
 												/>
 											</div>
 										</div>

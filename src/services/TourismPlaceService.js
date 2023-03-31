@@ -48,3 +48,48 @@ export const deleteTourismPlace = (id) => {
 		},
 	});
 };
+
+export const getAllKategori = () => {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/wisata-kategori`, {
+		headers: {
+			Authorization: `Bearer ${getAccessToken()}`,
+			Accept: 'application/json',
+		},
+	});
+};
+
+export const getKategori = (id) => {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/wisata-kategori/` + id, {
+		headers: {
+			Authorization: `Bearer ${getAccessToken()}`,
+			Accept: 'application/json',
+		},
+	});
+};
+
+export const getAllSubKategori = () => {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/wisata-subkategori`, {
+		headers: {
+			Authorization: `Bearer ${getAccessToken()}`,
+			Accept: 'application/json',
+		},
+	});
+};
+
+export const getSubKategori = (id) => {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/wisata-subkategori/` + id, {
+		headers: {
+			Authorization: `Bearer ${getAccessToken()}`,
+			Accept: 'application/json',
+		},
+	});
+};
+
+export const getAllSubKategoriByKategori = (name) => {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/wisata-subkategori/kategori/` + name, {
+		headers: {
+			Authorization: `Bearer ${getAccessToken()}`,
+			Accept: 'application/json',
+		},
+	});
+};
