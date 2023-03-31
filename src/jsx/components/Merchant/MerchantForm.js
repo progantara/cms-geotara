@@ -105,13 +105,7 @@ export default function UserForm() {
 						alamat: data.lokasi.alamat,
 					});
 					setDetail({
-						product: [
-							{
-								nama: data.detail.product[0].nama,
-								harga: data.detail.product[0].harga,
-								rating: data.detail.product[0].rating,
-							},
-						],
+						product: data.detail.product,
 					});
 				})
 				.catch((err) => {
@@ -169,6 +163,31 @@ export default function UserForm() {
 			...prevInput,
 			[type]: newJamOperasional,
 		}));
+	};
+
+	const handleChangeDetail = (e, index) => {
+		const { name, value } = e.target;
+		const newProduct = { ...detail.product[index] };
+		if (name === 'thumbnail') {
+			const files = e.target.files[0];
+			newProduct[name] = files;
+		} else if (name === 'varian') {
+			let arr = [];
+
+			// Memeriksa apakah nilai input adalah string dengan koma
+			if (typeof value === 'string' && value.includes(',')) {
+				arr = value.split(',');
+			} else {
+				arr.push(value);
+			}
+			newProduct[name] = arr;
+		} else {
+			newProduct[name] = value;
+		}
+		const newProducts = [...detail.product];
+		newProducts[index] = newProduct;
+		setDetail({ ...detail, product: newProducts });
+		console.log(detail);
 	};
 
 	const handleCreate = (e) => {
@@ -359,7 +378,7 @@ export default function UserForm() {
 											</div>
 										</div>
 										<div className="row">
-											<div className="form-group mb-4 col-md-4">
+											<div className="mb-4 form-group col-md-4">
 												<label>
 													Provinsi
 												</label>
@@ -424,7 +443,7 @@ export default function UserForm() {
 													}
 												/>
 											</div>
-											<div className="form-group mb-4 col-md-4">
+											<div className="mb-4 form-group col-md-4">
 												<label>
 													Kota
 												</label>
@@ -489,7 +508,7 @@ export default function UserForm() {
 													}
 												/>
 											</div>
-											<div className="form-group mb-4 col-md-4">
+											<div className="mb-4 form-group col-md-4">
 												<label>
 													Distrik
 												</label>
@@ -554,7 +573,7 @@ export default function UserForm() {
 													}
 												/>
 											</div>
-											<div className="form-group mb-4 col-md-4">
+											<div className="mb-4 form-group col-md-4">
 												<label>
 													Desa
 												</label>
@@ -587,7 +606,7 @@ export default function UserForm() {
 													}}
 												/>
 											</div>
-											<div className="form-group mb-3 col-md-8">
+											<div className="mb-3 form-group col-md-8">
 												<label>
 													Alamat
 												</label>
@@ -749,327 +768,256 @@ export default function UserForm() {
 											</div>
 										</div>
 										<hr />
-										{/* {detail.product.map((item, index) => {
-											return ( */}
-										<div className="row">
-											<h5>Produk 1</h5>
-											<div className="mb-3 form-group col-md-4">
-												<label>
-													Nama
-												</label>
-												<input
-													type="text"
-													className="form-control"
-													placeholder="Masukkan nama"
-													name="nama"
-													value={
-														detail
-															.product[0]
-															.nama
+										{detail.product.map((item, index) => {
+											return (
+												<div
+													className="mb-4"
+													key={
+														index
 													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => ({
-																...prevState,
-																product: [
-																	{
-																		...prevState
-																			.product[0],
-																		nama: event
-																			.target
-																			.value,
-																	},
-																	...prevState.product.slice(
-																		1
-																	),
-																],
-															})
-														)
-													}
-												/>
-											</div>
-											<div className="mb-3 form-group col-md-4">
-												<label>
-													Harga
-												</label>
-												<input
-													type="number"
-													className="form-control"
-													placeholder="Masukkan harga"
-													name="harga"
-													value={
-														detail
-															.product[0]
-															.harga
-													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => ({
-																...prevState,
-																product: [
-																	{
-																		...prevState
-																			.product[0],
-																		harga: event
-																			.target
-																			.value,
-																	},
-																	...prevState.product.slice(
-																		1
-																	),
-																],
-															})
-														)
-													}
-												/>
-											</div>
-											<div className="mb-3 form-group col-md-4">
-												<label>
-													Rating
-												</label>
-												<input
-													type="number"
-													className="form-control"
-													placeholder="Masukkan rating"
-													name="rating"
-													value={
-														detail
-															.product[0]
-															.rating
-													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => ({
-																...prevState,
-																product: [
-																	{
-																		...prevState
-																			.product[0],
-																		rating: event
-																			.target
-																			.value,
-																	},
-																	...prevState.product.slice(
-																		1
-																	),
-																],
-															})
-														)
-													}
-												/>
-											</div>
-										</div>
-										<div className="row">
-											<div className="form-group mb-3">
-												<label>
-													Deskripsi
-												</label>
-												<textarea
-													className="form-control"
-													rows="2"
-													name="deskripsi"
-													value={
-														detail
-															.product[0]
-															.deskripsi
-													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => ({
-																...prevState,
-																product: [
-																	{
-																		...prevState
-																			.product[0],
-																		deskripsi: event
-																			.target
-																			.value,
-																	},
-																	...prevState.product.slice(
-																		1
-																	),
-																],
-															})
-														)
-													}
-												></textarea>
-											</div>
-										</div>
-										<div className="row">
-											<div className="mb-3 form-group">
-												<label>
-													Varian
-													-
-													pisahkan
-													dengan
-													tanda
-													koma
-													","
-												</label>
-												<input
-													type="text"
-													className="form-control"
-													placeholder="Masukkan varian"
-													name="varian"
-													value={
-														detail
-															.product[0]
-															.varian
-													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => {
-																const value =
-																	event
-																		.target
-																		.value;
-																let arr =
-																	[];
-
-																// Memeriksa apakah nilai input adalah string dengan koma
-																if (
-																	typeof value ===
-																		'string' &&
-																	value.includes(
-																		','
-																	)
-																) {
-																	arr =
-																		value.split(
-																			','
-																		);
-																} else {
-																	arr.push(
-																		value
-																	);
-																}
-
-																return {
-																	...prevState,
-																	product: [
-																		{
-																			...prevState
-																				.product[0],
-																			varian: arr,
-																		},
-																		...prevState.product.slice(
+												>
+													<div className="row">
+														<span className="flex items-center justify-between px-4 py-2">
+															<span className="mr-4 text-4xl font-extrabold">
+																Produk{' '}
+																{` ${
+																	index +
+																	1
+																}`}
+															</span>
+															{index ? (
+																<button
+																	type="button"
+																	className="btn btn-danger btn-sm"
+																	onClick={() => {
+																		let newProduct =
+																			[
+																				...detail.product,
+																			];
+																		newProduct.splice(
+																			index,
 																			1
-																		),
-																	],
-																};
-															}
-														)
-													}
-												/>
-											</div>
-										</div>
-										<div className="row">
-											<div className="mb-3 form-group">
-												<label>
-													Thumbnail
-												</label>
-												<div className="input-group">
-													<div className="form-file">
-														<input
-															type="file"
-															className="form-file-input form-control"
-															name="thumbnail"
-															accept="image/*"
-															onChange={(
-																event
-															) =>
-																setDetail(
-																	(
-																		prevState
-																	) => ({
-																		...prevState,
-																		product: [
+																		);
+																		setDetail(
 																			{
-																				...prevState
-																					.product[0],
-																				thumbnail: event
-																					.target
-																					.files[0],
-																			},
-																			...prevState.product.slice(
-																				1
-																			),
-																		],
-																	})
-																)
-															}
-														/>
+																				...detail,
+																				product: newProduct,
+																			}
+																		);
+																	}}
+																>
+																	<i className="fa fa-trash color-danger"></i>
+																</button>
+															) : null}
+														</span>
+
+														<div className="mb-3 form-group col-md-4">
+															<label>
+																Nama
+															</label>
+															<input
+																type="text"
+																className="form-control"
+																placeholder="Masukkan nama"
+																name="nama"
+																value={
+																	item.nama
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															/>
+														</div>
+														<div className="mb-3 form-group col-md-4">
+															<label>
+																Harga
+															</label>
+															<input
+																type="number"
+																className="form-control"
+																placeholder="Masukkan harga"
+																name="harga"
+																value={
+																	item.harga
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															/>
+														</div>
+														<div className="mb-3 form-group col-md-4">
+															<label>
+																Rating
+															</label>
+															<input
+																type="number"
+																className="form-control"
+																placeholder="Masukkan rating"
+																name="rating"
+																value={
+																	item.rating
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															/>
+														</div>
 													</div>
-													<span className="input-group-text">
-														Upload
-													</span>
+													<div className="row">
+														<div className="mb-3 form-group">
+															<label>
+																Deskripsi
+															</label>
+															<textarea
+																className="form-control"
+																rows="2"
+																name="deskripsi"
+																value={
+																	item.deskripsi
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															></textarea>
+														</div>
+													</div>
+													<div className="row">
+														<div className="mb-3 form-group">
+															<label>
+																Varian
+																-
+																pisahkan
+																dengan
+																tanda
+																koma
+																","
+															</label>
+															<input
+																type="text"
+																className="form-control"
+																placeholder="Masukkan varian"
+																name="varian"
+																value={
+																	item.varian
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															/>
+														</div>
+													</div>
+													<div className="row">
+														<div className="mb-3 form-group">
+															<label>
+																Thumbnail
+															</label>
+															<div className="input-group">
+																<div className="form-file">
+																	<input
+																		type="file"
+																		className="form-file-input form-control"
+																		name="thumbnail"
+																		accept="image/*"
+																		onChange={(
+																			e
+																		) =>
+																			handleChangeDetail(
+																				e,
+																				index
+																			)
+																		}
+																	/>
+																</div>
+																<span className="input-group-text">
+																	Upload
+																</span>
+															</div>
+															{detail
+																.product[
+																index
+															]
+																.thumbnailPreview !==
+																'' && (
+																<img
+																	src={
+																		process
+																			.env
+																			.REACT_APP_STORAGE_BASE_URL +
+																		'/merchant/detail' +
+																		detail
+																			.product[
+																			index
+																		]
+																			.thumbnailPreview
+																	}
+																	alt="thumbnail"
+																	className="border border-2 img-fluid border-dark rounded-3"
+																	style={{
+																		width: '40%',
+																		height: 'auto',
+																	}}
+																/>
+															)}
+
+															{detail
+																.product[
+																index
+															]
+																.thumbnail &&
+																typeof detail
+																	.product[
+																	index
+																]
+																	.thumbnail ===
+																	'object' && (
+																	<img
+																		src={URL.createObjectURL(
+																			detail
+																				.product[
+																				index
+																			]
+																				.thumbnail
+																		)}
+																		alt="thumbnail"
+																		className="border border-2 img-fluid border-dark rounded-3"
+																		style={{
+																			width: '40%',
+																			height: 'auto',
+																		}}
+																	/>
+																)}
+														</div>
+													</div>
 												</div>
-												{detail
-													.product[0]
-													.thumbnailPreview !=
-													'' && (
-													<img
-														src={
-															process
-																.env
-																.REACT_APP_STORAGE_BASE_URL +
-															'/accomodation/detail' +
-															detail
-																.product[0]
-																.thumbnailPreview
-														}
-														alt="banner"
-														className="border border-2 img-fluid border-dark rounded-3"
-														style={{
-															width: '40%',
-															height: 'auto',
-														}}
-													/>
-												)}
-												{detail
-													.product[0]
-													.thumbnail !=
-													'' && (
-													<img
-														src={URL.createObjectURL(
-															detail
-																.product[0]
-																.thumbnail
-														)}
-														alt="banner"
-														className="border border-2 img-fluid border-dark rounded-3"
-														style={{
-															width: '40%',
-															height: 'auto',
-														}}
-													/>
-												)}
-											</div>
-										</div>
-										{/* );
-										})} */}
+											);
+										})}
 										<div className="row">
-											<div className="col-md-12 mb-4">
+											<div className="mb-4 col-md-12">
 												<div
 													style={{
 														display: 'flex',
