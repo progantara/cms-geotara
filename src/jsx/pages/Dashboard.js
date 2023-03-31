@@ -12,9 +12,9 @@ import pic6 from './../../images/card/Untitled-15.jpg';
 import { ThemeContext } from "../../context/ThemeContext";
 import VisitorChart from '../components/Dashboard/Dashboard/VisitorChart';
 import TopArticle from '../components/Dashboard/Dashboard/TopArticle';
-import TrendingGeosite from '../components/Dashboard/Dashboard/TrendingGeosite';
+import TrendingWisata from '../components/Dashboard/Dashboard/TrendingWisata';
 import DistributionMap from '../components/Dashboard/Dashboard/DistributionMap';
-import TopGeoarea from '../components/Dashboard/Dashboard/TopGeoarea';
+import TopWisata from '../components/Dashboard/Dashboard/TopWisata';
 
 
 const Home = () => {
@@ -76,7 +76,7 @@ const Home = () => {
 				<div className="col-xl-4 col-xxl-5">
 					<div className="row">
 						<DistributionMap />
-						<TopGeoarea />
+						<TopWisata />
 					</div>
 				</div>
 				<div className="col-xl-8 col-xxl-7">
@@ -166,7 +166,7 @@ const Home = () => {
 				<div className="col-xl-6">
 					<div className="row">
 						<div className="col-xl-12">
-							<TrendingGeosite />
+							<TrendingWisata />
 						</div>
 						<div className="col-xl-12">
 							<TopArticle />

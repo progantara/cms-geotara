@@ -20,7 +20,6 @@ const WisataList = () => {
 			name: "No",
 			selector: (row) => row.no,
 			sortable: false,
-			cell: (row, index) => index + 1,
 			width: "10%",
 		},
 		{
@@ -115,6 +114,9 @@ const WisataList = () => {
 			const newData = data.filter((item) => item._id !== id);
 			setData(newData);
 			Swal.fire("Berhasil!", "Wisata berhasil dihapus", "success");
+			setIsLoading(true);
+			fetchData();
+			setIsLoading(false);
 		} else {
 			Swal.fire("Gagal!", "Wisata gagal dihapus", "error");
 		}
@@ -128,9 +130,10 @@ const WisataList = () => {
 	const fetchData = async () => {
 		const response = await getAllTourismPlace();
 		if (response.status === 200) {
-			const data = response.data.data.map((item) => {
+			const data = response.data.data.map((item, index) => {
 				return {
 					...item,
+					no: index + 1,
 					name: item.nama,
 					category: item.kategori
 						.map((cat) => capitalizeEachFirstLetter(cat))

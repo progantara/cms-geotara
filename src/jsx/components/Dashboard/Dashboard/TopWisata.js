@@ -1,11 +1,11 @@
 import React from "react";
 
-export default function TopGeoarea() {
+export default function TopWisata() {
 	return (
 		<div className="col-xl-12 col-sm-6">
 			<div className="card">
 				<div className="card-header border-0 pb-0">
-					<h4 className="card-title">Geoarea Terbanyak</h4>
+					<h4 className="card-title">Wisata Terpopuler</h4>
 				</div>
 				<div className="card-body">
 					<div className="progress mb-4" style={{ height: "13px" }}>

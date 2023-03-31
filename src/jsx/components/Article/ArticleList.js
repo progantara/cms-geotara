@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
 import { deleteArticle, getAllArticle } from "../../../services/ArticleService";
 import ClipLoader from "react-spinners/ClipLoader";
-import BeatLoader from "react-spinners/BeatLoader"
 import moment from "moment";
 import "moment/locale/id";
 import { getUser } from "../../../services/UserService";
@@ -20,15 +19,14 @@ const ArticleList = () => {
 		{
 			name: "No",
 			selector: (row) => row.no,
-			sortable: false,
-			cell: (row, index) => index + 1,
-			width: "10%",
+			sortable: true,
+			width: "5%",
 		},
 		{
 			name: "Judul",
 			selector: (row) => row.title,
 			sortable: true,
-			width: "30%",
+			width: "35%",
 		},
 		{
 			name: "Penulis",
@@ -116,6 +114,9 @@ const ArticleList = () => {
 			const newData = data.filter((item) => item._id !== id);
 			setData(newData);
 			Swal.fire("Berhasil!", "Artikel berhasil dihapus", "success");
+			setIsLoading(true);
+			fetchData();
+			setIsLoading(false);
 		} else {
 			Swal.fire("Gagal!", "Artikel gagal dihapus", "error");
 		}
@@ -130,15 +131,18 @@ const ArticleList = () => {
 	const fetchData = async () => {
 		const response = await getAllArticle();
 		if (response.status === 200) {
-			const data = response.data.data.map((item) => {
+			const data = response.data.data.map(async (item, index) => {
+				const writer = await getUser(item.author_id);
 				return {
 					...item,
+					no: index + 1,
 					title: item.judul,
-					writer: item.author_id,
+					writer: writer.data.data.name,
 					publication_date: moment(item.created_at).format("LL"),
 				};
 			});
-			setData(data);
+			const resolvedData = await Promise.all(data);
+			setData(resolvedData);
 		}
 		setIsLoading(false);
 	};

@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { checkImageResolution } from "../../../utils/checkImageWidth";
-import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import {
+	DatePicker,
+	MuiPickersUtilsProvider,
+	TimePicker,
+} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import { format } from "date-fns";
 import Select from "react-select";
@@ -16,6 +20,7 @@ import {
 	getTourismPlace,
 } from "../../../services/TourismPlaceService";
 import BeatLoader from "react-spinners/BeatLoader";
+import { currencyFormatter } from "../../../utils/stringFormatter";
 
 const ClearIndicator = (props) => {
 	const {
@@ -57,10 +62,20 @@ const EventForm = () => {
 		flyerImagePreview: "",
 		nama: "",
 		deskripsi: "",
-		organizer: "",
+		organizer: {
+			nama: "",
+			kontak: "",
+		},
+		harga: "",
 		wisata: {},
-		startEvent: "",
-		endEvent: "",
+		startEvent: {
+			date: "",
+			time: "",
+		},
+		endEvent: {
+			date: "",
+			time: "",
+		},
 	});
 	const [wisataList, setWisataList] = useState([]);
 
@@ -71,10 +86,14 @@ const EventForm = () => {
 		formData.append("nama", formEvent.nama);
 		formData.append("flyer_image", formEvent.flyerImage);
 		formData.append("deskripsi", formEvent.deskripsi);
-		formData.append("organizer", formEvent.organizer);
+		formData.append("harga", formEvent.harga);
+		formData.append("nama_organizer", formEvent.organizer.nama);
+		formData.append("kontak_organizer", formEvent.organizer.kontak);
 		formData.append("wisata_id", formEvent.wisata.value);
-		formData.append("start_date", formEvent.startEvent);
-		formData.append("end_date", formEvent.endEvent);
+		formData.append("start_date", formEvent.startEvent.date);
+		formData.append("start_time", formEvent.startEvent.time);
+		formData.append("end_date", formEvent.endEvent.date);
+		formData.append("end_time", formEvent.endEvent.time);
 		createEvent(formData)
 			.then(() => {
 				setIsLoading(false);
@@ -101,10 +120,14 @@ const EventForm = () => {
 		formData.append("nama", formEvent.nama);
 		if (flyerImage !== "") formData.append("flyer_img", formEvent.flyerImage);
 		formData.append("deskripsi", formEvent.deskripsi);
-		formData.append("organizer", formEvent.organizer);
+		formData.append("harga", formEvent.harga);
+		formData.append("nama_organizer", formEvent.organizer.nama);
+		formData.append("kontak_organizer", formEvent.organizer.kontak);
 		formData.append("wisata_id", formEvent.wisata.value);
-		formData.append("start_date", formEvent.startEvent);
-		formData.append("end_date", formEvent.endEvent);
+		formData.append("start_date", formEvent.startEvent.date);
+		formData.append("start_time", formEvent.startEvent.time);
+		formData.append("end_date", formEvent.endEvent.date);
+		formData.append("end_time", formEvent.endEvent.time);
 		updateEvent(id, formData)
 			.then(() => {
 				setIsLoading(false);
@@ -148,9 +171,18 @@ const EventForm = () => {
 						...formEvent,
 						nama: res.data.data.nama,
 						deskripsi: res.data.data.deskripsi,
-						organizer: res.data.data.organizer,
-						startEvent: res.data.data.start_date,
-						endEvent: res.data.data.end_date,
+						organizer: {
+							nama: res.data.data.organizer.nama,
+							kontak: res.data.data.organizer.kontak,
+						},
+						startEvent: {
+							date: res.data.data.start_event.date,
+							time: res.data.data.start_event.time,
+						},
+						endEvent: {
+							date: res.data.data.end_event.date,
+							time: res.data.data.end_event.time,
+						},
 						flyerImagePreview: res.data.data.flyer_image,
 					});
 					getTourismPlace(res.data.data.wisata_id)
@@ -246,13 +278,13 @@ const EventForm = () => {
 															accept="image/*"
 															onChange={(event) => {
 																checkImageResolution(event.target.files[0])
-																	.then((res) => {
+																	.then(() => {
 																		setFormEvent({
 																			...formEvent,
 																			flyerImage: event.target.files[0],
 																		});
 																	})
-																	.catch((err) => {
+																	.catch(() => {
 																		Swal.fire(
 																			"Gagal!",
 																			"Ukuran gambar terlalu besar",
@@ -264,7 +296,7 @@ const EventForm = () => {
 													</div>
 													<span className="input-group-text">Upload</span>
 												</div>
-												{formEvent.flyerImagePreview != "" && (
+												{formEvent.flyerImagePreview?.length > 0 && (
 													<img
 														src={
 															process.env.REACT_APP_STORAGE_BASE_URL +
@@ -279,7 +311,7 @@ const EventForm = () => {
 														}}
 													/>
 												)}
-												{formEvent.flyerImage != "" && (
+												{formEvent.flyerImage?.length > 0 && (
 													<img
 														src={URL.createObjectURL(formEvent.flyerImage)}
 														alt="flyer"
@@ -307,16 +339,54 @@ const EventForm = () => {
 												></textarea>
 											</div>
 											<div className="form-group mb-3 col-md-6">
-												<label>Penyelenggara</label>
+												<label>Nama Penyelenggara</label>
 												<input
 													type="text"
 													className="form-control"
-													placeholder="Penyelanggara acara"
-													value={formEvent.organizer}
+													placeholder="Nama Penyelanggara"
+													value={formEvent.organizer.nama}
 													onChange={(e) =>
 														setFormEvent({
 															...formEvent,
-															organizer: e.target.value,
+															organizer: {
+																...formEvent.organizer,
+																nama: e.target.value,
+															},
+														})
+													}
+												/>
+											</div>
+											<div className="form-group mb-3 col-md-6">
+												<label>Kontak Penyelanggara</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Kontak Penyelanggara"
+													value={formEvent.organizer.kontak}
+													onChange={(e) =>
+														setFormEvent({
+															...formEvent,
+															organizer: {
+																...formEvent.organizer,
+																kontak: e.target.value,
+															},
+														})
+													}
+												/>
+											</div>
+											<div className="form-group mb-3 col-md-6">
+												<label>
+													Harga {currencyFormatter(formEvent.harga, "id-ID")}
+												</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Masukkan harga"
+													value={formEvent.harga}
+													onChange={(e) =>
+														setFormEvent({
+															...formEvent,
+															harga: e.target.value,
 														})
 													}
 												/>
@@ -345,8 +415,8 @@ const EventForm = () => {
 														clearable
 														format="yyyy-MM-dd"
 														value={
-															formEvent.tanggal_mulai
-																? formEvent.tanggal_mulai
+															formEvent.startEvent.date
+																? formEvent.startEvent.date
 																: null
 														}
 														onChange={(date) => {
@@ -355,7 +425,38 @@ const EventForm = () => {
 																: null;
 															setFormEvent({
 																...formEvent,
-																tanggal_mulai: formattedDate,
+																startEvent: {
+																	...formEvent.startEvent,
+																	date: formattedDate,
+																},
+															});
+														}}
+													/>
+												</MuiPickersUtilsProvider>
+											</div>
+											<div className="col-xl-3 col-xxl-6 col-md-6 mb-3">
+												<label>Waktu Mulai</label>
+												<MuiPickersUtilsProvider utils={DateFnsUtils}>
+													<TimePicker
+														autoOk
+														label=""
+														value={
+															formEvent.startEvent.time
+																? new Date(
+																		`01/01/1970 ${formEvent.startEvent.time}`
+																  )
+																: null
+														}
+														onChange={(time) => {
+															const formattedTime = time
+																? format(time, "HH:mm")
+																: null;
+															setFormEvent({
+																...formEvent,
+																startEvent: {
+																	...formEvent.startEvent,
+																	time: formattedTime,
+																},
 															});
 														}}
 													/>
@@ -370,8 +471,8 @@ const EventForm = () => {
 														clearable
 														format="yyyy-MM-dd"
 														value={
-															formEvent.tanggal_selesai
-																? formEvent.tanggal_selesai
+															formEvent.endEvent.date
+																? formEvent.endEvent.date
 																: null
 														}
 														onChange={(date) => {
@@ -380,7 +481,38 @@ const EventForm = () => {
 																: null;
 															setFormEvent({
 																...formEvent,
-																tanggal_selesai: formattedDate,
+																endEvent: {
+																	...formEvent.endEvent,
+																	date: formattedDate,
+																},
+															});
+														}}
+													/>
+												</MuiPickersUtilsProvider>
+											</div>
+											<div className="col-xl-3 col-xxl-6 col-md-6 mb-3">
+												<label>Waktu Selesai</label>
+												<MuiPickersUtilsProvider utils={DateFnsUtils}>
+													<TimePicker
+														autoOk
+														label=""
+														value={
+															formEvent.endEvent.time
+																? new Date(
+																		`01/01/1970 ${formEvent.endEvent.time}`
+																  )
+																: null
+														}
+														onChange={(time) => {
+															const formattedTime = time
+																? format(time, "HH:mm")
+																: null;
+															setFormEvent({
+																...formEvent,
+																endEvent: {
+																	...formEvent.endEvent,
+																	time: formattedTime,
+																},
 															});
 														}}
 													/>
