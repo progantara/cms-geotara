@@ -25,7 +25,7 @@ const DropdownBlog = () =>{
 	)
 }
 
-const TrendingGeosite = () =>{
+const TrendingWisata = () =>{
 	const [data, setData] = useState(
 		document.querySelectorAll("#room_wrapper tbody tr")
 	);
@@ -159,4 +159,4 @@ const TrendingGeosite = () =>{
 		</>
 	)
 }
-export default TrendingGeosite;
+export default TrendingWisata;
