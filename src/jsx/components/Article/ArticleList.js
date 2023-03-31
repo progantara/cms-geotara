@@ -18,11 +18,10 @@ const ArticleList = () => {
 
 	const columns = [
 		{
-			name: "No",
+			name: 'No',
 			selector: (row) => row.no,
-			sortable: false,
-			cell: (row, index) => index + 1,
-			width: "10%",
+			sortable: true,
+			width: '5%',
 		},
 		{
 			name: "Judul",
@@ -116,6 +115,9 @@ const ArticleList = () => {
 			const newData = data.filter((item) => item._id !== id);
 			setData(newData);
 			Swal.fire("Berhasil!", "Artikel berhasil dihapus", "success");
+			setIsLoading(true);
+			fetchData();
+			setIsLoading(false);
 		} else {
 			Swal.fire("Gagal!", "Artikel gagal dihapus", "error");
 		}
@@ -130,9 +132,10 @@ const ArticleList = () => {
 	const fetchData = async () => {
 		const response = await getAllArticle();
 		if (response.status === 200) {
-			const data = response.data.data.map((item) => {
+			const data = response.data.data.map((item, index) => {
 				return {
 					...item,
+					no: index + 1,
 					title: item.judul,
 					writer: item.author_id,
 					publication_date: moment(item.created_at).format("LL"),

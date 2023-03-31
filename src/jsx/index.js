@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import LoadingBar from 'react-top-loading-bar';
 
 /// React router dom
-import { Switch, Route, useLocation } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 
 /// Css
 import './index.css';
@@ -13,9 +13,6 @@ import './step.css';
 import Nav from './layouts/nav';
 import Footer from './layouts/Footer';
 
-/// Dashboard
-import Home from './pages/Dashboard';
-
 import DashboardDark from './components/Dashboard/DashboardDark';
 import GuestList from './components/Dashboard/GuestList';
 import GuestDetail from './components/Dashboard/GuestDetail';
@@ -25,9 +22,7 @@ import Reviews from './components/Dashboard/Reviews';
 import Task from './components/Dashboard/Task';
 
 /// Pages
-import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
-import LockScreen from './pages/LockScreen';
 import Error400 from './pages/Error400';
 import Error403 from './pages/Error403';
 import Error404 from './pages/Error404';
@@ -38,6 +33,12 @@ import Section from './components/Section';
 import { useSelector } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import { history } from '../store/store';
+
+// Dashboard
+const Home = React.lazy(() => import('./pages/Dashboard'));
+
+// Auth
+const Login = React.lazy(() => import('./pages/Login'));
 
 // Profil
 const Profil = React.lazy(() => import('./components/Profil/Profil'));
@@ -150,7 +151,6 @@ const Markup = () => {
 		{ url: 'pengguna/edit/:id', component: UserForm },
 
 		/// pages
-		{ url: 'page-lock-screen', component: LockScreen },
 		{ url: 'page-login', component: Login },
 		{ url: 'page-forgot-password', component: ForgotPassword },
 		{ url: 'page-error-400', component: Error400 },

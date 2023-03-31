@@ -16,7 +16,6 @@ const EventList = () => {
 			name: "No",
 			selector: (row) => row.no,
 			sortable: false,
-			cell: (row, index) => index + 1,
 			width: "10%",
 		},
 		{
@@ -111,6 +110,9 @@ const EventList = () => {
 			const newData = data.filter((item) => item._id !== id);
 			setData(newData);
 			Swal.fire("Berhasil!", "Acara berhasil dihapus", "success");
+			setIsLoading(true);
+			fetchData();
+			setIsLoading(false);
 		} else {
 			Swal.fire("Gagal!", "Acara gagal dihapus", "error");
 		}
@@ -124,13 +126,15 @@ const EventList = () => {
 
 	const fetchData = async () => {
 		const response = await getAllEvents();
+		console.log(response);
 		if (response.status === 200) {
-			const data = response.data.data.map((item) => {
+			const data = response.data.data.map((item, index) => {
 				return {
 					...item,
+					no: index + 1,
 					nama: item.nama,
-					penyelenggara: item.organizer,
-					tanggal_mulai: item.start_date,
+					penyelenggara: item.organizer.nama,
+					tanggal_mulai: item.start_event.date,
 				};
 			});
 			setData(data);
@@ -154,7 +158,7 @@ const EventList = () => {
 				</div>
 				<div className="card-body">
 					<div className="table-responsive">
-						<div id="job_data" className="dataTables_wrapper">
+						<div className="dataTables_wrapper">
 							<DataTable
 								columns={columns}
 								data={data}
