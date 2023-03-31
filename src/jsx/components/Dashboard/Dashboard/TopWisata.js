@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function TopGeoarea() {
+export default function TopWisata() {
 	return (
 		<div className="col-xl-12 col-sm-6">
 			<div className="card">

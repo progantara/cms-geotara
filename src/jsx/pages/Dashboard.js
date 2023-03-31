@@ -14,7 +14,7 @@ import VisitorChart from '../components/Dashboard/Dashboard/VisitorChart';
 import TopArticle from '../components/Dashboard/Dashboard/TopArticle';
 import TrendingGeosite from '../components/Dashboard/Dashboard/TrendingGeosite';
 import DistributionMap from '../components/Dashboard/Dashboard/DistributionMap';
-import TopGeoarea from '../components/Dashboard/Dashboard/TopGeoarea';
+import TopWisata from '../components/Dashboard/Dashboard/TopWisata';
 
 
 const Home = () => {
@@ -76,7 +76,7 @@ const Home = () => {
 				<div className="col-xl-4 col-xxl-5">
 					<div className="row">
 						<DistributionMap />
-						<TopGeoarea />
+						<TopWisata />
 					</div>
 				</div>
 				<div className="col-xl-8 col-xxl-7">
