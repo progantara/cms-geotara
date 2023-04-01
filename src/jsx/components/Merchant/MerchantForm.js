@@ -5,7 +5,7 @@ import { createMerchant, getMerchant, updateMerchant } from '../../../services/M
 import { getAllProvinsi } from '../../../services/ProvinsiService';
 import { getAllKotaByCode } from '../../../services/KotaService';
 import { getAllDistrikByCode, getDistrik } from '../../../services/DistrikService';
-import { getAllDesaByCode, getDesa } from '../../../services/DesaService';
+import { getAllDesaByCode, getDesa, getParentDesa } from '../../../services/DesaService';
 import { TimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { format } from 'date-fns';
@@ -20,11 +20,11 @@ export default function UserForm() {
 	const { id } = useParams();
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [provinsiId, setProvinsiId] = useState({});
+	const [provinsiId, setProvinsiId] = useState('');
+	const [kotaId, setKotaId] = useState('');
+	const [distrikId, setDistrikId] = useState('');
 	const [provinsiList, setProvinsiList] = useState([]);
-	const [kotaId, setKotaId] = useState({});
 	const [kotaList, setKotaList] = useState([]);
-	const [distrikId, setDistrikId] = useState({});
 	const [distrikList, setDistrikList] = useState([]);
 	const [desaList, setDesaList] = useState([]);
 	const [inputMerchant, setInputMerchant] = useState({
@@ -48,7 +48,7 @@ export default function UserForm() {
 			{
 				nama: '',
 				deskripsi: '',
-				varian: [],
+				varian: [''],
 				thumbnail: '',
 				thumbnailPreview: '',
 				harga: '',
@@ -86,8 +86,9 @@ export default function UserForm() {
 	useEffect(() => {
 		if (id !== undefined) {
 			getMerchant(id)
-				.then((res) => {
+				.then(async (res) => {
 					let data = res.data.data;
+					const parentDesa = await getParentDesa(data.lokasi.desa_id);
 					setInputMerchant({
 						nama: data.nama,
 						no_telp: data.no_telp,
@@ -101,18 +102,138 @@ export default function UserForm() {
 					setLokasi({
 						lat: data.lokasi.lat,
 						long: data.lokasi.long,
-						desa_id: data.lokasi.desa_id,
+						desa_id: {
+							value: parentDesa.data.data.desa.kode,
+							label: parentDesa.data.data.desa.nama,
+							color: '#00B8D9',
+						},
 						alamat: data.lokasi.alamat,
 					});
 					setDetail({
 						product: data.detail.product,
 					});
+					setProvinsiId({
+						value: parentDesa.data.data.provinsi.kode,
+						label: parentDesa.data.data.provinsi.nama,
+						color: '#00B8D9',
+					});
+					setKotaId({
+						value: parentDesa.data.data.kota.kode,
+						label: parentDesa.data.data.kota.nama,
+						color: '#00B8D9',
+					});
+					setDistrikId({
+						value: parentDesa.data.data.distrik.kode,
+						label: parentDesa.data.data.distrik.nama,
+						color: '#00B8D9',
+					});
+					getAllProvinsi()
+						.then((prov) => {
+							setProvinsiList(
+								prov.data.data.map((provItem) => {
+									getAllKotaByCode(provItem.kode)
+										.then((kota) => {
+											setKotaList(
+												kota.data.data.map(
+													(
+														kotaItem
+													) => {
+														getAllDistrikByCode(
+															kotaItem.kode
+														)
+															.then(
+																(
+																	distrik
+																) => {
+																	setDistrikList(
+																		distrik.data.data.map(
+																			(
+																				distrikItem
+																			) => {
+																				getAllDesaByCode(
+																					distrikItem.kode
+																				)
+																					.then(
+																						(
+																							desa
+																						) => {
+																							setDesaList(
+																								desa.data.data.map(
+																									(
+																										desaItem
+																									) => {
+																										return {
+																											value: desaItem.kode,
+																											label: desaItem.nama,
+																											color: '#00B8D9',
+																										};
+																									}
+																								)
+																							);
+																						}
+																					)
+																					.catch(
+																						() => {
+																							Swal.fire(
+																								'Gagal!',
+																								'Desa gagal dimuat',
+																								'error'
+																							);
+																						}
+																					);
+																				return {
+																					value: distrikItem.kode,
+																					label: distrikItem.nama,
+																					color: '#00B8D9',
+																				};
+																			}
+																		)
+																	);
+																}
+															)
+															.catch(
+																() => {
+																	Swal.fire(
+																		'Gagal!',
+																		'Distrik gagal dimuat',
+																		'error'
+																	);
+																}
+															);
+														return {
+															value: kotaItem.kode,
+															label: kotaItem.nama,
+															color: '#00B8D9',
+														};
+													}
+												)
+											);
+										})
+										.catch(() => {
+											Swal.fire(
+												'Gagal!',
+												'Kota gagal dimuat',
+												'error'
+											);
+										});
+									return {
+										value: provItem.kode,
+										label: provItem.nama,
+										color: '#00B8D9',
+									};
+								})
+							);
+						})
+						.catch(() => {
+							Swal.fire('Gagal!', 'Provinsi gagal dimuat', 'error');
+						});
 				})
 				.catch((err) => {
 					Swal.fire('Gagal!', 'Merchant gagal dimuat', 'error').then(() => {
 						history.push('/merchant');
 					});
 				});
+			console.log(lokasi);
 		} else {
 			getAllProvinsi()
 				.then((res) => {
@@ -311,7 +432,7 @@ export default function UserForm() {
 												<input
 													type="text"
 													className="form-control"
-													placeholder="Masukkan nama restaurant"
+													placeholder="Masukkan nama merchant"
 													name="nama"
 													value={
 														inputMerchant.nama
@@ -350,7 +471,7 @@ export default function UserForm() {
 															process
 																.env
 																.REACT_APP_STORAGE_BASE_URL +
-															'/restaurant/' +
+															'/merchant/' +
 															inputMerchant.thumbnailPreview
 														}
 														alt="banner"
@@ -777,8 +898,8 @@ export default function UserForm() {
 													}
 												>
 													<div className="row">
-														<span className="flex items-center justify-between px-4 py-2">
-															<span className="mr-4 text-4xl font-extrabold">
+														<div className="d-flex justify-content-between">
+															<span className="font-weight-bold h3">
 																Produk{' '}
 																{` ${
 																	index +
@@ -788,7 +909,7 @@ export default function UserForm() {
 															{index ? (
 																<button
 																	type="button"
-																	className="btn btn-danger btn-sm"
+																	className="btn btn-danger btn-sm mr-4"
 																	onClick={() => {
 																		let newProduct =
 																			[
@@ -809,7 +930,7 @@ export default function UserForm() {
 																	<i className="fa fa-trash color-danger"></i>
 																</button>
 															) : null}
-														</span>
+														</div>
 
 														<div className="mb-3 form-group col-md-4">
 															<label>

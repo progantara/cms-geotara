@@ -71,3 +71,12 @@ export const deleteDesa = (id) => {
 		},
 	});
 };
+
+export const getParentDesa = (kode) => {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/lokasi/desa/parent/` + kode, {
+		headers: {
+			Authorization: `Bearer ${getAccessToken()}`,
+			Accept: 'application/json',
+		},
+	});
+};
