@@ -4,15 +4,15 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 import { createMerchant, getMerchant, updateMerchant } from '../../../services/MerchantService';
 import { getAllProvinsi } from '../../../services/ProvinsiService';
 import { getAllKotaByCode } from '../../../services/KotaService';
-import { getAllDistrikByCode, getDistrik } from '../../../services/DistrikService';
-import { getAllDesaByCode, getDesa, getParentDesa } from '../../../services/DesaService';
+import { getAllDistrikByCode } from '../../../services/DistrikService';
+import { getAllDesaByCode, getParentDesa } from '../../../services/DesaService';
 import { TimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { format } from 'date-fns';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import 'ol/ol.css';
 import Select from 'react-select';
-import { RControl, RLayerTile, RMap, ROSM } from 'rlayers';
+import { RControl, RMap, ROSM } from 'rlayers';
 import BeatLoader from 'react-spinners/BeatLoader';
 
 export default function UserForm() {
@@ -370,9 +370,21 @@ export default function UserForm() {
 		data.append('alamat', lokasi.alamat);
 		data.append('jam_buka', inputMerchant.jam_buka);
 		data.append('jam_tutup', inputMerchant.jam_tutup);
-		data.append('product[0][nama]', detail.product[0].nama);
-		data.append('product[0][harga]', detail.product[0].harga);
-		data.append('product[0][rating]', detail.product[0].rating);
+		// Loop through each product and add its details
+		for (let i = 0; i < detail.product.length; i++) {
+			data.append(`product[${i}][nama]`, detail.product[i].nama);
+			data.append(`product[${i}][deskripsi]`, detail.product[i].deskripsi);
+
+			// Loop through each varian of the product and add it as a separate element
+			const varianString = detail.product[0].varian.join(',');
+			for (let j = 0; j < varianString.length; j++) {
+				data.append(`product[${i}][varian][${j}]`, detail.product[i].varian[j]);
+			}
+
+			data.append(`product[${i}][thumbnail]`, detail.product[i].thumbnail);
+			data.append(`product[${i}][harga]`, detail.product[i].harga);
+			data.append(`product[${i}][rating]`, detail.product[i].rating);
+		}
 
 		updateMerchant(id, data)
 			.then(() => {
@@ -889,7 +901,7 @@ export default function UserForm() {
 											</div>
 										</div>
 										<hr />
-										{detail.product.map((item, index) => {
+										{detail.kamar.map((item, index) => {
 											return (
 												<div
 													className="mb-4"
@@ -909,7 +921,7 @@ export default function UserForm() {
 															{index ? (
 																<button
 																	type="button"
-																	className="btn btn-danger btn-sm mr-4"
+																	className="mr-4 btn btn-danger btn-sm"
 																	onClick={() => {
 																		let newProduct =
 																			[
@@ -931,7 +943,8 @@ export default function UserForm() {
 																</button>
 															) : null}
 														</div>
-
+													</div>
+													<div className="row">
 														<div className="mb-3 form-group col-md-4">
 															<label>
 																Nama
