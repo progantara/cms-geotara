@@ -32,7 +32,7 @@ export function AuthReducer(state = initialState, action) {
                 access_token: action.payload.access_token,
             },
 			errorMessage: "",
-			successMessage: "Login Successfully Completed",
+			successMessage: "Login successful",
 			showLoading: false,
 		};
 	}
@@ -58,7 +58,7 @@ export function AuthReducer(state = initialState, action) {
 	if (action.type === LOGIN_FAILED_ACTION) {
 		return {
 			...state,
-			errorMessage: action.payload.message,
+			errorMessage: action.payload,
 			successMessage: "",
 			showLoading: false,
 		};

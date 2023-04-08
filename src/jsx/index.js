@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import LoadingBar from "react-top-loading-bar";
 
 /// React router dom
@@ -31,8 +31,6 @@ import Error503 from "./pages/Error503";
 import { ThemeContext } from "../context/ThemeContext";
 import Section from "./components/Section";
 import { useSelector } from "react-redux";
-import { ConnectedRouter } from "connected-react-router";
-import { history } from "../store/store";
 
 // Dashboard
 const Home = React.lazy(() => import("./pages/Dashboard"));
@@ -191,39 +189,37 @@ const Markup = () => {
 
 	return (
 		<>
-			<ConnectedRouter history={history}>
-				<div
-					id={`${!pagePath ? "main-wrapper" : ""}`}
-					className={`${!pagePath ? "show" : "vh-100"}  ${
-						menuToggle ? "menu-toggle" : ""
-					}`}
-				>
-					{!pagePath && <Nav />}
-					<div className={`${!pagePath ? "content-body" : ""}`}>
-						<div
-							className={`${!pagePath ? "container-fluid" : ""}`}
-							style={{ minHeight: window.screen.height - 60 }}
-						>
-							{show && <LoadingBar color="#f11946" progress={progress} />}
-							<Switch>
-								{routes.map((data, i) => (
-									<Route
-										key={i}
-										exact
-										path={`/${data.url}`}
-										component={data.component}
-									/>
-								))}
-								<Route path="*">
-									<Redirect to="/page-error-404" />
-								</Route>
-							</Switch>
-							{/* Route untuk menangani semua path yang tidak cocok */}
-						</div>
+			<div
+				id={`${!pagePath ? "main-wrapper" : ""}`}
+				className={`${!pagePath ? "show" : "vh-100"}  ${
+					menuToggle ? "menu-toggle" : ""
+				}`}
+			>
+				{!pagePath && <Nav />}
+				<div className={`${!pagePath ? "content-body" : ""}`}>
+					<div
+						className={`${!pagePath ? "container-fluid" : ""}`}
+						style={{ minHeight: window.screen.height - 60 }}
+					>
+						{show && <LoadingBar color="#f11946" progress={progress} />}
+						<Switch>
+							{routes.map((data, i) => (
+								<Route
+									key={i}
+									exact
+									path={`/${data.url}`}
+									component={data.component}
+								/>
+							))}
+							<Route path="*">
+								<Redirect to="/page-error-404" />
+							</Route>
+						</Switch>
+						{/* Route untuk menangani semua path yang tidak cocok */}
 					</div>
-					{!pagePath && <Footer />}
 				</div>
-			</ConnectedRouter>
+				{!pagePath && <Footer />}
+			</div>
 		</>
 	);
 };

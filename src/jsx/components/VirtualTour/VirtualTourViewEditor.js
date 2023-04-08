@@ -9,37 +9,36 @@ import styled from "styled-components";
 import Sample360 from "../../../images/360/1.jpg";
 
 const ContextMenu = styled.div`
-  border-radius: 4px;
-  box-sizing: border-box;
-  position: absolute;
-  width: 200px;
-  background-color: #383838;
-  box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.1);
-  ul {
-    list-style-type: none;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 10px;
-  }
-  ul li {
-    padding: 18px 12px;
-    border-radius: 4px;
-  }
-  ul li:hover {
-    cursor: pointer;
-    background-color: #4b4b4b;
-  }
+	border-radius: 4px;
+	box-sizing: border-box;
+	position: absolute;
+	width: 200px;
+	background-color: #383838;
+	box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.1);
+	ul {
+		list-style-type: none;
+		box-sizing: border-box;
+		margin: 0;
+		padding: 10px;
+	}
+	ul li {
+		padding: 18px 12px;
+		border-radius: 4px;
+	}
+	ul li:hover {
+		cursor: pointer;
+		background-color: #4b4b4b;
+	}
 `;
 
 const ContextMenuProps = styled(ContextMenu)`
-  ${({ top, left }) => css`
-    top: ${top}px;
-    left: ${left}px;
-  `}
+	${({ top, left }) => css`
+		top: ${top}px;
+		left: ${left}px;
+	`}
 `;
 
 const VirtualTourViewEditor = () => {
-	const [showContextMenu, setShowContextMenu] = useState(false);
 	const [mouseCoord, setMouseCoord] = useState(false);
 
 	const [spotInfo, setSpotInfo] = useState({
@@ -98,9 +97,7 @@ const VirtualTourViewEditor = () => {
 												name="type"
 												onChange={handleChange}
 											>
-												<option>
-													Pilih...
-												</option>
+												<option>Pilih...</option>
 												<option value="scene">Transition</option>
 												<option value="info">Information</option>
 											</select>
@@ -263,7 +260,7 @@ const VirtualTourViewEditor = () => {
 												text: "Facebook",
 												clickHandlerArgs: { id: spotList.length + 1 },
 												clickHandlerFunc: (evt, args) => {
-													console.log(evt)
+													console.log(evt);
 													if (evt.which === 1) {
 														removeHotSpot(args.id);
 														// TODO: Left Click to Edit Hotspot
@@ -276,8 +273,10 @@ const VirtualTourViewEditor = () => {
 										}
 									}
 								}}
+								onContextMenu={(event) => {
+									console.log("Right Clicked");
+								}}
 							>
-								{showContextMenu && <ContextMenu/>}
 								<div
 									style={{
 										position: "absolute",

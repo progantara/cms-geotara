@@ -1,4 +1,4 @@
-import { formatError, login, runLogoutTimer, saveTokenInLocalStorage } from '../../services/AuthService';
+import { formatError, formatSuccess, login, runLogoutTimer, saveTokenInLocalStorage } from '../../services/AuthService';
 
 export const LOGIN_CONFIRMED_ACTION = '[login action] confirmed login';
 export const LOGIN_FAILED_ACTION = '[login action] failed login';
@@ -26,13 +26,15 @@ export function loginAction(email, password, history) {
 					access_token: response.data.data.access_token,
 				});
 				runLogoutTimer(dispatch, 1000 * 60 * 60 * 24, history);
-				dispatch(loginConfirmedAction(response.data.data));
-				history.push('/dashboard');
-				window.location.reload();
+				const successMessage = formatSuccess(response.data.data);
+				setTimeout(() => {
+					dispatch(loginConfirmedAction(successMessage));
+					history.push('/dashboard');
+					// window.location.reload();
+				}, 1500);
 			})
 			.catch((error) => {
-				error = JSON.parse(JSON.stringify(error));
-				const errorMessage = formatError(error);
+				const errorMessage = formatError(error.response);
 				dispatch(loginFailedAction(errorMessage));
 			});
 	};
