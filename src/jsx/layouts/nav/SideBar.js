@@ -182,7 +182,7 @@ const SideBar = () => {
 					<li className={`${plugins.includes(path) ? 'mm-active' : ''}`}>
 						<Link className="has-arrow ai-icon" to="#">
 							<i className="fa fa-lock"></i>
-							<span className="nav-text">Autentikasi</span>
+							<span className="nav-text">Manajemen</span>
 						</Link>
 						<ul>
 							<li>
