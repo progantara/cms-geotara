@@ -112,7 +112,7 @@ const WisataForm = () => {
 		setIsLoading(true);
 		const data = new FormData();
 		data.append("nama", formWisata.nama);
-		data.append("deskripsi", formWisatadeskripsi);
+		data.append("deskripsi", formWisata.deskripsi);
 		formWisata.kategori
 			.map((item) => item.value)
 			.forEach((item, index) => {
