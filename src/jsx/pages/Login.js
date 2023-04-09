@@ -7,10 +7,10 @@ import {
 } from "../../store/actions/AuthActions";
 
 function Login(props) {
-	const [email, setEmail] = useState("manajer@geotara.com");
+	const [email, setEmail] = useState("");
 	let errorsObj = { email: "", password: "" };
 	const [errors, setErrors] = useState(errorsObj);
-	const [password, setPassword] = useState("manajer");
+	const [password, setPassword] = useState("");
 
 	const dispatch = useDispatch();
 
@@ -19,11 +19,11 @@ function Login(props) {
 		let error = false;
 		const errorObj = { ...errorsObj };
 		if (email === "") {
-			errorObj.email = "Email is Required";
+			errorObj.email = "Email is required";
 			error = true;
 		}
 		if (password === "") {
-			errorObj.password = "Password is Required";
+			errorObj.password = "Password is required";
 			error = true;
 		}
 		setErrors(errorObj);
@@ -101,7 +101,7 @@ function Login(props) {
 											</label>
 											<div>
 												<input
-													type="email"
+													type="text"
 													className="form-control"
 													value={email}
 													id="email"
@@ -121,6 +121,7 @@ function Login(props) {
 												type="password"
 												className="form-control"
 												value={password}
+												id="password"
 												placeholder="Type Your Password"
 												onChange={(e) => setPassword(e.target.value)}
 											/>
@@ -134,6 +135,7 @@ function Login(props) {
 											<button
 												type="submit"
 												className="btn btn-primary btn-block"
+												id="submit_login"
 											>
 												Masuk
 											</button>

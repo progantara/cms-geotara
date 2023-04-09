@@ -216,7 +216,7 @@ const ArticleForm = () => {
 												</div>
 												<span className="input-group-text">Upload</span>
 											</div>
-											{formArticle.thumbnailPreview != "" && (
+											{formArticle.thumbnailPreview?.length > 0 && (
 												<img
 													src={
 														process.env.REACT_APP_STORAGE_BASE_URL +
@@ -231,7 +231,7 @@ const ArticleForm = () => {
 													}}
 												/>
 											)}
-											{formArticle.thumbnail != "" && (
+											{formArticle.thumbnail?.length > 0 && (
 												<img
 													src={URL.createObjectURL(formArticle.thumbnail)}
 													alt="thumbnail"

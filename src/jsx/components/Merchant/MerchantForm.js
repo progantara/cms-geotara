@@ -4,15 +4,15 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 import { createMerchant, getMerchant, updateMerchant } from '../../../services/MerchantService';
 import { getAllProvinsi } from '../../../services/ProvinsiService';
 import { getAllKotaByCode } from '../../../services/KotaService';
-import { getAllDistrikByCode, getDistrik } from '../../../services/DistrikService';
-import { getAllDesaByCode, getDesa } from '../../../services/DesaService';
+import { getAllDistrikByCode } from '../../../services/DistrikService';
+import { getAllDesaByCode, getParentDesa } from '../../../services/DesaService';
 import { TimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { format } from 'date-fns';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import 'ol/ol.css';
 import Select from 'react-select';
-import { RControl, RLayerTile, RMap, ROSM } from 'rlayers';
+import { RControl, RMap, ROSM } from 'rlayers';
 import BeatLoader from 'react-spinners/BeatLoader';
 
 export default function UserForm() {
@@ -20,11 +20,11 @@ export default function UserForm() {
 	const { id } = useParams();
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [provinsiId, setProvinsiId] = useState({});
+	const [provinsiId, setProvinsiId] = useState('');
+	const [kotaId, setKotaId] = useState('');
+	const [distrikId, setDistrikId] = useState('');
 	const [provinsiList, setProvinsiList] = useState([]);
-	const [kotaId, setKotaId] = useState({});
 	const [kotaList, setKotaList] = useState([]);
-	const [distrikId, setDistrikId] = useState({});
 	const [distrikList, setDistrikList] = useState([]);
 	const [desaList, setDesaList] = useState([]);
 	const [inputMerchant, setInputMerchant] = useState({
@@ -48,7 +48,7 @@ export default function UserForm() {
 			{
 				nama: '',
 				deskripsi: '',
-				varian: [],
+				varian: [''],
 				thumbnail: '',
 				thumbnailPreview: '',
 				harga: '',
@@ -86,8 +86,9 @@ export default function UserForm() {
 	useEffect(() => {
 		if (id !== undefined) {
 			getMerchant(id)
-				.then((res) => {
+				.then(async (res) => {
 					let data = res.data.data;
+					const parentDesa = await getParentDesa(data.lokasi.desa_id);
 					setInputMerchant({
 						nama: data.nama,
 						no_telp: data.no_telp,
@@ -101,24 +102,138 @@ export default function UserForm() {
 					setLokasi({
 						lat: data.lokasi.lat,
 						long: data.lokasi.long,
-						desa_id: data.lokasi.desa_id,
+						desa_id: {
+							value: parentDesa.data.data.desa.kode,
+							label: parentDesa.data.data.desa.nama,
+							color: '#00B8D9',
+						},
 						alamat: data.lokasi.alamat,
 					});
 					setDetail({
-						product: [
-							{
-								nama: data.detail.product[0].nama,
-								harga: data.detail.product[0].harga,
-								rating: data.detail.product[0].rating,
-							},
-						],
+						product: data.detail.product,
 					});
+					setProvinsiId({
+						value: parentDesa.data.data.provinsi.kode,
+						label: parentDesa.data.data.provinsi.nama,
+						color: '#00B8D9',
+					});
+					setKotaId({
+						value: parentDesa.data.data.kota.kode,
+						label: parentDesa.data.data.kota.nama,
+						color: '#00B8D9',
+					});
+					setDistrikId({
+						value: parentDesa.data.data.distrik.kode,
+						label: parentDesa.data.data.distrik.nama,
+						color: '#00B8D9',
+					});
+					getAllProvinsi()
+						.then((prov) => {
+							setProvinsiList(
+								prov.data.data.map((provItem) => {
+									getAllKotaByCode(provItem.kode)
+										.then((kota) => {
+											setKotaList(
+												kota.data.data.map(
+													(
+														kotaItem
+													) => {
+														getAllDistrikByCode(
+															kotaItem.kode
+														)
+															.then(
+																(
+																	distrik
+																) => {
+																	setDistrikList(
+																		distrik.data.data.map(
+																			(
+																				distrikItem
+																			) => {
+																				getAllDesaByCode(
+																					distrikItem.kode
+																				)
+																					.then(
+																						(
+																							desa
+																						) => {
+																							setDesaList(
+																								desa.data.data.map(
+																									(
+																										desaItem
+																									) => {
+																										return {
+																											value: desaItem.kode,
+																											label: desaItem.nama,
+																											color: '#00B8D9',
+																										};
+																									}
+																								)
+																							);
+																						}
+																					)
+																					.catch(
+																						() => {
+																							Swal.fire(
+																								'Gagal!',
+																								'Desa gagal dimuat',
+																								'error'
+																							);
+																						}
+																					);
+																				return {
+																					value: distrikItem.kode,
+																					label: distrikItem.nama,
+																					color: '#00B8D9',
+																				};
+																			}
+																		)
+																	);
+																}
+															)
+															.catch(
+																() => {
+																	Swal.fire(
+																		'Gagal!',
+																		'Distrik gagal dimuat',
+																		'error'
+																	);
+																}
+															);
+														return {
+															value: kotaItem.kode,
+															label: kotaItem.nama,
+															color: '#00B8D9',
+														};
+													}
+												)
+											);
+										})
+										.catch(() => {
+											Swal.fire(
+												'Gagal!',
+												'Kota gagal dimuat',
+												'error'
+											);
+										});
+									return {
+										value: provItem.kode,
+										label: provItem.nama,
+										color: '#00B8D9',
+									};
+								})
+							);
+						})
+						.catch(() => {
+							Swal.fire('Gagal!', 'Provinsi gagal dimuat', 'error');
+						});
 				})
 				.catch((err) => {
 					Swal.fire('Gagal!', 'Merchant gagal dimuat', 'error').then(() => {
 						history.push('/merchant');
 					});
 				});
+			console.log(lokasi);
 		} else {
 			getAllProvinsi()
 				.then((res) => {
@@ -169,6 +284,31 @@ export default function UserForm() {
 			...prevInput,
 			[type]: newJamOperasional,
 		}));
+	};
+
+	const handleChangeDetail = (e, index) => {
+		const { name, value } = e.target;
+		const newProduct = { ...detail.product[index] };
+		if (name === 'thumbnail') {
+			const files = e.target.files[0];
+			newProduct[name] = files;
+		} else if (name === 'varian') {
+			let arr = [];
+
+			// Memeriksa apakah nilai input adalah string dengan koma
+			if (typeof value === 'string' && value.includes(',')) {
+				arr = value.split(',');
+			} else {
+				arr.push(value);
+			}
+			newProduct[name] = arr;
+		} else {
+			newProduct[name] = value;
+		}
+		const newProducts = [...detail.product];
+		newProducts[index] = newProduct;
+		setDetail({ ...detail, product: newProducts });
+		console.log(detail);
 	};
 
 	const handleCreate = (e) => {
@@ -230,9 +370,21 @@ export default function UserForm() {
 		data.append('alamat', lokasi.alamat);
 		data.append('jam_buka', inputMerchant.jam_buka);
 		data.append('jam_tutup', inputMerchant.jam_tutup);
-		data.append('product[0][nama]', detail.product[0].nama);
-		data.append('product[0][harga]', detail.product[0].harga);
-		data.append('product[0][rating]', detail.product[0].rating);
+		// Loop through each product and add its details
+		for (let i = 0; i < detail.product.length; i++) {
+			data.append(`product[${i}][nama]`, detail.product[i].nama);
+			data.append(`product[${i}][deskripsi]`, detail.product[i].deskripsi);
+
+			// Loop through each varian of the product and add it as a separate element
+			const varianString = detail.product[0].varian.join(',');
+			for (let j = 0; j < varianString.length; j++) {
+				data.append(`product[${i}][varian][${j}]`, detail.product[i].varian[j]);
+			}
+
+			data.append(`product[${i}][thumbnail]`, detail.product[i].thumbnail);
+			data.append(`product[${i}][harga]`, detail.product[i].harga);
+			data.append(`product[${i}][rating]`, detail.product[i].rating);
+		}
 
 		updateMerchant(id, data)
 			.then(() => {
@@ -292,7 +444,7 @@ export default function UserForm() {
 												<input
 													type="text"
 													className="form-control"
-													placeholder="Masukkan nama restaurant"
+													placeholder="Masukkan nama merchant"
 													name="nama"
 													value={
 														inputMerchant.nama
@@ -331,7 +483,7 @@ export default function UserForm() {
 															process
 																.env
 																.REACT_APP_STORAGE_BASE_URL +
-															'/restaurant/' +
+															'/merchant/' +
 															inputMerchant.thumbnailPreview
 														}
 														alt="banner"
@@ -359,7 +511,7 @@ export default function UserForm() {
 											</div>
 										</div>
 										<div className="row">
-											<div className="form-group mb-4 col-md-4">
+											<div className="mb-4 form-group col-md-4">
 												<label>
 													Provinsi
 												</label>
@@ -424,7 +576,7 @@ export default function UserForm() {
 													}
 												/>
 											</div>
-											<div className="form-group mb-4 col-md-4">
+											<div className="mb-4 form-group col-md-4">
 												<label>
 													Kota
 												</label>
@@ -489,7 +641,7 @@ export default function UserForm() {
 													}
 												/>
 											</div>
-											<div className="form-group mb-4 col-md-4">
+											<div className="mb-4 form-group col-md-4">
 												<label>
 													Distrik
 												</label>
@@ -554,7 +706,7 @@ export default function UserForm() {
 													}
 												/>
 											</div>
-											<div className="form-group mb-4 col-md-4">
+											<div className="mb-4 form-group col-md-4">
 												<label>
 													Desa
 												</label>
@@ -587,7 +739,7 @@ export default function UserForm() {
 													}}
 												/>
 											</div>
-											<div className="form-group mb-3 col-md-8">
+											<div className="mb-3 form-group col-md-8">
 												<label>
 													Alamat
 												</label>
@@ -749,327 +901,257 @@ export default function UserForm() {
 											</div>
 										</div>
 										<hr />
-										{/* {detail.product.map((item, index) => {
-											return ( */}
-										<div className="row">
-											<h5>Produk 1</h5>
-											<div className="mb-3 form-group col-md-4">
-												<label>
-													Nama
-												</label>
-												<input
-													type="text"
-													className="form-control"
-													placeholder="Masukkan nama"
-													name="nama"
-													value={
-														detail
-															.product[0]
-															.nama
+										{detail.kamar.map((item, index) => {
+											return (
+												<div
+													className="mb-4"
+													key={
+														index
 													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => ({
-																...prevState,
-																product: [
-																	{
-																		...prevState
-																			.product[0],
-																		nama: event
-																			.target
-																			.value,
-																	},
-																	...prevState.product.slice(
-																		1
-																	),
-																],
-															})
-														)
-													}
-												/>
-											</div>
-											<div className="mb-3 form-group col-md-4">
-												<label>
-													Harga
-												</label>
-												<input
-													type="number"
-													className="form-control"
-													placeholder="Masukkan harga"
-													name="harga"
-													value={
-														detail
-															.product[0]
-															.harga
-													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => ({
-																...prevState,
-																product: [
-																	{
-																		...prevState
-																			.product[0],
-																		harga: event
-																			.target
-																			.value,
-																	},
-																	...prevState.product.slice(
-																		1
-																	),
-																],
-															})
-														)
-													}
-												/>
-											</div>
-											<div className="mb-3 form-group col-md-4">
-												<label>
-													Rating
-												</label>
-												<input
-													type="number"
-													className="form-control"
-													placeholder="Masukkan rating"
-													name="rating"
-													value={
-														detail
-															.product[0]
-															.rating
-													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => ({
-																...prevState,
-																product: [
-																	{
-																		...prevState
-																			.product[0],
-																		rating: event
-																			.target
-																			.value,
-																	},
-																	...prevState.product.slice(
-																		1
-																	),
-																],
-															})
-														)
-													}
-												/>
-											</div>
-										</div>
-										<div className="row">
-											<div className="form-group mb-3">
-												<label>
-													Deskripsi
-												</label>
-												<textarea
-													className="form-control"
-													rows="2"
-													name="deskripsi"
-													value={
-														detail
-															.product[0]
-															.deskripsi
-													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => ({
-																...prevState,
-																product: [
-																	{
-																		...prevState
-																			.product[0],
-																		deskripsi: event
-																			.target
-																			.value,
-																	},
-																	...prevState.product.slice(
-																		1
-																	),
-																],
-															})
-														)
-													}
-												></textarea>
-											</div>
-										</div>
-										<div className="row">
-											<div className="mb-3 form-group">
-												<label>
-													Varian
-													-
-													pisahkan
-													dengan
-													tanda
-													koma
-													","
-												</label>
-												<input
-													type="text"
-													className="form-control"
-													placeholder="Masukkan varian"
-													name="varian"
-													value={
-														detail
-															.product[0]
-															.varian
-													}
-													onChange={(
-														event
-													) =>
-														setDetail(
-															(
-																prevState
-															) => {
-																const value =
-																	event
-																		.target
-																		.value;
-																let arr =
-																	[];
-
-																// Memeriksa apakah nilai input adalah string dengan koma
-																if (
-																	typeof value ===
-																		'string' &&
-																	value.includes(
-																		','
-																	)
-																) {
-																	arr =
-																		value.split(
-																			','
-																		);
-																} else {
-																	arr.push(
-																		value
-																	);
-																}
-
-																return {
-																	...prevState,
-																	product: [
-																		{
-																			...prevState
-																				.product[0],
-																			varian: arr,
-																		},
-																		...prevState.product.slice(
+												>
+													<div className="row">
+														<div className="d-flex justify-content-between">
+															<span className="font-weight-bold h3">
+																Produk{' '}
+																{` ${
+																	index +
+																	1
+																}`}
+															</span>
+															{index ? (
+																<button
+																	type="button"
+																	className="mr-4 btn btn-danger btn-sm"
+																	onClick={() => {
+																		let newProduct =
+																			[
+																				...detail.product,
+																			];
+																		newProduct.splice(
+																			index,
 																			1
-																		),
-																	],
-																};
-															}
-														)
-													}
-												/>
-											</div>
-										</div>
-										<div className="row">
-											<div className="mb-3 form-group">
-												<label>
-													Thumbnail
-												</label>
-												<div className="input-group">
-													<div className="form-file">
-														<input
-															type="file"
-															className="form-file-input form-control"
-															name="thumbnail"
-															accept="image/*"
-															onChange={(
-																event
-															) =>
-																setDetail(
-																	(
-																		prevState
-																	) => ({
-																		...prevState,
-																		product: [
+																		);
+																		setDetail(
 																			{
-																				...prevState
-																					.product[0],
-																				thumbnail: event
-																					.target
-																					.files[0],
-																			},
-																			...prevState.product.slice(
-																				1
-																			),
-																		],
-																	})
-																)
-															}
-														/>
+																				...detail,
+																				product: newProduct,
+																			}
+																		);
+																	}}
+																>
+																	<i className="fa fa-trash color-danger"></i>
+																</button>
+															) : null}
+														</div>
 													</div>
-													<span className="input-group-text">
-														Upload
-													</span>
+													<div className="row">
+														<div className="mb-3 form-group col-md-4">
+															<label>
+																Nama
+															</label>
+															<input
+																type="text"
+																className="form-control"
+																placeholder="Masukkan nama"
+																name="nama"
+																value={
+																	item.nama
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															/>
+														</div>
+														<div className="mb-3 form-group col-md-4">
+															<label>
+																Harga
+															</label>
+															<input
+																type="number"
+																className="form-control"
+																placeholder="Masukkan harga"
+																name="harga"
+																value={
+																	item.harga
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															/>
+														</div>
+														<div className="mb-3 form-group col-md-4">
+															<label>
+																Rating
+															</label>
+															<input
+																type="number"
+																className="form-control"
+																placeholder="Masukkan rating"
+																name="rating"
+																value={
+																	item.rating
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															/>
+														</div>
+													</div>
+													<div className="row">
+														<div className="mb-3 form-group">
+															<label>
+																Deskripsi
+															</label>
+															<textarea
+																className="form-control"
+																rows="2"
+																name="deskripsi"
+																value={
+																	item.deskripsi
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															></textarea>
+														</div>
+													</div>
+													<div className="row">
+														<div className="mb-3 form-group">
+															<label>
+																Varian
+																-
+																pisahkan
+																dengan
+																tanda
+																koma
+																","
+															</label>
+															<input
+																type="text"
+																className="form-control"
+																placeholder="Masukkan varian"
+																name="varian"
+																value={
+																	item.varian
+																}
+																onChange={(
+																	e
+																) =>
+																	handleChangeDetail(
+																		e,
+																		index
+																	)
+																}
+															/>
+														</div>
+													</div>
+													<div className="row">
+														<div className="mb-3 form-group">
+															<label>
+																Thumbnail
+															</label>
+															<div className="input-group">
+																<div className="form-file">
+																	<input
+																		type="file"
+																		className="form-file-input form-control"
+																		name="thumbnail"
+																		accept="image/*"
+																		onChange={(
+																			e
+																		) =>
+																			handleChangeDetail(
+																				e,
+																				index
+																			)
+																		}
+																	/>
+																</div>
+																<span className="input-group-text">
+																	Upload
+																</span>
+															</div>
+															{detail
+																.product[
+																index
+															]
+																.thumbnailPreview !==
+																'' && (
+																<img
+																	src={
+																		process
+																			.env
+																			.REACT_APP_STORAGE_BASE_URL +
+																		'/merchant/detail' +
+																		detail
+																			.product[
+																			index
+																		]
+																			.thumbnailPreview
+																	}
+																	alt="thumbnail"
+																	className="border border-2 img-fluid border-dark rounded-3"
+																	style={{
+																		width: '40%',
+																		height: 'auto',
+																	}}
+																/>
+															)}
+
+															{detail
+																.product[
+																index
+															]
+																.thumbnail &&
+																typeof detail
+																	.product[
+																	index
+																]
+																	.thumbnail ===
+																	'object' && (
+																	<img
+																		src={URL.createObjectURL(
+																			detail
+																				.product[
+																				index
+																			]
+																				.thumbnail
+																		)}
+																		alt="thumbnail"
+																		className="border border-2 img-fluid border-dark rounded-3"
+																		style={{
+																			width: '40%',
+																			height: 'auto',
+																		}}
+																	/>
+																)}
+														</div>
+													</div>
 												</div>
-												{detail
-													.product[0]
-													.thumbnailPreview !=
-													'' && (
-													<img
-														src={
-															process
-																.env
-																.REACT_APP_STORAGE_BASE_URL +
-															'/accomodation/detail' +
-															detail
-																.product[0]
-																.thumbnailPreview
-														}
-														alt="banner"
-														className="border border-2 img-fluid border-dark rounded-3"
-														style={{
-															width: '40%',
-															height: 'auto',
-														}}
-													/>
-												)}
-												{detail
-													.product[0]
-													.thumbnail !=
-													'' && (
-													<img
-														src={URL.createObjectURL(
-															detail
-																.product[0]
-																.thumbnail
-														)}
-														alt="banner"
-														className="border border-2 img-fluid border-dark rounded-3"
-														style={{
-															width: '40%',
-															height: 'auto',
-														}}
-													/>
-												)}
-											</div>
-										</div>
-										{/* );
-										})} */}
+											);
+										})}
 										<div className="row">
-											<div className="col-md-12 mb-4">
+											<div className="mb-4 col-md-12">
 												<div
 													style={{
 														display: 'flex',

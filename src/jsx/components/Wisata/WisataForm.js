@@ -16,6 +16,7 @@ import {
 	createTourismPlace,
 	getAllKategori,
 	getAllSubKategoriByKategori,
+	getParentDesa,
 	getTourismPlace,
 	updateTourismPlace,
 } from "../../../services/TourismPlaceService";
@@ -89,7 +90,7 @@ const WisataForm = () => {
 				hari: "",
 			},
 		],
-		desaId: "",
+		desaId: {},
 		lat: "",
 		long: "",
 		alamat: "",
@@ -205,9 +206,9 @@ const WisataForm = () => {
 	useEffect(() => {
 		if (id !== undefined) {
 			getTourismPlace(id)
-				.then((res) => {
+				.then(async (res) => {
+					const parentDesa = await getParentDesa(res.data.data.lokasi.desa_id);
 					setFormWisata({
-						thumbnail: res.data.data.thumbnail,
 						thumbnailPreview: res.data.data.thumbnail,
 						nama: res.data.data.nama,
 						deskripsi: res.data.data.deskripsi,
@@ -235,12 +236,122 @@ const WisataForm = () => {
 						lat: res.data.data.lokasi.lat,
 						long: res.data.data.lokasi.long,
 						alamat: res.data.data.lokasi.alamat,
-						file360: res.data.data.file360,
+						file360Preview: res.data.data.file360,
 					});
+					setProvinsiId({
+						value: parentDesa.data.data.provinsi.kode,
+						label: parentDesa.data.data.provinsi.nama,
+						color: "#00B8D9"
+					});
+					setKotaId({
+						value: parentDesa.data.data.kota.kode,
+						label: parentDesa.data.data.kota.nama,
+						color: "#00B8D9"
+					});
+					setDistrikId({
+						value: parentDesa.data.data.distrik.kode,
+						label: parentDesa.data.data.distrik.nama,
+						color: "#00B8D9"
+					});
+					setFormWisata({
+						...formWisata,
+						desaId: {
+							value: parentDesa.data.data.desa.kode,
+							label: parentDesa.data.data.desa.nama,
+							color: "#00B8D9"
+						}
+					});
+					getAllProvinsi()
+						.then((prov) => {
+							setProvinsiList(
+								prov.data.data.map((provItem) => {
+									getAllKotaByCode(provItem.kode)
+										.then((kota) => {
+											setKotaList(
+												kota.data.data.map((kotaItem) => {
+													getAllDistrikByCode(kotaItem.kode)
+														.then((distrik) => {
+															setDistrikList(
+																distrik.data.data.map((distrikItem) => {
+																	getAllDesaByCode(distrikItem.kode)
+																		.then((desa) => {
+																			setDesaList(
+																				desa.data.data.map((desaItem) => {
+																					return {
+																						value: desaItem.kode,
+																						label: desaItem.nama,
+																						color: "#00B8D9",
+																					};
+																				})
+																			);
+																		})
+																		.catch(() => {
+																			Swal.fire(
+																				"Gagal!",
+																				"Desa gagal dimuat",
+																				"error"
+																			);
+																		});
+																	return {
+																		value: distrikItem.kode,
+																		label: distrikItem.nama,
+																		color: "#00B8D9",
+																	};
+																})
+															);
+														})
+														.catch(() => {
+															Swal.fire(
+																"Gagal!",
+																"Distrik gagal dimuat",
+																"error"
+															);
+														});
+													return {
+														value: kotaItem.kode,
+														label: kotaItem.nama,
+														color: "#00B8D9",
+													};
+												})
+											);
+										})
+										.catch(() => {
+											Swal.fire("Gagal!", "Kota gagal dimuat", "error");
+										});
+									return {
+										value: provItem.kode,
+										label: provItem.nama,
+										color: "#00B8D9",
+									};
+								})
+							);
+						})
+						.catch(() => {
+							Swal.fire("Gagal!", "Provinsi gagal dimuat", "error");
+						});
+				})
+				.catch((err) => {
+					console.log(err)
+					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+						history.push("/wisata");
+					});
+				});
+			getAllKategori()
+				.then((res) => {
+					setKategoriList(
+						res.data.data.map((kategori) => {
+							return {
+								...kategoriList,
+								value: kategori.nama,
+								label: kategori.nama,
+								color: "#00B8D9",
+							};
+						})
+					);
 				})
 				.catch(() => {
 					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
-						history.push("/wisata");
+						history.push("/acara");
 					});
 				});
 		} else {
@@ -349,7 +460,7 @@ const WisataForm = () => {
 													</div>
 													<span className="input-group-text">Upload</span>
 												</div>
-												{formWisata.thumbnailPreview != "" && (
+												{formWisata.thumbnailPreview?.length > 0 && (
 													<img
 														src={
 															process.env.REACT_APP_STORAGE_BASE_URL +
@@ -364,7 +475,7 @@ const WisataForm = () => {
 														}}
 													/>
 												)}
-												{formWisata.thumbnail != "" && (
+												{formWisata.thumbnail?.length > 0 && (
 													<img
 														src={URL.createObjectURL(formWisata.thumbnail)}
 														alt="thumbnail"
@@ -396,7 +507,7 @@ const WisataForm = () => {
 													</div>
 													<span className="input-group-text">Upload</span>
 												</div>
-												{formWisata.file360Preview != "" && (
+												{formWisata.file360Preview?.length > 0 && (
 													<a
 														href={
 															process.env.REACT_APP_STORAGE_BASE_URL +
@@ -408,7 +519,7 @@ const WisataForm = () => {
 														See Preview
 													</a>
 												)}
-												{formWisata.file360 != "" && (
+												{formWisata.file360?.length > 0 && (
 													<ReactPannellum
 														id="1"
 														type="equirectangular"
@@ -459,16 +570,36 @@ const WisataForm = () => {
 													value={formWisata.kategori}
 													onChange={(e) => {
 														setFormWisata({ ...formWisata, kategori: e });
-														getAllSubKategoriByKategori(e.value)
-															.then((res) => {
-																setSubKategoriList(res.data);
+														Promise.all(
+															e.map((item) => {
+																return getAllSubKategoriByKategori(item.value)
+																	.then((res) => {
+																		return res.data.data.map((subkategori) => {
+																			return {
+																				value: subkategori.nama,
+																				label: subkategori.nama,
+																				color: "#00B8D9",
+																			};
+																		});
+																	})
+																	.catch((error) => {
+																		Swal.fire(
+																			"Gagal!",
+																			"Wisata gagal dimuat",
+																			"error"
+																		).then(() => {
+																			history.push("/wisata");
+																		});
+																		throw error;
+																	});
 															})
-															.catch((err) => {
-																Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
-																	history.push("/acara");
-																});
-															}
-														);
+														)
+															.then((subKategoriList) => {
+																setSubKategoriList(subKategoriList.flat());
+															})
+															.catch((error) => {
+																console.error(error);
+															});
 													}}
 													isMulti
 													options={kategoriList}

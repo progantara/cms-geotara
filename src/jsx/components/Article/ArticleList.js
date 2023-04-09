@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
 import { deleteArticle, getAllArticle } from "../../../services/ArticleService";
 import ClipLoader from "react-spinners/ClipLoader";
-import BeatLoader from "react-spinners/BeatLoader"
 import moment from "moment";
 import "moment/locale/id";
 import { getUser } from "../../../services/UserService";
@@ -18,16 +17,16 @@ const ArticleList = () => {
 
 	const columns = [
 		{
-			name: 'No',
+			name: "No",
 			selector: (row) => row.no,
 			sortable: true,
-			width: '5%',
+			width: "5%",
 		},
 		{
 			name: "Judul",
 			selector: (row) => row.title,
 			sortable: true,
-			width: "30%",
+			width: "35%",
 		},
 		{
 			name: "Penulis",
@@ -132,16 +131,18 @@ const ArticleList = () => {
 	const fetchData = async () => {
 		const response = await getAllArticle();
 		if (response.status === 200) {
-			const data = response.data.data.map((item, index) => {
+			const data = response.data.data.map(async (item, index) => {
+				const writer = await getUser(item.author_id);
 				return {
 					...item,
 					no: index + 1,
 					title: item.judul,
-					writer: item.author_id,
+					writer: writer.data.data.name,
 					publication_date: moment(item.created_at).format("LL"),
 				};
 			});
-			setData(data);
+			const resolvedData = await Promise.all(data);
+			setData(resolvedData);
 		}
 		setIsLoading(false);
 	};

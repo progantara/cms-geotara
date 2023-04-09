@@ -130,9 +130,10 @@ const WisataList = () => {
 	const fetchData = async () => {
 		const response = await getAllTourismPlace();
 		if (response.status === 200) {
-			const data = response.data.data.map((item) => {
+			const data = response.data.data.map((item, index) => {
 				return {
 					...item,
+					no: index + 1,
 					name: item.nama,
 					category: item.kategori
 						.map((cat) => capitalizeEachFirstLetter(cat))

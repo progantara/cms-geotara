@@ -15,7 +15,6 @@ const UserList = () => {
 			name: "No",
 			selector: (row) => row.no,
 			sortable: false,
-      cell: (row, index) => index + 1,
 			width: "10%",
 		},
 		{
@@ -110,6 +109,9 @@ const UserList = () => {
 			const newData = data.filter((item) => item._id !== id);
 			setData(newData);
 			Swal.fire("Berhasil!", "Pengguna berhasil dihapus", "success");
+			setIsLoading(true);
+			fetchData();
+			setIsLoading(false);
 		} else {
 			Swal.fire("Gagal!", "Pengguna gagal dihapus", "error");
 		}
