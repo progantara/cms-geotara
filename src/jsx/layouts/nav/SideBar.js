@@ -120,7 +120,7 @@ const SideBar = () => {
 						</ul>
 					</li>
 					<li className={`${charts.includes(path) ? 'mm-active' : ''}`}>
-						<Link className="has-arrow ai-icon" to="#">
+						<Link id="publikasi-btn" className="has-arrow ai-icon" to="#">
 							<i className="fa fa-bullhorn"></i>
 							<span className="nav-text">Publikasi</span>
 						</Link>
