@@ -62,6 +62,7 @@ const Header = ({ onNote }) => {
 								<Dropdown.Toggle
 									variant=""
 									as="a"
+									id="profile-btn"
 									className="nav-link i-false c-pointer"
 								>
 									<img src={profile} width={20} alt="" />
