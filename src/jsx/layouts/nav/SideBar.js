@@ -126,7 +126,7 @@ const SideBar = () => {
 						</Link>
 						<ul>
 							<li>
-								<Link className={`${path === 'artikel' ? 'mm-active' : ''}`} to="/artikel">
+								<Link id="artikel-link-btn" className={`${path === 'artikel' ? 'mm-active' : ''}`} to="/artikel">
 									Artikel
 								</Link>
 							</li>
