@@ -69,6 +69,9 @@ const ArticleDetail = React.lazy(() =>
 const Event = React.lazy(() => import("./components/Event/Event"));
 const EventForm = React.lazy(() => import("./components/Event/EventForm"));
 
+const Entertaiment = React.lazy(() => import("./components/Entertaiment/Entertaiment"));
+const EntertaimentForm = React.lazy(() => import("./components/Entertaiment/EntertaimentForm"));
+
 // Kemitraan
 const Accomodation = React.lazy(() =>
 	import("./components/Accomodation/Accomodation")
@@ -143,6 +146,10 @@ const Markup = () => {
 		{ url: "acara", component: Event },
 		{ url: "acara/tambah", component: EventForm },
 		{ url: "acara/edit/:id", component: EventForm },
+
+		{ url: "entertaiment", component: Entertaiment },
+		{ url: "entertaiment/tambah", component: EntertaimentForm },
+		{ url: "entertaiment/edit/:id", component: EntertaimentForm },
 
 		/// Kemitraan
 		{ url: "accomodation", component: Accomodation },

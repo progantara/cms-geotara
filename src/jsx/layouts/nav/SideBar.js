@@ -135,6 +135,11 @@ const SideBar = () => {
 									Acara
 								</Link>
 							</li>
+							<li>
+								<Link className={`${path === 'entertaiment' ? 'mm-active' : ''}`} to="/entertaiment">
+									Entertaiment
+								</Link>
+							</li>
 						</ul>
 					</li>
 					<li className={`${bootstrap.includes(path) ? 'mm-active' : ''}`}>
