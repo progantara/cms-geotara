@@ -167,7 +167,7 @@ const WisataList = () => {
 								columns={columns}
 								data={data}
 								pagination
-								paginationPerPage={5}
+								paginationPerPage={10}
 								customStyles={customStyles}
 								progressPending={isLoading}
 								progressComponent={

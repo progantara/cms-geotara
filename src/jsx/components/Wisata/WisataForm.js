@@ -96,12 +96,12 @@ const WisataForm = () => {
 			},
 		],
 		desaId: {},
-		lat: "",
-		long: "",
 		alamat: "",
 		file360: "",
 		file360Preview: "",
 	});
+	const [long, setLong] = useState(0);
+	const [lat, setLat] = useState(0);
 	const [provinsiId, setProvinsiId] = useState("");
 	const [kotaId, setKotaId] = useState("");
 	const [distrikId, setDistrikId] = useState("");
@@ -135,8 +135,8 @@ const WisataForm = () => {
 			data.append(`jam_operasional[${index}][mulai]`, item.mulai);
 			data.append(`jam_operasional[${index}][akhir]`, item.akhir);
 		});
-		data.append("lat", formWisata.lat);
-		data.append("long", formWisata.long);
+		data.append("lat", lat);
+		data.append("long", long);
 		data.append("desa_id", formWisata.desaId.value);
 		data.append("alamat", formWisata.alamat);
 		data.append("thumbnail", formWisata.thumbnail);
@@ -183,8 +183,8 @@ const WisataForm = () => {
 			data.append(`jam_operasional[${index}][mulai]`, item.mulai);
 			data.append(`jam_operasional[${index}][akhir]`, item.akhir);
 		});
-		data.append("lat", formWisata.lat);
-		data.append("long", formWisata.long);
+		data.append("lat", lat);
+		data.append("long", long);
 		data.append("desa_id", formWisata.desaId.value);
 		data.append("alamat", formWisata.alamat);
 		if (formWisata.thumbnail !== "")
@@ -232,7 +232,6 @@ const WisataForm = () => {
 					});
 					setFormWisata({
 						...formWisata,
-						...formWisata,
 						thumbnailPreview: res.data.data.thumbnail,
 						nama: res.data.data.nama,
 						deskripsi: res.data.data.deskripsi,
@@ -257,8 +256,6 @@ const WisataForm = () => {
 							akhir: item.akhir,
 							hari: item.hari,
 						})),
-						lat: res.data.data.lokasi.lat,
-						long: res.data.data.lokasi.long,
 						alamat: res.data.data.lokasi.alamat,
 						file360Preview: res.data.data.file360,
 						desaId: {
@@ -267,6 +264,9 @@ const WisataForm = () => {
 							color: "#00B8D9",
 						},
 					});
+
+					setLat(res.data.data.lokasi.lat);
+					setLong(res.data.data.lokasi.long);
 					// const prov = await getAllProvinsi();
 					// setProvinsiList(
 					// 	prov.data.data.map(async (provItem) => {
@@ -730,12 +730,12 @@ const WisataForm = () => {
 													className="form-control"
 													rows="2"
 													value={formWisata.alamat}
-													onChange={(e) =>
+													onChange={(e) => {
 														setFormWisata({
 															...formWisata,
 															alamat: e.target.value,
-														})
-													}
+														});
+													}}
 												></textarea>
 											</div>
 										</div>
@@ -747,7 +747,7 @@ const WisataForm = () => {
 														type="text"
 														className="form-control mb-3"
 														placeholder="Pilih pada peta"
-														value={formWisata.long}
+														value={long}
 														disabled
 													/>
 												</div>
@@ -757,7 +757,7 @@ const WisataForm = () => {
 														type="text"
 														className="form-control mb-3"
 														placeholder="Pilih pada peta"
-														value={formWisata.lat}
+														value={lat}
 														disabled
 													/>
 												</div>
@@ -776,11 +776,8 @@ const WisataForm = () => {
 															e.pixel
 														);
 														const lonlat = toLonLat(coords);
-														setFormWisata({
-															...formWisata,
-															long: lonlat[0],
-															lat: lonlat[1],
-														});
+														setLong(lonlat[0]);
+														setLat(lonlat[1]);
 													}, [])}
 												>
 													<ROSM />
@@ -788,38 +785,9 @@ const WisataForm = () => {
 														<RFeature
 															geometry={
 																new Point(
-																	fromLonLat([formWisata.long, formWisata.lat])
+																	fromLonLat([long, lat])
 																)
 															}
-															// useCallback is here for performance reasons
-															// without it RFeature will have its props updated at every call
-															onPointerDrag={useCallback((e) => {
-																const coords = e.map.getCoordinateFromPixel(
-																	e.pixel
-																);
-																e.target.setGeometry(new Point(coords));
-																// this stops OpenLayers from interpreting the event to pan the map
-																e.preventDefault();
-																return false;
-															}, [])}
-															onPointerDragEnd={useCallback((e) => {
-																const coords = e.map.getCoordinateFromPixel(
-																	e.pixel
-																);
-																setLoc(toLonLat(coords));
-															}, [])}
-															onPointerEnter={useCallback(
-																(e) =>
-																	(e.map.getTargetElement().style.cursor =
-																		"move") && undefined,
-																[]
-															)}
-															onPointerLeave={useCallback(
-																(e) =>
-																	(e.map.getTargetElement().style.cursor =
-																		"initial") && undefined,
-																[]
-															)}
 														>
 															<RStyle.RStyle>
 																<RStyle.RIcon
