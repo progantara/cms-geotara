@@ -901,7 +901,7 @@ export default function UserForm() {
 											</div>
 										</div>
 										<hr />
-										{detail.kamar.map((item, index) => {
+										{detail.product.map((item, index) => {
 											return (
 												<div
 													className="mb-4"
