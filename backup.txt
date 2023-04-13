@@ -1,0 +1,187 @@
+useEffect(() => {
+		if (id !== undefined) {
+			getTourismPlace(id)
+				.then(async (res) => {
+					const parentDesa = await getParentDesa(res.data.data.lokasi.desa_id);
+					setFormWisata({
+						thumbnailPreview: res.data.data.thumbnail,
+						nama: res.data.data.nama,
+						deskripsi: res.data.data.deskripsi,
+						kategori: res.data.data.kategori.map((item) => {
+							return {
+								value: item,
+								label: capitalizeEachFirstLetter(item),
+								color: "#00B8D9",
+							};
+						}),
+						subkategori: res.data.data.sub_kategori.map((item) => {
+							return {
+								value: item,
+								label: capitalizeEachFirstLetter(item),
+								color: "#00B8D9",
+							};
+						}),
+						hargaTiket: res.data.data.harga_tiket,
+						isActive: res.data.data.is_active,
+						jamOperasional: res.data.data.jam_operasional.map((item) => ({
+							mulai: item.mulai,
+							akhir: item.akhir,
+							hari: item.hari,
+						})),
+						lat: res.data.data.lokasi.lat,
+						long: res.data.data.lokasi.long,
+						alamat: res.data.data.lokasi.alamat,
+						file360Preview: res.data.data.file360,
+					});
+					setProvinsiId({
+						value: parentDesa.data.data.provinsi.kode,
+						label: parentDesa.data.data.provinsi.nama,
+						color: "#00B8D9",
+					});
+					setKotaId({
+						value: parentDesa.data.data.kota.kode,
+						label: parentDesa.data.data.kota.nama,
+						color: "#00B8D9",
+					});
+					setDistrikId({
+						value: parentDesa.data.data.distrik.kode,
+						label: parentDesa.data.data.distrik.nama,
+						color: "#00B8D9",
+					});
+					setFormWisata({
+						...formWisata,
+						desaId: {
+							value: parentDesa.data.data.desa.kode,
+							label: parentDesa.data.data.desa.nama,
+							color: "#00B8D9",
+						},
+					});
+					getAllProvinsi()
+						.then((prov) => {
+							setProvinsiList(
+								prov.data.data.map((provItem) => {
+									getAllKotaByCode(provItem.kode)
+										.then((kota) => {
+											setKotaList(
+												kota.data.data.map((kotaItem) => {
+													getAllDistrikByCode(kotaItem.kode)
+														.then((distrik) => {
+															setDistrikList(
+																distrik.data.data.map((distrikItem) => {
+																	getAllDesaByCode(distrikItem.kode)
+																		.then((desa) => {
+																			setDesaList(
+																				desa.data.data.map((desaItem) => {
+																					return {
+																						value: desaItem.kode,
+																						label: desaItem.nama,
+																						color: "#00B8D9",
+																					};
+																				})
+																			);
+																		})
+																		.catch(() => {
+																			Swal.fire(
+																				"Gagal!",
+																				"Desa gagal dimuat",
+																				"error"
+																			);
+																		});
+																	return {
+																		value: distrikItem.kode,
+																		label: distrikItem.nama,
+																		color: "#00B8D9",
+																	};
+																})
+															);
+														})
+														.catch(() => {
+															Swal.fire(
+																"Gagal!",
+																"Distrik gagal dimuat",
+																"error"
+															);
+														});
+													return {
+														value: kotaItem.kode,
+														label: kotaItem.nama,
+														color: "#00B8D9",
+													};
+												})
+											);
+										})
+										.catch(() => {
+											Swal.fire("Gagal!", "Kota gagal dimuat", "error");
+										});
+									return {
+										value: provItem.kode,
+										label: provItem.nama,
+										color: "#00B8D9",
+									};
+								})
+							);
+						})
+						.catch(() => {
+							Swal.fire("Gagal!", "Provinsi gagal dimuat", "error");
+						});
+				})
+				.catch((err) => {
+					console.log(err);
+					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+						history.push("/wisata");
+					});
+				});
+			getAllKategori()
+				.then((res) => {
+					setKategoriList(
+						res.data.data.map((kategori) => {
+							return {
+								...kategoriList,
+								value: kategori.nama,
+								label: kategori.nama,
+								color: "#00B8D9",
+							};
+						})
+					);
+				})
+				.catch(() => {
+					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+						history.push("/acara");
+					});
+				});
+		} else {
+			getAllProvinsi()
+				.then((res) => {
+					setProvinsiList(
+						res.data.data.map((item) => {
+							return {
+								value: item.kode,
+								label: item.nama,
+								color: "#00B8D9",
+							};
+						})
+					);
+				})
+				.catch(() => {
+					Swal.fire("Gagal!", "Provinsi gagal dimuat", "error");
+				});
+			getAllKategori()
+				.then((res) => {
+					setKategoriList(
+						res.data.data.map((kategori) => {
+							return {
+								...kategoriList,
+								value: kategori.nama,
+								label: kategori.nama,
+								color: "#00B8D9",
+							};
+						})
+					);
+				})
+				.catch(() => {
+					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
+						history.push("/acara");
+					});
+				});
+		}
+	}, []);

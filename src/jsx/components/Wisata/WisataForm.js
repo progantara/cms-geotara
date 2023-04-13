@@ -11,7 +11,9 @@ import { TimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import { fromLonLat, toLonLat } from "ol/proj";
 import "ol/ol.css";
-import { RControl, RMap, ROSM } from "rlayers";
+import { RControl, RFeature, RLayerVector, RMap, ROSM, RStyle } from "rlayers";
+import { Point } from "ol/geom";
+import { Coordinate } from "ol/coordinate";
 import {
 	createTourismPlace,
 	getAllKategori,
@@ -31,6 +33,9 @@ import {
 } from "../../../services/DistrikService";
 import { getAllDesaByCode, getDesa } from "../../../services/DesaService";
 import BeatLoader from "react-spinners/BeatLoader";
+
+const locationIcon =
+	"https://cdn.jsdelivr.net/npm/rlayers/examples/./svg/location.svg";
 
 const kategoriOption = [{ value: "alam", label: "Wisata", color: "#00B8D9" }];
 
@@ -204,11 +209,30 @@ const WisataForm = () => {
 	};
 
 	useEffect(() => {
-		if (id !== undefined) {
-			getTourismPlace(id)
-				.then(async (res) => {
+		const getTourismData = async () => {
+			try {
+				setIsLoading(true);
+				if (id !== undefined) {
+					const res = await getTourismPlace(id);
 					const parentDesa = await getParentDesa(res.data.data.lokasi.desa_id);
+					setProvinsiId({
+						value: parentDesa.data.data.provinsi.kode,
+						label: parentDesa.data.data.provinsi.nama,
+						color: "#00B8D9",
+					});
+					setKotaId({
+						value: parentDesa.data.data.kota.kode,
+						label: parentDesa.data.data.kota.nama,
+						color: "#00B8D9",
+					});
+					setDistrikId({
+						value: parentDesa.data.data.distrik.kode,
+						label: parentDesa.data.data.distrik.nama,
+						color: "#00B8D9",
+					});
 					setFormWisata({
+						...formWisata,
+						...formWisata,
 						thumbnailPreview: res.data.data.thumbnail,
 						nama: res.data.data.nama,
 						deskripsi: res.data.data.deskripsi,
@@ -237,159 +261,67 @@ const WisataForm = () => {
 						long: res.data.data.lokasi.long,
 						alamat: res.data.data.lokasi.alamat,
 						file360Preview: res.data.data.file360,
-					});
-					setProvinsiId({
-						value: parentDesa.data.data.provinsi.kode,
-						label: parentDesa.data.data.provinsi.nama,
-						color: "#00B8D9"
-					});
-					setKotaId({
-						value: parentDesa.data.data.kota.kode,
-						label: parentDesa.data.data.kota.nama,
-						color: "#00B8D9"
-					});
-					setDistrikId({
-						value: parentDesa.data.data.distrik.kode,
-						label: parentDesa.data.data.distrik.nama,
-						color: "#00B8D9"
-					});
-					setFormWisata({
-						...formWisata,
 						desaId: {
 							value: parentDesa.data.data.desa.kode,
 							label: parentDesa.data.data.desa.nama,
-							color: "#00B8D9"
-						}
+							color: "#00B8D9",
+						},
 					});
-					getAllProvinsi()
-						.then((prov) => {
-							setProvinsiList(
-								prov.data.data.map((provItem) => {
-									getAllKotaByCode(provItem.kode)
-										.then((kota) => {
-											setKotaList(
-												kota.data.data.map((kotaItem) => {
-													getAllDistrikByCode(kotaItem.kode)
-														.then((distrik) => {
-															setDistrikList(
-																distrik.data.data.map((distrikItem) => {
-																	getAllDesaByCode(distrikItem.kode)
-																		.then((desa) => {
-																			setDesaList(
-																				desa.data.data.map((desaItem) => {
-																					return {
-																						value: desaItem.kode,
-																						label: desaItem.nama,
-																						color: "#00B8D9",
-																					};
-																				})
-																			);
-																		})
-																		.catch(() => {
-																			Swal.fire(
-																				"Gagal!",
-																				"Desa gagal dimuat",
-																				"error"
-																			);
-																		});
-																	return {
-																		value: distrikItem.kode,
-																		label: distrikItem.nama,
-																		color: "#00B8D9",
-																	};
-																})
-															);
-														})
-														.catch(() => {
-															Swal.fire(
-																"Gagal!",
-																"Distrik gagal dimuat",
-																"error"
-															);
-														});
-													return {
-														value: kotaItem.kode,
-														label: kotaItem.nama,
-														color: "#00B8D9",
-													};
-												})
-											);
-										})
-										.catch(() => {
-											Swal.fire("Gagal!", "Kota gagal dimuat", "error");
-										});
-									return {
-										value: provItem.kode,
-										label: provItem.nama,
-										color: "#00B8D9",
-									};
-								})
-							);
-						})
-						.catch(() => {
-							Swal.fire("Gagal!", "Provinsi gagal dimuat", "error");
-						});
-				})
-				.catch((err) => {
-					console.log(err)
-					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
-						history.push("/wisata");
-					});
-				});
-			getAllKategori()
-				.then((res) => {
-					setKategoriList(
-						res.data.data.map((kategori) => {
-							return {
-								...kategoriList,
-								value: kategori.nama,
-								label: kategori.nama,
-								color: "#00B8D9",
-							};
-						})
-					);
-				})
-				.catch(() => {
-					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
-						history.push("/acara");
-					});
-				});
-		} else {
-			getAllProvinsi()
-				.then((res) => {
-					setProvinsiList(
-						res.data.data.map((item) => {
-							return {
-								value: item.kode,
-								label: item.nama,
-								color: "#00B8D9",
-							};
-						})
-					);
-				})
-				.catch(() => {
-					Swal.fire("Gagal!", "Provinsi gagal dimuat", "error");
-				});
-			getAllKategori()
-				.then((res) => {
-					setKategoriList(
-						res.data.data.map((kategori) => {
-							return {
-								...kategoriList,
-								value: kategori.nama,
-								label: kategori.nama,
-								color: "#00B8D9",
-							};
-						})
-					);
-				})
-				.catch(() => {
-					Swal.fire("Gagal!", "Wisata gagal dimuat", "error").then(() => {
-						history.push("/acara");
-					});
-				});
-		}
-	}, [id]);
+					// const prov = await getAllProvinsi();
+					// setProvinsiList(
+					// 	prov.data.data.map(async (provItem) => {
+					// 		const kota = await getAllKotaByCode(provItem.kode);
+					// 		setKotaList(
+					// 			kota.data.data.map(async (kotaItem) => {
+					// 				const distrik = await getAllDistrikByCode(kotaItem.kode);
+					// 				setDistrikList(
+					// 					distrik.data.data.map(async (distrikItem) => {
+					// 						const desa = await getAllDesaByCode(distrikItem.kode);
+					// 						setDesaList(
+					// 							desa.data.data.map((desaItem) => {
+					// 								return {
+					// 									value: desaItem.kode,
+					// 									label: desaItem.nama,
+					// 									color: "#00B8D9",
+					// 								};
+					// 							})
+					// 						);
+					// 						return {
+					// 							value: distrikItem.kode,
+					// 							label: distrikItem.nama,
+					// 							color: "#00B8D9",
+					// 						};
+					// 					})
+					// 				);
+					// 				return {
+					// 					value: kotaItem.kode,
+					// 					label: kotaItem.nama,
+					// 					color: "#00B8D9",
+					// 				};
+					// 			})
+					// 		);
+					// 		return {
+					// 			value: provItem.kode,
+					// 			label: provItem.nama,
+					// 			color: "#00B8D9",
+					// 		};
+					// 	})
+					// );
+				}
+				setIsLoading(false);
+			} catch (err) {
+				if (err.response) {
+					Swal.fire("Gagal!", err.response.data.message, "error");
+				} else if (err.request) {
+					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
+				} else {
+					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
+				}
+			}
+		};
+
+		getTourismData();
+	}, []);
 
 	return (
 		<div className="h-80">
@@ -852,6 +784,51 @@ const WisataForm = () => {
 													}, [])}
 												>
 													<ROSM />
+													<RLayerVector>
+														<RFeature
+															geometry={
+																new Point(
+																	fromLonLat([formWisata.long, formWisata.lat])
+																)
+															}
+															// useCallback is here for performance reasons
+															// without it RFeature will have its props updated at every call
+															onPointerDrag={useCallback((e) => {
+																const coords = e.map.getCoordinateFromPixel(
+																	e.pixel
+																);
+																e.target.setGeometry(new Point(coords));
+																// this stops OpenLayers from interpreting the event to pan the map
+																e.preventDefault();
+																return false;
+															}, [])}
+															onPointerDragEnd={useCallback((e) => {
+																const coords = e.map.getCoordinateFromPixel(
+																	e.pixel
+																);
+																setLoc(toLonLat(coords));
+															}, [])}
+															onPointerEnter={useCallback(
+																(e) =>
+																	(e.map.getTargetElement().style.cursor =
+																		"move") && undefined,
+																[]
+															)}
+															onPointerLeave={useCallback(
+																(e) =>
+																	(e.map.getTargetElement().style.cursor =
+																		"initial") && undefined,
+																[]
+															)}
+														>
+															<RStyle.RStyle>
+																<RStyle.RIcon
+																	src={locationIcon}
+																	anchor={[0.5, 0.8]}
+																/>
+															</RStyle.RStyle>
+														</RFeature>
+													</RLayerVector>
 													<RControl.RScaleLine />
 													<RControl.RAttribution />
 													<RControl.RZoom />
