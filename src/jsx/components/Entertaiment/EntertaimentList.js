@@ -15,12 +15,7 @@ const EntertaimentList = () => {
 			tipe: "Youtube",
 			link: ( 
 				<div className="d-flex">
-					<Link
-						to='https://www.youtube.com/watch?v=0UzfcDNAP-o'
-						className="btn btn-info shadow sharp me-1"
-					>
-						Lihat
-					</Link>
+					<a href="https://www.youtube.com/watch?v=0UzfcDNAP-o" 	target='_blank'				className="btn btn-info shadow sharp me-1">Lihat </a>
 				</div>
 				),
 			action: (
