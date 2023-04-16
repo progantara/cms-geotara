@@ -13,7 +13,6 @@ import { fromLonLat, toLonLat } from "ol/proj";
 import "ol/ol.css";
 import { RControl, RFeature, RLayerVector, RMap, ROSM, RStyle } from "rlayers";
 import { Point } from "ol/geom";
-import { Coordinate } from "ol/coordinate";
 import {
 	createTourismPlace,
 	getAllKategori,
@@ -36,13 +35,6 @@ import BeatLoader from "react-spinners/BeatLoader";
 
 const locationIcon =
 	"https://cdn.jsdelivr.net/npm/rlayers/examples/./svg/location.svg";
-
-const kategoriOption = [{ value: "alam", label: "Wisata", color: "#00B8D9" }];
-
-const subkategoriOption = [
-	{ value: "pantai", label: "Pantai", color: "#00B8D9" },
-	{ value: "curug", label: "Curug", color: "#00B8D9" },
-];
 
 const ClearIndicator = (props) => {
 	const {

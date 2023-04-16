@@ -217,7 +217,6 @@ const VirtualTourViewEditor = () => {
 									className="btn-square btn-sm"
 									variant={activeAction === "remove" ? "dark" : "outline-dark"}
 									onClick={() => {
-										handleRemoveSpot();
 										activeAction !== "remove"
 											? setActiveAction("remove")
 											: setActiveAction("");
