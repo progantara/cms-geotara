@@ -258,7 +258,7 @@ const ArticleForm = () => {
 											/>
 										</div>
 										<div className="form-group mb-3">
-											{/* <Editor
+											<Editor
 												initialValue=""
 												value={formArticle.content}
 												onEditorChange={handleEditorChange}
@@ -275,7 +275,7 @@ const ArticleForm = () => {
 														"bullist numlist outdent indent | removeformat | help ",
 													content_style: "body { color: #828282 }",
 												}}
-											/> */}
+											/>
 										</div>
 										<div className="form-group mb-3">
 											<label>Tag</label>
