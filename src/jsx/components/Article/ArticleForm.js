@@ -11,6 +11,7 @@ import {
 import Swal from "sweetalert2";
 import { capitalizeEachFirstLetter } from "../../../utils/stringFormatter";
 import BeatLoader from "react-spinners/BeatLoader";
+import { Editor } from "@tinymce/tinymce-react";
 
 const tagsOption = [
 	{ value: "wisata", label: "Wisata", color: "#00B8D9" },
