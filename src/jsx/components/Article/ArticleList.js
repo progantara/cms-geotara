@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
 import { deleteArticle, getAllArticle } from "../../../services/ArticleService";
@@ -11,7 +11,6 @@ import { getUser } from "../../../services/UserService";
 moment.locale("id");
 
 const ArticleList = () => {
-	const history = useHistory();
 	const [data, setData] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -20,19 +19,19 @@ const ArticleList = () => {
 			name: "No",
 			selector: (row) => row.no,
 			sortable: true,
-			width: "5%",
+			width: "10%",
 		},
 		{
 			name: "Judul",
 			selector: (row) => row.title,
 			sortable: true,
-			width: "35%",
+			width: "30%",
 		},
 		{
 			name: "Penulis",
 			selector: (row) => row.writer,
 			sortable: true,
-			width: "20%",
+			width: "15%",
 		},
 		{
 			name: "Tanggal Publikasi",
@@ -42,25 +41,25 @@ const ArticleList = () => {
 		},
 		{
 			name: "Aksi",
-			width: "20%",
+			width: "25%",
 			cell: (row) => (
 				<div className="d-flex">
 					<Link
 						to="#"
 						// to={"/artikel/detail/" + row._id}
-						className="btn btn-primary shadow btn-xs sharp me-1"
+						className="btn btn-primary shadow btn-xs me-1"
 					>
 						<i className="fas fa-eye"></i>
 					</Link>
 					<Link
 						to={"/artikel/edit/" + row._id}
-						className="btn btn-secondary shadow btn-xs sharp me-1"
+						className="btn btn-secondary shadow btn-xs me-1"
 					>
 						<i className="fas fa-pen"></i>
 					</Link>
 					<Link
 						to="#"
-						className="btn btn-danger shadow btn-xs sharp"
+						className="btn btn-danger shadow btn-xs"
 						onClick={() =>
 							Swal.fire({
 								title: "Anda yakin ingin menghapus artikel ini?",
@@ -122,13 +121,8 @@ const ArticleList = () => {
 		}
 	};
 
-	// use effect
-	useEffect(() => {
-		setIsLoading(true);
-		fetchData();
-	}, []);
-
 	const fetchData = async () => {
+		setIsLoading(true);
 		const response = await getAllArticle();
 		if (response.status === 200) {
 			const data = response.data.data.map(async (item, index) => {
@@ -146,6 +140,11 @@ const ArticleList = () => {
 		}
 		setIsLoading(false);
 	};
+
+	// use effect
+	useEffect(() => {
+		fetchData();
+	}, []);
 
 	return (
 		<div className="col-12">

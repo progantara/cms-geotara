@@ -1,7 +1,6 @@
 import React, { useState} from 'react';
 import { Link} from 'react-router-dom';
 import {Dropdown, Modal} from 'react-bootstrap';
-import Swal from "sweetalert2";
 import {nanoid} from 'nanoid';
 //Images
 //import data from './../Boltz/Task/Postpage.json';
@@ -14,6 +13,7 @@ import card6 from './../../../images/task/img6.jpg';
 import card7 from './../../../images/task/img7.jpg';
 import card8 from './../../../images/task/img8.jpg';
 import user from './../../../images/task/user.jpg';
+import Swal from 'sweetalert2';
 
 const CardListBlog = [
 	{ 
@@ -113,7 +113,7 @@ const PostPage = () => {
             addFormData.Cust_Name = addFormData.Location = addFormData.Date_Join = '';         
             
         }else{
-			swal('Oops', errorMsg, "error");
+			Swal.fire('Oops', errorMsg, "error");
 		}
     }; 
     

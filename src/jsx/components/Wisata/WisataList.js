@@ -6,6 +6,7 @@ import DataTable from "react-data-table-component";
 import {
 	deleteTourismPlace,
 	getAllTourismPlace,
+	getParentDesa,
 } from "../../../services/TourismPlaceService";
 import ClipLoader from "react-spinners/ClipLoader";
 import { capitalizeEachFirstLetter } from "../../../utils/stringFormatter";
@@ -20,7 +21,7 @@ const WisataList = () => {
 			name: "No",
 			selector: (row) => row.no,
 			sortable: false,
-			width: "10%",
+			width: "5%",
 		},
 		{
 			name: "Nama",
@@ -48,19 +49,19 @@ const WisataList = () => {
 					<Link
 						to="#"
 						// to={"/wisata/detail/" + row._id}
-						className="btn btn-primary shadow btn-xs sharp me-1"
+						className="btn btn-primary shadow btn-xs me-1"
 					>
 						<i className="fas fa-eye"></i>
 					</Link>
 					<Link
 						to={"/wisata/edit/" + row._id}
-						className="btn btn-secondary shadow btn-xs sharp me-1"
+						className="btn btn-secondary shadow btn-xs me-1"
 					>
 						<i className="fas fa-pen"></i>
 					</Link>
 					<Link
 						to="#"
-						className="btn btn-danger shadow btn-xs sharp"
+						className="btn btn-danger shadow btn-xs me-1"
 						onClick={() =>
 							Swal.fire({
 								title: "Anda yakin ingin menghapus wisata ini?",
@@ -78,6 +79,12 @@ const WisataList = () => {
 						}
 					>
 						<i className="fa fa-trash"></i>
+					</Link>
+					<Link
+						to={"/wisata/view/" + row._id}
+						className="btn btn-info shadow btn-xs me-1"
+					>
+						V-Tour
 					</Link>
 				</div>
 			),
@@ -128,22 +135,35 @@ const WisataList = () => {
 	}, []);
 
 	const fetchData = async () => {
-		const response = await getAllTourismPlace();
-		if (response.status === 200) {
-			const data = response.data.data.map((item, index) => {
-				return {
-					...item,
-					no: index + 1,
-					name: item.nama,
-					category: item.kategori
-						.map((cat) => capitalizeEachFirstLetter(cat))
-						.join(", "),
-					location: capitalizeEachFirstLetter(item.lokasi.alamat),
-				};
-			});
-			setData(data);
+		try {
+			const response = await getAllTourismPlace();
+			if (response.status === 200) {
+				const data = await Promise.all(
+					response.data.data.map(async (item, index) => {
+						const parentDesaResponse = await getParentDesa(item.lokasi.desa_id);
+						const parentDesaData = parentDesaResponse.data.data;
+						return {
+							...item,
+							no: index + 1,
+							name: item.nama,
+							category: item.kategori
+								.map((cat) => capitalizeEachFirstLetter(cat))
+								.join(", "),
+							location: capitalizeEachFirstLetter(parentDesaData.kota.nama),
+						};
+					})
+				);
+				setData(data);
+			}
+			setIsLoading(false);
+		} catch (error) {
+			Swal.fire(
+				"Terjadi kesalahan",
+				"Terjadi kesalahan saat mengambil data",
+				"error"
+			);
+			history.push("/dashboard");
 		}
-		setIsLoading(false);
 	};
 
 	return (

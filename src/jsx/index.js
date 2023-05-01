@@ -56,6 +56,9 @@ const VirtualTourViewEditor = React.lazy(() =>
 const VirtualTourViewList = React.lazy(() =>
 	import("./components/VirtualTour/VirtualTourViewList")
 );
+const VirtualTourViewForm = React.lazy(() =>
+	import("./components/VirtualTour/VirtualTourViewForm")
+);
 
 // Publikasi
 const Article = React.lazy(() => import("./components/Article/Article"));
@@ -137,6 +140,7 @@ const Markup = () => {
 		/// Virtual Tour
 		{ url: "virtual-tour/editor", component: VirtualTourViewEditor },
 		{ url: "virtual-tour/view", component: VirtualTourViewList },
+		{ url: "virtual-tour/form", component: VirtualTourViewForm },
 
 		/// Publikasi
 		{ url: "artikel", component: Article },

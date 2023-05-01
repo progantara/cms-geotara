@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link as RouterLink, useHistory, useParams } from "react-router-dom";
 import Select from "react-select";
 import { checkImageResolution } from "../../../utils/checkImageWidth";
 import {
@@ -11,7 +11,43 @@ import {
 import Swal from "sweetalert2";
 import { capitalizeEachFirstLetter } from "../../../utils/stringFormatter";
 import BeatLoader from "react-spinners/BeatLoader";
-import { Editor } from "@tinymce/tinymce-react";
+
+// AM Editor
+import Engine from "@aomao/engine";
+import Toolbar, { ToolbarPlugin, ToolbarComponent } from "@aomao/toolbar";
+import Image, { ImageComponent, ImageUploader } from "@aomao/plugin-image";
+import Table, { TableComponent } from "@aomao/plugin-table";
+import File, { FileComponent, FileUploader } from "@aomao/plugin-file";
+import Video, { VideoComponent, VideoUploader } from "@aomao/plugin-video";
+import Math, { MathComponent } from "@aomao/plugin-math";
+import Status, { StatusComponent } from "@aomao/plugin-status";
+import CodeBlock, { CodeBlockComponent } from "@aomao/plugin-codeblock";
+import Undo from "@aomao/plugin-undo";
+import Redo from "@aomao/plugin-redo";
+import Paintformat from "@aomao/plugin-paintformat";
+import Removeformat from "@aomao/plugin-removeformat";
+import Bold from "@aomao/plugin-bold";
+import Underline from "@aomao/plugin-underline";
+import Italic from "@aomao/plugin-italic";
+import Strikethrough from "@aomao/plugin-strikethrough";
+import Code from "@aomao/plugin-code";
+import Sub from "@aomao/plugin-sub";
+import Sup from "@aomao/plugin-sup";
+import Mark from "@aomao/plugin-mark";
+import Alignment from "@aomao/plugin-alignment";
+import Heading from "@aomao/plugin-heading";
+import Fontfamily from "@aomao/plugin-fontfamily";
+import Fontsize from "@aomao/plugin-fontsize";
+import Fontcolor from "@aomao/plugin-fontcolor";
+import Backcolor from "@aomao/plugin-backcolor";
+import Unorderedlist from "@aomao/plugin-unorderedlist";
+import Orderedlist from "@aomao/plugin-orderedlist";
+import Tasklist, { CheckboxComponent } from "@aomao/plugin-tasklist";
+import Indent from "@aomao/plugin-indent";
+import LineHeight from "@aomao/plugin-line-height";
+import Link from "@aomao/plugin-link";
+import Quote from "@aomao/plugin-quote";
+import Hr, { HrComponent } from "@aomao/plugin-hr";
 
 const tagsOption = [
 	{ value: "wisata", label: "Wisata", color: "#00B8D9" },
@@ -52,26 +88,21 @@ const ArticleForm = () => {
 		button = "Perbarui";
 	}
 
+	const editorRef = useRef(null);
+	const [engine, setEngine] = useState();
 	const [isLoading, setIsLoading] = useState(false);
 	const [formArticle, setFormArticle] = useState({
 		thumbnail: "",
 		thumbnailPreview: "",
 		judul: "",
 		tags: [],
-		content: "",
 	});
+	const [content, setContent] = useState("");
 
 	const [bannerResolution, setBannerResolution] = useState({
 		width: 0,
 		height: 0,
 	});
-
-	const handleEditorChange = (content, editor) => {
-		setFormArticle({
-			...formArticle,
-			content: content,
-		});
-	};
 
 	const handleCreate = (e) => {
 		e.preventDefault();
@@ -79,7 +110,7 @@ const ArticleForm = () => {
 		const data = new FormData();
 		data.append("thumbnail", formArticle.thumbnail);
 		data.append("judul", formArticle.judul);
-		data.append("content", formArticle.content);
+		data.append("content", content);
 		formArticle.tags
 			.map((item) => item.value)
 			.forEach((item, index) => {
@@ -111,7 +142,7 @@ const ArticleForm = () => {
 		if (formArticle.banner !== "")
 			data.append("thumbnail", formArticle.thumbnail);
 		data.append("judul", formArticle.judul);
-		data.append("content", formArticle.content);
+		data.append("content", content);
 		formArticle.tags
 			.map((item) => item.value)
 			.forEach((item, index) => {
@@ -135,29 +166,97 @@ const ArticleForm = () => {
 			});
 	};
 
+	const initEditor = (val) => {
+		if (!editorRef.current) return;
+		const engine = new Engine(editorRef.current, {
+			lang: "en-US",
+			plugins: [
+				ToolbarPlugin,
+				CodeBlock,
+				Image,
+				ImageUploader,
+				Table,
+				File,
+				FileUploader,
+				Video,
+				VideoUploader,
+				Math,
+				Status,
+				Undo,
+				Redo,
+				Paintformat,
+				Removeformat,
+				Bold,
+				Italic,
+				Underline,
+				Strikethrough,
+				Code,
+				Sub,
+				Sup,
+				Mark,
+				Alignment,
+				Heading,
+				Fontfamily,
+				Fontsize,
+				Fontcolor,
+				Backcolor,
+				Unorderedlist,
+				Orderedlist,
+				Tasklist,
+				Indent,
+				LineHeight,
+				Link,
+				Quote,
+				Hr,
+			],
+			cards: [
+				ToolbarComponent,
+				CodeBlockComponent,
+				ImageComponent,
+				TableComponent,
+				FileComponent,
+				VideoComponent,
+				MathComponent,
+				StatusComponent,
+				HrComponent,
+				CheckboxComponent,
+			],
+		});
+		engine.setValue(val);
+		engine.on("change", () => {
+			const value = engine.getValue();
+			setContent(value);
+		});
+		setEngine(engine);
+	};
+
+	const loadArticle = async () => {
+		try {
+			const res = await getArticle(id);
+			setFormArticle({
+				...formArticle,
+				thumbnailPreview: res.data.data.thumbnail,
+				judul: res.data.data.judul,
+				tags: res.data.data.tags.map((item) => ({
+					value: item,
+					label: capitalizeEachFirstLetter(item),
+					color: "#00B8D9",
+				})),
+			});
+
+			initEditor(res.data.data.content);
+		} catch (error) {
+			Swal.fire("Gagal!", "Artikel gagal dimuat", "error").then(() => {
+				history.push("/artikel");
+			});
+		}
+	};
+
 	useEffect(() => {
 		if (id !== undefined) {
-			getArticle(id)
-				.then((res) => {
-					setFormArticle({
-						...formArticle,
-						thumbnailPreview: res.data.data.thumbnail,
-						judul: res.data.data.judul,
-						content: res.data.data.content,
-						tags: res.data.data.tags.map((item) => {
-							return {
-								value: item,
-								label: capitalizeEachFirstLetter(item),
-								color: "#00B8D9",
-							};
-						}),
-					});
-				})
-				.catch(() => {
-					Swal.fire("Gagal!", "Artikel gagal dimuat", "error").then(() => {
-						history.push("/artikel");
-					});
-				});
+			loadArticle();
+		} else {
+			initEditor("");
 		}
 	}, [id]);
 
@@ -243,7 +342,7 @@ const ArticleForm = () => {
 												/>
 											)}
 										</div>
-										<div className="form-group mb-3">
+										<div className="form-group mb-4">
 											<label>Judul Artikel</label>
 											<input
 												type="text"
@@ -258,25 +357,36 @@ const ArticleForm = () => {
 												}
 											/>
 										</div>
-										<div className="form-group mb-3">
-											<Editor
-												initialValue=""
-												value={formArticle.content}
-												onEditorChange={handleEditorChange}
-												init={{
-													height: 500,
-													menubar: false,
-													plugins: [
-														"advlist autolink lists link image code charmap print preview anchor",
-														"searchreplace visualblocks code fullscreen",
-														"insertdatetime media table paste code help wordcount",
-													],
-													toolbar:
-														"undo redo | formatselect | code |link | image | bold italic backcolor |  alignleft aligncenter alignright alignjustify | \n" +
-														"bullist numlist outdent indent | removeformat | help ",
-													content_style: "body { color: #828282 }",
-												}}
-											/>
+										<div className="form-group mb-5">
+											{engine && (
+												<Toolbar
+													engine={engine}
+													items={[
+														["collapse"],
+														["undo", "redo", "paintformat", "removeformat"],
+														["heading", "fontfamily", "fontsize"],
+														[
+															"bold",
+															"italic",
+															"underline",
+															"strikethrough",
+															"moremark",
+														],
+														["fontcolor", "backcolor"],
+														["alignment"],
+														["code", "sub", "sup"],
+														[
+															"unorderedlist",
+															"orderedlist",
+															"tasklist",
+															"indent",
+															"line-height",
+														],
+														["link", "quote", "hr"],
+													]}
+												/>
+											)}
+											<div ref={editorRef} />
 										</div>
 										<div className="form-group mb-3">
 											<label>Tag</label>
@@ -301,11 +411,11 @@ const ArticleForm = () => {
 										<button type="submit" className="btn btn-primary me-2">
 											{button}
 										</button>
-										<Link to="/artikel">
+										<RouterLink to="/artikel">
 											<button type="button" className="btn btn-warning">
 												Kembali
 											</button>
-										</Link>
+										</RouterLink>
 									</div>
 								</fieldset>
 							</form>

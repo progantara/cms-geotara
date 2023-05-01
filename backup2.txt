@@ -1,0 +1,114 @@
+useEffect(() => {
+		const getTourismData = async () => {
+			try {
+				setIsLoading(true);
+				if (id !== undefined) {
+					const res = await getTourismPlace(id);
+					const parentDesa = await getParentDesa(res.data.data.lokasi.desa_id);
+					setProvinsiId({
+						value: parentDesa.data.data.provinsi.kode,
+						label: parentDesa.data.data.provinsi.nama,
+						color: "#00B8D9",
+					});
+					setKotaId({
+						value: parentDesa.data.data.kota.kode,
+						label: parentDesa.data.data.kota.nama,
+						color: "#00B8D9",
+					});
+					setDistrikId({
+						value: parentDesa.data.data.distrik.kode,
+						label: parentDesa.data.data.distrik.nama,
+						color: "#00B8D9",
+					});
+					setFormWisata({
+						...formWisata,
+						thumbnailPreview: res.data.data.thumbnail,
+						nama: res.data.data.nama,
+						deskripsi: res.data.data.deskripsi,
+						kategori: res.data.data.kategori.map((item) => {
+							return {
+								value: item,
+								label: capitalizeEachFirstLetter(item),
+								color: "#00B8D9",
+							};
+						}),
+						subkategori: res.data.data.sub_kategori.map((item) => {
+							return {
+								value: item,
+								label: capitalizeEachFirstLetter(item),
+								color: "#00B8D9",
+							};
+						}),
+						hargaTiket: res.data.data.harga_tiket,
+						isActive: res.data.data.is_active,
+						jamOperasional: res.data.data.jam_operasional.map((item) => ({
+							mulai: item.mulai,
+							akhir: item.akhir,
+							hari: item.hari,
+						})),
+						alamat: res.data.data.lokasi.alamat,
+						file360Preview: res.data.data.file360,
+						desaId: {
+							value: parentDesa.data.data.desa.kode,
+							label: parentDesa.data.data.desa.nama,
+							color: "#00B8D9",
+						},
+					});
+
+					setLat(res.data.data.lokasi.lat);
+					setLong(res.data.data.lokasi.long);
+					// const prov = await getAllProvinsi();
+					// setProvinsiList(
+					// 	prov.data.data.map(async (provItem) => {
+					// 		const kota = await getAllKotaByCode(provItem.kode);
+					// 		setKotaList(
+					// 			kota.data.data.map(async (kotaItem) => {
+					// 				const distrik = await getAllDistrikByCode(kotaItem.kode);
+					// 				setDistrikList(
+					// 					distrik.data.data.map(async (distrikItem) => {
+					// 						const desa = await getAllDesaByCode(distrikItem.kode);
+					// 						setDesaList(
+					// 							desa.data.data.map((desaItem) => {
+					// 								return {
+					// 									value: desaItem.kode,
+					// 									label: desaItem.nama,
+					// 									color: "#00B8D9",
+					// 								};
+					// 							})
+					// 						);
+					// 						return {
+					// 							value: distrikItem.kode,
+					// 							label: distrikItem.nama,
+					// 							color: "#00B8D9",
+					// 						};
+					// 					})
+					// 				);
+					// 				return {
+					// 					value: kotaItem.kode,
+					// 					label: kotaItem.nama,
+					// 					color: "#00B8D9",
+					// 				};
+					// 			})
+					// 		);
+					// 		return {
+					// 			value: provItem.kode,
+					// 			label: provItem.nama,
+					// 			color: "#00B8D9",
+					// 		};
+					// 	})
+					// );
+				}
+				setIsLoading(false);
+			} catch (err) {
+				if (err.response) {
+					Swal.fire("Gagal!", err.response.data.message, "error");
+				} else if (err.request) {
+					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
+				} else {
+					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
+				}
+			}
+		};
+
+		getTourismData();
+	}, []);

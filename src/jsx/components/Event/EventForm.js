@@ -118,7 +118,8 @@ const EventForm = () => {
 		const formData = new FormData();
 		formData.append("_method", "PUT");
 		formData.append("nama", formEvent.nama);
-		if (flyerImage !== "") formData.append("flyer_img", formEvent.flyerImage);
+		if (formEvent.flyerImage !== "")
+			formData.append("flyer_img", formEvent.flyerImage);
 		formData.append("deskripsi", formEvent.deskripsi);
 		formData.append("harga", formEvent.harga);
 		formData.append("nama_organizer", formEvent.organizer.nama);
@@ -147,71 +148,14 @@ const EventForm = () => {
 	};
 
 	useEffect(() => {
-		if (id !== undefined) {
-			getEvent(id)
-				.then((res) => {
-					getAllTourismPlace()
-						.then((res) => {
-							setWisataList(
-								res.data.data.map((wisata) => {
-									return {
-										value: wisata._id,
-										label: wisata.nama,
-										color: "#00B8D9",
-									};
-								})
-							);
-						})
-						.catch((err) => {
-							Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
-								history.push("/acara");
-							});
-						});
-					setFormEvent({
-						...formEvent,
-						nama: res.data.data.nama,
-						deskripsi: res.data.data.deskripsi,
-						organizer: {
-							nama: res.data.data.organizer.nama,
-							kontak: res.data.data.organizer.kontak,
-						},
-						startEvent: {
-							date: res.data.data.start_event.date,
-							time: res.data.data.start_event.time,
-						},
-						endEvent: {
-							date: res.data.data.end_event.date,
-							time: res.data.data.end_event.time,
-						},
-						flyerImagePreview: res.data.data.flyer_image,
-					});
-					getTourismPlace(res.data.data.wisata_id)
-						.then((wisata) => {
-							setFormEvent({
-								...formEvent,
-								wisata: {
-									value: res.data.data.wisata_id,
-									label: wisata.data.data.nama,
-									color: "#00B8D9",
-								},
-							});
-						})
-						.catch(() => {
-							Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
-								history.push("/acara");
-							});
-						});
-				})
-				.catch(() => {
-					Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
-						history.push("/acara");
-					});
-				});
-		} else {
-			getAllTourismPlace()
-				.then((res) => {
+		const loadEvent = async () => {
+			setIsLoading(true);
+			try {
+				if (id !== undefined) {
+					const event = await getEvent(id);
+					const tourismPlaces = await getAllTourismPlace();
 					setWisataList(
-						res.data.data.map((wisata) => {
+						tourismPlaces.data.data.map((wisata) => {
 							return {
 								value: wisata._id,
 								label: wisata.nama,
@@ -219,13 +163,55 @@ const EventForm = () => {
 							};
 						})
 					);
-				})
-				.catch(() => {
-					Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
-						history.push("/acara");
+					const { data } = event.data;
+					const { wisata_id, organizer, start_event, end_event, flyer_image } =
+						data;
+					const wisata = await getTourismPlace(wisata_id);
+					setFormEvent({
+						...formEvent,
+						nama: data.nama,
+						deskripsi: data.deskripsi,
+						organizer: {
+							nama: organizer.nama,
+							kontak: organizer.kontak,
+						},
+						harga: data.harga,
+						startEvent: {
+							date: start_event.date,
+							time: start_event.time,
+						},
+						endEvent: {
+							date: end_event.date,
+							time: end_event.time,
+						},
+						flyerImagePreview: flyer_image,
+						wisata: {
+							value: wisata.data.data._id,
+							label: wisata.data.data.nama,
+							color: "#00B8D9",
+						},
 					});
+				} else {
+					const tourismPlaces = await getAllTourismPlace();
+					setWisataList(
+						tourismPlaces.data.data.map((wisata) => {
+							return {
+								value: wisata._id,
+								label: wisata.nama,
+								color: "#00B8D9",
+							};
+						})
+					);
+				}
+			} catch (err) {
+				Swal.fire("Gagal!", "Acara gagal dimuat", "error").then(() => {
+					history.push("/acara");
 				});
-		}
+			}
+
+			setIsLoading(false);
+		};
+		loadEvent();
 	}, []);
 
 	return (
@@ -237,24 +223,24 @@ const EventForm = () => {
 							<h4 className="card-title">Tambah Acara</h4>
 						</div>
 						<div className="card-body">
-							{isLoading && (
-								<BeatLoader
-									color="#36d7b7"
-									cssOverride={{
-										position: "absolute",
-										top: "50%",
-										left: "50%",
-										zIndex: "999",
-									}}
-									size={30}
-								/>
-							)}
 							<div className="basic-form">
 								<form onSubmit={id !== undefined ? handleUpdate : handleCreate}>
 									<fieldset
 										{...(isLoading && { disabled: true })}
-										{...(isLoading && { style: { filter: "blur(2px)" } })}
+										{...(isLoading && { style: { filter: "blur(2px)", position: "relative" } })}
 									>
+										{isLoading && (
+											<BeatLoader
+												color="#36d7b7"
+												cssOverride={{
+													position: "absolute",
+													top: "50%",
+													left: "50%",
+													zIndex: "999",
+												}}
+												size={30}
+											/>
+										)}
 										<div className="row">
 											<div className="form-group mb-3 col-md-12">
 												<label>Nama</label>
