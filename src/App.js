@@ -11,6 +11,7 @@ import { isAuthenticated } from './store/selectors/AuthSelectors';
 import './vendor/bootstrap-select/dist/css/bootstrap-select.min.css';
 import './vendor/datatables/css/dataTables.min.css';
 import './css/style.css';
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const ForgotPassword = lazy(() => import('./jsx/pages/ForgotPassword'));
 const Login = lazy(() => {

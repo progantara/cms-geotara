@@ -19,6 +19,15 @@ export const getTourismPlace = (id) => {
 	});
 };
 
+export const getTourismPlaceByDetail = (id) => {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/wisata/` + id, {
+		headers: {
+			Authorization: `Bearer ${getAccessToken()}`,
+			Accept: 'application/json',
+		},
+	});
+};
+
 export const createTourismPlace = (tourismPlace) => {
 	return axios.post(process.env.REACT_APP_API_BASE_URL + `/master/wisata`, tourismPlace, {
 		headers: {

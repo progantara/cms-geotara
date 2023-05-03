@@ -59,6 +59,9 @@ const VirtualTourViewList = React.lazy(() =>
 const VirtualTourViewForm = React.lazy(() =>
 	import("./components/VirtualTour/VirtualTourViewForm")
 );
+const VirtualTourSpotForm = React.lazy(() =>
+	import("./components/VirtualTour/VirtualTourSpotForm")
+);
 
 // Publikasi
 const Article = React.lazy(() => import("./components/Article/Article"));
@@ -138,9 +141,10 @@ const Markup = () => {
 		{ url: "kota/edit/:id", component: KotaForm },
 
 		/// Virtual Tour
-		{ url: "virtual-tour/editor", component: VirtualTourViewEditor },
-		{ url: "virtual-tour/view", component: VirtualTourViewList },
-		{ url: "virtual-tour/form", component: VirtualTourViewForm },
+		{ url: "virtual-tour/editor/:idView", component: VirtualTourViewEditor },
+		{ url: "virtual-tour/view/:idWisata", component: VirtualTourViewList },
+		{ url: "virtual-tour/form/:idSpot", component: VirtualTourViewForm },
+		// TODO: Add SpotForm routes
 
 		/// Publikasi
 		{ url: "artikel", component: Article },

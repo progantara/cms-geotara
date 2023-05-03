@@ -81,7 +81,7 @@ const WisataList = () => {
 						<i className="fa fa-trash"></i>
 					</Link>
 					<Link
-						to={"/wisata/view/" + row._id}
+						to={"/virtual-tour/view/" + row._id}
 						className="btn btn-info shadow btn-xs me-1"
 					>
 						V-Tour

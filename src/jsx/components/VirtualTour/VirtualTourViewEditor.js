@@ -5,7 +5,7 @@ import ReactPannellum, {
 	addHotSpot,
 	removeHotSpot,
 	getPitch,
-	getYaw
+	getYaw,
 } from "react-pannellum";
 import Sample360 from "../../../images/360/1.jpg";
 import {
@@ -18,8 +18,18 @@ import {
 import "./virtualTour.css";
 import { generateUUID } from "../../../utils/stringFormatter";
 import Swal from "sweetalert2";
+import { useParams } from "react-router-dom";
+import {
+	createSpot,
+	deleteSpot,
+	getAllSpot,
+	getView,
+} from "../../../services/VirtualTourService";
 
 const VirtualTourViewEditor = () => {
+	const { idView } = useParams();
+
+	const [imageEditor, setImageEditor] = useState(null);
 	const [mouseCoord, setMouseCoord] = useState(false);
 	const [activeAction, setActiveAction] = useState("");
 	const [clickedSpot, setClickedSpot] = useState({});
@@ -42,31 +52,50 @@ const VirtualTourViewEditor = () => {
 	};
 
 	const handleAddHotSpot = (coord) => {
-		let newSpotId;
+		let randomSpotName;
 		let findSpot;
-		do {
-			newSpotId = generateUUID(8);
-			findSpot = spotList.find((spot) => spot.id === newSpotId);
-		} while (findSpot);
+		randomSpotName = generateUUID(8);
 
-		const newSpot = {
-			id: newSpotId,
-			text: "Spot " + newSpotId,
-			type: "info",
-			pitch: coord[0],
-			yaw: coord[1],
-			clickHandlerArgs: {
-				id: newSpotId,
-				sceneId: "firstScene",
-			},
-			clickHandlerFunc: (evt, args) => {
-				if (evt.which === 1) {
-					handleClickHandlerChange(args);
-				}
-			},
-		};
-		setSpotList([...spotList, newSpot]);
-		addHotSpot(newSpot);
+		const data = new FormData();
+		data.append("view_id", idView);
+		data.append("nama", "Spot " + randomSpotName);
+		data.append("yaw", coord[1]);
+		data.append("pitch", coord[0]);
+		data.append("tipe", "info");
+		data.append("aksi[url]", "#");
+
+		createSpot(data)
+			.then((response) => {
+				const newSpot = {
+					id: response.data.data._id,
+					text: response.data.data.nama,
+					type: response.data.data.tipe,
+					pitch: response.data.data.koordinat.pitch,
+					yaw: response.data.data.koordinat.yaw,
+					url: response.data.data.aksi.url,
+					clickHandlerArgs: {
+						id: response.data.data._id,
+						sceneId: idView,
+					},
+					clickHandlerFunc: (evt, args) => {
+						if (evt.which === 1) {
+							handleClickHandlerChange(args);
+						}
+					},
+				};
+
+				setSpotList([...spotList, newSpot]);
+				addHotSpot(newSpot);
+			})
+			.catch((error) => {
+				Swal.fire({
+					title: "Gagal Menambah Spot!",
+					text: error.response.data.message,
+					icon: "error",
+					showCancelButton: false,
+					confirmButtonText: "OK",
+				});
+			});
 	};
 
 	const handleClickHandlerChange = (args) => {
@@ -86,11 +115,23 @@ const VirtualTourViewEditor = () => {
 				cancelButtonText: "Batal",
 			}).then((result) => {
 				if (result.isConfirmed) {
-					setSpotList(spotList.filter((spot) => spot.id !== args.id));
-					removeHotSpot(args.id, args.sceneId);
-					if(clickedSpot.id === args.id) {
-						setClickedSpot({});
-					}
+					deleteSpot(args.id)
+						.then((response) => {
+							setSpotList(spotList.filter((spot) => spot.id !== args.id));
+							removeHotSpot(args.id, args.sceneId);
+							if (clickedSpot.id === args.id) {
+								setClickedSpot({});
+							}
+						})
+						.catch((error) => {
+							Swal.fire({
+								title: "Gagal Menghapus Spot!",
+								text: error.response.data.message,
+								icon: "error",
+								showCancelButton: false,
+								confirmButtonText: "OK",
+							});
+						});
 				}
 			});
 		} else {
@@ -103,10 +144,6 @@ const VirtualTourViewEditor = () => {
 			});
 		}
 	};
-
-	useEffect(() => {
-		refreshComponent();
-	}, [activeAction, clickedSpot]);
 
 	const refreshComponent = () => {
 		spotList.forEach((spot) => {
@@ -125,6 +162,43 @@ const VirtualTourViewEditor = () => {
 		setSpotListLength(spotListLength + 1);
 	};
 
+	const loadData = async () => {
+		try {
+			const responseView = await getView(idView);
+			setImageEditor(responseView.data.data.file);
+
+			const responseSpot = await getAllSpot(idView);
+			setSpotList(
+				responseSpot.data.data.map((spot) => {
+					return {
+						id: spot._id,
+						text: spot.nama,
+						type: spot.tipe,
+						pitch: spot.koordinat.pitch,
+						yaw: spot.koordinat.yaw,
+						url: spot.aksi.url,
+						clickHandlerArgs: {
+							id: spot._id,
+							sceneId: spot.view_id,
+						},
+						clickHandlerFunc: (evt, args) => {
+							if (evt.which === 1) {
+								handleClickHandlerChange(args);
+							}
+						},
+					};
+				})
+			);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	useEffect(() => {
+		loadData();
+		refreshComponent();
+	}, [activeAction, clickedSpot]);
+
 	return (
 		<>
 			<PageTitle
@@ -140,56 +214,60 @@ const VirtualTourViewEditor = () => {
 							<h4 className="card-title">View Editor</h4>
 						</div>
 						<div className="card-body d-flex">
-							<ReactPannellum
-								key={`pannellum-${spotListLength}`}
-								className={
-									activeAction === "select"
-										? "cursor-select"
-										: activeAction === "add"
-										? "cursor-add"
-										: activeAction === "remove"
-										? "cursor-remove"
-										: ""
-								}
-								id="1"
-								type="equirectangular"
-								sceneId="firstScene"
-								imageSource={Sample360}
-								style={{
-									width: "100%",
-									height: "400px",
-								}}
-								config={viewConfig}
-								onPanoramaMouseDown={(event) => {
-									const coord = mouseEventToCoords(event);
-									setMouseCoord({
-										x: coord[0],
-										y: coord[1],
-									});
-								}}
-								onPanoramaMouseUp={(event) => {
-									const coord = mouseEventToCoords(event);
-									const diffX = mouseCoord.x - coord[0];
-									const diffY = mouseCoord.y - coord[1];
-
-									if (diffX === 0 && diffY === 0) {
-										if (event.which === 1) {
-											if (activeAction === "add") {
-												handleAddHotSpot(coord);
-											}
-										}
-									} else {
-										setCenterView({
-											yaw: getYaw(),
-											pitch: getPitch(),
-										});
+							{imageEditor && (
+								<ReactPannellum
+									key={`pannellum-${spotListLength}-${spotList.length}`}
+									className={
+										activeAction === "select"
+											? "cursor-select"
+											: activeAction === "add"
+											? "cursor-add"
+											: activeAction === "remove"
+											? "cursor-remove"
+											: ""
 									}
-								}}
-							></ReactPannellum>
+									id="1"
+									type="equirectangular"
+									sceneId={idView}
+									imageSource={
+										process.env.REACT_APP_STORAGE_BASE_URL +
+										"/view/" +
+										imageEditor
+									}
+									style={{
+										width: "100%",
+										height: "400px",
+									}}
+									config={viewConfig}
+									onPanoramaMouseDown={(event) => {
+										const coord = mouseEventToCoords(event);
+										setMouseCoord({
+											x: coord[0],
+											y: coord[1],
+										});
+									}}
+									onPanoramaMouseUp={(event) => {
+										const coord = mouseEventToCoords(event);
+										const diffX = mouseCoord.x - coord[0];
+										const diffY = mouseCoord.y - coord[1];
 
-							<div
-								className="ms-2 d-flex flex-column"
-							>
+										if (diffX === 0 && diffY === 0) {
+											if (event.which === 1) {
+												if (activeAction === "add") {
+													handleAddHotSpot(coord);
+												}
+											}
+										} else {
+											setCenterView({
+												yaw: getYaw(),
+												pitch: getPitch(),
+											});
+										}
+									}}
+								></ReactPannellum>
+							)}
+
+							<div className="ms-2 d-flex flex-column">
 								<OverlayTrigger
 									placement="right"
 									overlay={<Tooltip>Pilih Spot</Tooltip>}
@@ -294,10 +372,7 @@ const VirtualTourViewEditor = () => {
 						{clickedSpot !== null && Object.keys(clickedSpot).length !== 0 && (
 							<div className="card-footer px-0">
 								<div className="btn-group">
-									<Button
-										className="btn-square btn-sm"
-										variant="secondary"
-									>
+									<Button className="btn-square btn-sm" variant="secondary">
 										<i className="fa fa-edit"></i>
 									</Button>
 									<Button
