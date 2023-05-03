@@ -37,6 +37,7 @@ const Home = React.lazy(() => import("./pages/Dashboard"));
 
 // Auth
 const Login = React.lazy(() => import("./pages/Login"));
+const Register = React.lazy(() => import("./pages/Registration"));
 
 // Profil
 const Profil = React.lazy(() => import("./components/Profil/Profil"));
