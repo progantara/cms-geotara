@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import DataTable from 'react-data-table-component';
-import { getAllEntertaiment, deleteEntertaiment } from '../../../services/EntertaimentService';
-import ClipLoader from 'react-spinners/ClipLoader';
-import { currencyFormatter } from '../../../utils/stringFormatter';
+import React, { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import DataTable from "react-data-table-component";
+import {
+	getAllEntertaiment,
+	deleteEntertaiment,
+} from "../../../services/EntertaimentService";
+import ClipLoader from "react-spinners/ClipLoader";
+import { currencyFormatter } from "../../../utils/stringFormatter";
 
 const EntertaimentList = () => {
 	const [data, setData] = useState([
@@ -13,59 +16,52 @@ const EntertaimentList = () => {
 			no: 1,
 			judul: "Keindahan Alam Sutra",
 			tipe: "Youtube",
-			link: ( 
+			link: (
 				<div className="d-flex">
-					<a href="https://www.youtube.com/watch?v=0UzfcDNAP-o" 	target='_blank'				className="btn btn-info shadow sharp me-1">Lihat </a>
+					<a
+						href="https://www.youtube.com/watch?v=0UzfcDNAP-o"
+						target="_blank"
+						className="btn btn-info btn-sm shadow me-1"
+					>
+						Lihat{" "}
+					</a>
 				</div>
-				),
+			),
 			action: (
 				<div className="d-flex">
 					<Link
-						to={'/entertaiment/detail/' + 0}
-						className="btn btn-primary shadow btn-xs sharp me-1"
+						to={"/entertaiment/detail/" + 0}
+						className="btn btn-primary shadow btn-xs me-1"
 					>
 						<i className="fas fa-eye"></i>
 					</Link>
 					<Link
-						to={'/entertaiment/edit/' + 0}
-						className="btn btn-secondary shadow btn-xs sharp me-1"
+						to={"/entertaiment/edit/" + 0}
+						className="btn btn-secondary shadow btn-xs me-1"
 					>
 						<i className="fas fa-pen"></i>
 					</Link>
 					<Link
 						to="#"
-						className="btn btn-danger shadow btn-xs sharp"
+						className="btn btn-danger shadow btn-xs"
 						onClick={() =>
 							Swal.fire({
-								title: 'Anda yakin ingin menghapus Entertaiment ini?',
-								text: 'Setelah dihapus, Anda tidak akan dapat memulihkannya',
-								icon: 'warning',
+								title: "Anda yakin ingin menghapus Entertaiment ini?",
+								text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+								icon: "warning",
 								showCancelButton: true,
-								confirmButtonColor: '#3085d6',
-								cancelButtonColor: '#d33',
-								confirmButtonText: 'Ya, hapus!',
+								confirmButtonColor: "#3085d6",
+								cancelButtonColor: "#d33",
+								confirmButtonText: "Ya, hapus!",
 							}).then((res) => {
-								if (
-									res.isConfirmed
-								) {
-									deleteEntertaiment(
-										0
-									);
-									let newData =
-										data.filter(
-											(
-												e
-											) =>
-												e._id !==
-												0
-										);
-									setData(
-										newData
-									);
+								if (res.isConfirmed) {
+									deleteEntertaiment(0);
+									let newData = data.filter((e) => e._id !== 0);
+									setData(newData);
 									Swal.fire(
-										'Dihapus!',
-										'Entertaiment telah dihapus.',
-										'success'
+										"Dihapus!",
+										"Entertaiment telah dihapus.",
+										"success"
 									);
 								}
 							})
@@ -81,56 +77,56 @@ const EntertaimentList = () => {
 
 	const columns = [
 		{
-			name: 'No',
+			name: "No",
 			selector: (row) => row.no,
 			sortable: true,
-			width: '10%',
+			width: "10%",
 		},
 		{
-			name: 'Judul',
+			name: "Judul",
 			selector: (row) => row.judul,
 			sortable: true,
-			width: '45%',
+			width: "45%",
 		},
 		{
-			name: 'Tipe',
+			name: "Tipe",
 			selector: (row) => row.tipe,
 			sortable: true,
-			width: '10%',
+			width: "10%",
 		},
 		{
-			name: 'Link',
+			name: "Link",
 			selector: (row) => row.link,
 			sortable: true,
-			width: '15%',
+			width: "15%",
 		},
 		{
-			name: 'Aksi',
+			name: "Aksi",
 			selector: (row) => row.action,
-			width: '20%',
+			width: "20%",
 		},
 	];
 
 	const customStyles = {
 		headCells: {
 			style: {
-				borderBottom: '0.125rem solid #F2F2F2',
-				borderTop: '0',
-				color: '#000',
-				whiteSpace: 'nowrap',
-				fontSize: '1.125rem',
-				textTransform: 'capitalize',
-				fontWeight: '600',
-				padding: '1.25rem 0.9375rem',
+				borderBottom: "0.125rem solid #F2F2F2",
+				borderTop: "0",
+				color: "#000",
+				whiteSpace: "nowrap",
+				fontSize: "1.125rem",
+				textTransform: "capitalize",
+				fontWeight: "600",
+				padding: "1.25rem 0.9375rem",
 			},
 		},
 		rows: {
 			style: {
-				background: 'transparent !important',
-				padding: '1.25rem 0.9375rem',
-				fontSize: '1rem',
-				fontWeight: '400',
-				borderBottom: '0',
+				background: "transparent !important",
+				padding: "1.25rem 0.9375rem",
+				fontSize: "1rem",
+				fontWeight: "400",
+				borderBottom: "0",
 			},
 		},
 	};
@@ -146,64 +142,51 @@ const EntertaimentList = () => {
 							no: index + 1,
 							judul: item.judul,
 							tipe: "Youtube",
-							link: ( 
+							link: (
 								<div className="d-flex">
 									<Link
 										to={item.link}
-										className="btn btn-primary shadow btn-xs sharp me-1"
+										className="btn btn-primary shadow btn-xs me-1"
 									>
 										Lihat
 									</Link>
 								</div>
-								),
+							),
 							action: (
 								<div className="d-flex">
 									<Link
-										to={'/entertaiment/detail/' + 0}
-										className="btn btn-primary shadow btn-xs sharp me-1"
+										to={"/entertaiment/detail/" + 0}
+										className="btn btn-primary shadow btn-xs me-1"
 									>
 										<i className="fas fa-eye"></i>
 									</Link>
 									<Link
-										to={'/entertaiment/edit/' + 0}
-										className="btn btn-secondary shadow btn-xs sharp me-1"
+										to={"/entertaiment/edit/" + 0}
+										className="btn btn-secondary shadow btn-xs me-1"
 									>
 										<i className="fas fa-pen"></i>
 									</Link>
 									<Link
 										to="#"
-										className="btn btn-danger shadow btn-xs sharp"
+										className="btn btn-danger shadow btn-xs"
 										onClick={() =>
 											Swal.fire({
-												title: 'Anda yakin ingin menghapus Entertaiment ini?',
-												text: 'Setelah dihapus, Anda tidak akan dapat memulihkannya',
-												icon: 'warning',
+												title: "Anda yakin ingin menghapus Entertaiment ini?",
+												text: "Setelah dihapus, Anda tidak akan dapat memulihkannya",
+												icon: "warning",
 												showCancelButton: true,
-												confirmButtonColor: '#3085d6',
-												cancelButtonColor: '#d33',
-												confirmButtonText: 'Ya, hapus!',
+												confirmButtonColor: "#3085d6",
+												cancelButtonColor: "#d33",
+												confirmButtonText: "Ya, hapus!",
 											}).then((res) => {
-												if (
-													res.isConfirmed
-												) {
-													deleteEntertaiment(
-														0
-													);
-													let newData =
-														data.filter(
-															(
-																e
-															) =>
-																e._id !==
-																0
-														);
-													setData(
-														newData
-													);
+												if (res.isConfirmed) {
+													deleteEntertaiment(0);
+													let newData = data.filter((e) => e._id !== 0);
+													setData(newData);
 													Swal.fire(
-														'Dihapus!',
-														'Entertaiment telah dihapus.',
-														'success'
+														"Dihapus!",
+														"Entertaiment telah dihapus.",
+														"success"
 													);
 												}
 											})
@@ -252,7 +235,7 @@ const EntertaimentList = () => {
 								progressPending={isLoading}
 								progressComponent={
 									<ClipLoader
-										color={'#20c997'}
+										color={"#20c997"}
 										loading={isLoading}
 										aria-label="Loading Spinner"
 									/>

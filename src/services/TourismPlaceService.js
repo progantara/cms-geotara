@@ -20,7 +20,7 @@ export const getTourismPlace = (id) => {
 };
 
 export const getTourismPlaceByDetail = (id) => {
-	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/wisata/` + id, {
+	return axios.get(process.env.REACT_APP_API_BASE_URL + `/master/wisata-detail/` + id, {
 		headers: {
 			Authorization: `Bearer ${getAccessToken()}`,
 			Accept: 'application/json',

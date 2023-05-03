@@ -90,19 +90,19 @@ const MerchantList = () => {
 								<div className="d-flex">
 									<Link
 										to={'/merchant/detail/' + item._id}
-										className="shadow btn btn-primary btn-xs sharp me-1"
+										className="shadow btn btn-primary btn-xs  me-1"
 									>
 										<i className="fas fa-eye"></i>
 									</Link>
 									<Link
 										to={'/merchant/edit/' + item._id}
-										className="shadow btn btn-secondary btn-xs sharp me-1"
+										className="shadow btn btn-secondary btn-xs  me-1"
 									>
 										<i className="fas fa-pen"></i>
 									</Link>
 									<Link
 										to="#"
-										className="shadow btn btn-danger btn-xs sharp"
+										className="shadow btn btn-danger btn-xs "
 										onClick={() =>
 											Swal.fire({
 												title: 'Anda yakin ingin menghapus merchant ini?',

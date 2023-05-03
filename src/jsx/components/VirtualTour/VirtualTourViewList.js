@@ -111,7 +111,6 @@ const ViewList = () => {
 				return item;
 			});
 			setViewList(newImageList);
-
 		} else {
 			const newImageList = viewList.map((item) => {
 				if (item.id === id) {
@@ -174,14 +173,36 @@ const ViewList = () => {
 
 	const handleFileChange = (event) => {
 		const file = event.target.files[0];
-		const reader = new FileReader();
-		reader.onload = () => {
-			setViewForm({
-				...viewForm,
-				file360: reader.result,
+		setViewForm({
+			...viewForm,
+			file360: file,
+		});
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const data = new FormData();
+		data.append("_method", "PUT");
+		data.append("file", viewForm.file360);
+
+		const res = await updateView(viewForm.id, data);
+		if (res.status === 200) {
+			Swal.fire({
+				title: "Berhasil!",
+				text: "View berhasil diubah",
+				icon: "success",
+				confirmButtonText: "OK",
+			}).then(() => {
+				router.push("/wisata");
 			});
-		};
-		reader.readAsText(file);
+		} else {
+			Swal.fire({
+				title: "Error!",
+				text: "Gagal mengubah view",
+				icon: "error",
+				confirmButtonText: "OK",
+			});
+		}
 	};
 
 	const loadData = async () => {
@@ -202,7 +223,6 @@ const ViewList = () => {
 				})
 			);
 			setViewList(newViewList);
-
 			setWisata({
 				id: responseWisata.data.data._id,
 				thumbnail: responseWisata.data.data.thumbnail,
@@ -215,7 +235,9 @@ const ViewList = () => {
 				distrik: responseLokasi.data.data.distrik.nama,
 				desa: responseLokasi.data.data.desa.nama,
 				detail_id: responseWisata.data.data.detail._id,
+				editor: responseWisata.data.data.editor,
 			});
+			setActiveEditor(responseWisata.data.data.editor === undefined ? "pannellum" : responseWisata.data.data.editor);
 		} catch (error) {
 			console.log(error);
 		}
@@ -223,8 +245,6 @@ const ViewList = () => {
 
 	useEffect(() => {
 		loadData();
-		// TODO: Add Field Default Editor on Detail Wisata
-		setActiveEditor("pannellum");
 	}, []);
 
 	return (
@@ -327,20 +347,6 @@ const ViewList = () => {
 								</li>
 							</ul>
 						</div>
-						{activeEditor == "pannellum" && (
-							<div className="card-footer pt-0 pb-0 text-center">
-								<div className="row">
-									<div className="col-6 pt-3 pb-3 border-right">
-										<h3 className="mb-1 text-primary">150</h3>
-										<span>View</span>
-									</div>
-									<div className="col-6 pt-3 pb-3 border-right">
-										<h3 className="mb-1 text-primary">140</h3>
-										<span>Spot</span>
-									</div>
-								</div>
-							</div>
-						)}
 					</div>
 				</div>
 				<div className="col-lg-8 hidden-xs">
@@ -525,7 +531,7 @@ const ViewList = () => {
 							) : (
 								<div className="row">
 									<div className="basic-form">
-										<form>
+										<form onSubmit={handleSubmit}>
 											<fieldset
 												{...(isLoading && { disabled: true })}
 												{...(isLoading && {
@@ -539,15 +545,28 @@ const ViewList = () => {
 															<input
 																type="file"
 																className="custom-file-input form-control"
-																accept=".html, .htm, .xhtml, .xht"
+																accept=".zip"
 																onChange={handleFileChange}
 															/>
 														</div>
 														<span className="input-group-text">Upload</span>
 													</div>
 													<div className="text-danger fs-12">
-														* Format file HTML
+														* Format file ZIP
 													</div>
+												</div>
+												<div className="form-group mt-4">
+													<button
+														type="submit"
+														className="btn btn-primary me-2"
+													>
+														Unggah
+													</button>
+													<Link to="/wisata">
+														<button type="button" className="btn btn-warning">
+															Kembali
+														</button>
+													</Link>
 												</div>
 											</fieldset>
 										</form>
@@ -571,17 +590,6 @@ const ViewList = () => {
 									<iframe
 										title="preview"
 										srcDoc={viewForm.file360Preview}
-										style={{
-											width: "100%",
-											height: "500px",
-											border: "none",
-										}}
-									/>
-								)}
-								{viewForm.file360 && (
-									<iframe
-										title="preview"
-										srcDoc={viewForm.file360}
 										style={{
 											width: "100%",
 											height: "500px",

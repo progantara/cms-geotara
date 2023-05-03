@@ -6,6 +6,8 @@ import ReactPannellum, {
 	removeHotSpot,
 	getPitch,
 	getYaw,
+	addScene,
+	getAllScenes,
 } from "react-pannellum";
 import {
 	Badge,
@@ -17,11 +19,12 @@ import {
 import "./virtualTour.css";
 import { generateUUID } from "../../../utils/stringFormatter";
 import Swal from "sweetalert2";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
 	createSpot,
 	deleteSpot,
 	getAllSpot,
+	getAllSpotByView,
 	getView,
 } from "../../../services/VirtualTourService";
 
@@ -52,7 +55,6 @@ const VirtualTourViewEditor = () => {
 
 	const handleAddHotSpot = (coord) => {
 		let randomSpotName;
-		let findSpot;
 		randomSpotName = generateUUID(8);
 
 		const data = new FormData();
@@ -166,9 +168,12 @@ const VirtualTourViewEditor = () => {
 			const responseView = await getView(idView);
 			setImageEditor(responseView.data.data.file);
 
-			const responseSpot = await getAllSpot(idView);
+			const responseSpot = await getAllSpotByView(idView);
 			setSpotList(
 				responseSpot.data.data.map((spot) => {
+					if (spot.tipe === "scene") {
+						addScene(spot._id, viewConfig, () => {});
+					}
 					return {
 						id: spot._id,
 						text: spot.nama,
@@ -212,114 +217,125 @@ const VirtualTourViewEditor = () => {
 						<div className="card-header">
 							<h4 className="card-title">View Editor</h4>
 						</div>
-						<div className="card-body d-flex">
-							{imageEditor && (
-								<ReactPannellum
-									key={`pannellum-${spotListLength}-${spotList.length}`}
-									className={
-										activeAction === "select"
-											? "cursor-select"
-											: activeAction === "add"
-											? "cursor-add"
-											: activeAction === "remove"
-											? "cursor-remove"
-											: ""
-									}
-									id="1"
-									type="equirectangular"
-									sceneId={idView}
-									imageSource={
-										process.env.REACT_APP_STORAGE_BASE_URL +
-										"/view/" +
-										imageEditor
-									}
-									style={{
-										width: "100%",
-										height: "400px",
-									}}
-									config={viewConfig}
-									onPanoramaMouseDown={(event) => {
-										const coord = mouseEventToCoords(event);
-										setMouseCoord({
-											x: coord[0],
-											y: coord[1],
-										});
-									}}
-									onPanoramaMouseUp={(event) => {
-										const coord = mouseEventToCoords(event);
-										const diffX = mouseCoord.x - coord[0];
-										const diffY = mouseCoord.y - coord[1];
-
-										if (diffX === 0 && diffY === 0) {
-											if (event.which === 1) {
-												if (activeAction === "add") {
-													handleAddHotSpot(coord);
-												}
-											}
-										} else {
-											setCenterView({
-												yaw: getYaw(),
-												pitch: getPitch(),
+						<div className="card-body">
+							<div className="d-flex">
+								{imageEditor && (
+									<ReactPannellum
+										key={`pannellum-${spotListLength}-${spotList.length}`}
+										className={
+											activeAction === "select"
+												? "cursor-select"
+												: activeAction === "add"
+												? "cursor-add"
+												: activeAction === "remove"
+												? "cursor-remove"
+												: ""
+										}
+										id="1"
+										type="equirectangular"
+										sceneId={idView}
+										imageSource={
+											process.env.REACT_APP_STORAGE_BASE_URL +
+											"/view/" +
+											imageEditor
+										}
+										style={{
+											width: "100%",
+											height: "400px",
+										}}
+										config={viewConfig}
+										onPanoramaMouseDown={(event) => {
+											const coord = mouseEventToCoords(event);
+											setMouseCoord({
+												x: coord[0],
+												y: coord[1],
 											});
-										}
-									}}
-								></ReactPannellum>
-							)}
+										}}
+										onPanoramaMouseUp={(event) => {
+											const coord = mouseEventToCoords(event);
+											const diffX = mouseCoord.x - coord[0];
+											const diffY = mouseCoord.y - coord[1];
 
-							<div className="ms-2 d-flex flex-column">
-								<OverlayTrigger
-									placement="right"
-									overlay={<Tooltip>Pilih Spot</Tooltip>}
-								>
-									<Button
-										className="btn-square btn-sm"
-										variant={
-											activeAction === "select" ? "dark" : "outline-dark"
-										}
-										onClick={() => {
-											activeAction !== "select"
-												? setActiveAction("select")
-												: setActiveAction("");
+											if (diffX === 0 && diffY === 0) {
+												if (event.which === 1) {
+													if (activeAction === "add") {
+														handleAddHotSpot(coord);
+													}
+												}
+											} else {
+												setCenterView({
+													yaw: getYaw(),
+													pitch: getPitch(),
+												});
+											}
 										}}
+									></ReactPannellum>
+								)}
+
+								<div className="ms-2 d-flex flex-column">
+									<OverlayTrigger
+										placement="right"
+										overlay={<Tooltip>Pilih Spot</Tooltip>}
 									>
-										<i className="fa fa-mouse-pointer"></i>
-									</Button>
-								</OverlayTrigger>
-								<OverlayTrigger
-									placement="right"
-									overlay={<Tooltip>Tambah Spot</Tooltip>}
-								>
-									<Button
-										className="btn-square btn-sm"
-										variant={activeAction === "add" ? "dark" : "outline-dark"}
-										onClick={() => {
-											activeAction !== "add"
-												? setActiveAction("add")
-												: setActiveAction("");
-										}}
+										<Button
+											className="btn-square btn-sm"
+											variant={
+												activeAction === "select" ? "dark" : "outline-dark"
+											}
+											onClick={() => {
+												activeAction !== "select"
+													? setActiveAction("select")
+													: setActiveAction("");
+											}}
+										>
+											<i className="fa fa-mouse-pointer"></i>
+										</Button>
+									</OverlayTrigger>
+									<OverlayTrigger
+										placement="right"
+										overlay={<Tooltip>Tambah Spot</Tooltip>}
 									>
-										<i className="fa fa-plus"></i>
-									</Button>
-								</OverlayTrigger>
-								<OverlayTrigger
-									placement="right"
-									overlay={<Tooltip>Hapus Spot</Tooltip>}
-								>
-									<Button
-										className="btn-square btn-sm"
-										variant={
-											activeAction === "remove" ? "dark" : "outline-dark"
-										}
-										onClick={() => {
-											activeAction !== "remove"
-												? setActiveAction("remove")
-												: setActiveAction("");
-										}}
+										<Button
+											className="btn-square btn-sm"
+											variant={activeAction === "add" ? "dark" : "outline-dark"}
+											onClick={() => {
+												activeAction !== "add"
+													? setActiveAction("add")
+													: setActiveAction("");
+											}}
+										>
+											<i className="fa fa-plus"></i>
+										</Button>
+									</OverlayTrigger>
+									<OverlayTrigger
+										placement="right"
+										overlay={<Tooltip>Hapus Spot</Tooltip>}
 									>
-										<i className="fa fa-trash"></i>
-									</Button>
-								</OverlayTrigger>
+										<Button
+											className="btn-square btn-sm"
+											variant={
+												activeAction === "remove" ? "dark" : "outline-dark"
+											}
+											onClick={() => {
+												activeAction !== "remove"
+													? setActiveAction("remove")
+													: setActiveAction("");
+											}}
+										>
+											<i className="fa fa-trash"></i>
+										</Button>
+									</OverlayTrigger>
+								</div>
 							</div>
+							<Button
+								className="ms-auto me-2 mt-3"
+								variant="warning"
+								onClick={() => {
+									history.back();
+								}}
+							>
+								Kembali
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -371,9 +387,11 @@ const VirtualTourViewEditor = () => {
 						{clickedSpot !== null && Object.keys(clickedSpot).length !== 0 && (
 							<div className="card-footer px-0">
 								<div className="btn-group">
-									<Button className="btn-square btn-sm" variant="secondary">
-										<i className="fa fa-edit"></i>
-									</Button>
+									<Link to={"/virtual-tour/spot/" + clickedSpot.id}>
+										<Button className="btn-square btn-sm" variant="secondary">
+											<i className="fa fa-edit"></i>
+										</Button>
+									</Link>
 									<Button
 										className="btn-square btn-sm"
 										variant="danger"
@@ -382,12 +400,36 @@ const VirtualTourViewEditor = () => {
 												(spot) => spot.id === clickedSpot.id
 											);
 											if (isSpotExists) {
-												removeHotSpot(clickedSpot.id, clickedSpot.sceneId);
-												setSpotList(
-													spotList.filter((spot) => spot.id !== clickedSpot.id)
-												);
-												setClickedSpot({});
-												Swal.fire("Dihapus!", "Spot dihapus", "success");
+												Swal.fire({
+													title: "Hapus Spot?",
+													text: "Spot yang dihapus tidak dapat dikembalikan!",
+													icon: "warning",
+													showCancelButton: true,
+													confirmButtonText: "Hapus",
+													cancelButtonText: "Batal",
+												}).then((result) => {
+													if (result.isConfirmed) {
+														deleteSpot(clickedSpot.id)
+															.then((response) => {
+																setSpotList(
+																	spotList.filter(
+																		(spot) => spot.id !== clickedSpot.id
+																	)
+																);
+																removeHotSpot(clickedSpot.id, clickedSpot.sceneId);
+																setClickedSpot({});
+															})
+															.catch((error) => {
+																Swal.fire({
+																	title: "Gagal Menghapus Spot!",
+																	text: error.response.data.message,
+																	icon: "error",
+																	showCancelButton: false,
+																	confirmButtonText: "OK",
+																});
+															});
+													}
+												});
 											} else {
 												Swal.fire("Gagal!", "Spot tidak ditemukan", "error");
 											}

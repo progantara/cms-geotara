@@ -89,19 +89,19 @@ const RestaurantList = () => {
 								<div className="d-flex">
 									<Link
 										to={'/restaurant/detail/' + item._id}
-										className="btn btn-primary shadow btn-xs sharp me-1"
+										className="btn btn-primary shadow btn-xs  me-1"
 									>
 										<i className="fas fa-eye"></i>
 									</Link>
 									<Link
 										to={'/restaurant/edit/' + item._id}
-										className="btn btn-secondary shadow btn-xs sharp me-1"
+										className="btn btn-secondary shadow btn-xs  me-1"
 									>
 										<i className="fas fa-pen"></i>
 									</Link>
 									<Link
 										to="#"
-										className="btn btn-danger shadow btn-xs sharp"
+										className="btn btn-danger shadow btn-xs "
 										onClick={() =>
 											Swal.fire({
 												title: 'Anda yakin ingin menghapus restaurant ini?',

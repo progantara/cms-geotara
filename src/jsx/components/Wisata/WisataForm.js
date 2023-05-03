@@ -406,6 +406,7 @@ const WisataForm = () => {
 															nama: e.target.value,
 														})
 													}
+													required
 												/>
 											</div>
 										</div>
@@ -430,6 +431,7 @@ const WisataForm = () => {
 																		console.log(err);
 																	});
 															}}
+															required
 														/>
 													</div>
 													<span className="input-group-text">Upload</span>
@@ -475,6 +477,7 @@ const WisataForm = () => {
 															deskripsi: e.target.value,
 														});
 													}}
+													required
 												></textarea>
 											</div>
 										</div>
