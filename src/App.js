@@ -12,6 +12,7 @@ import './vendor/bootstrap-select/dist/css/bootstrap-select.min.css';
 import './vendor/datatables/css/dataTables.min.css';
 import './css/style.css';
 import 'react-loading-skeleton/dist/skeleton.css'
+import Registration from './jsx/pages/Registration';
 
 const ForgotPassword = lazy(() => import('./jsx/pages/ForgotPassword'));
 const Login = lazy(() => {
@@ -29,6 +30,7 @@ function App(props) {
 	let routes = (
 		<Switch>
 			<Route path="/login" component={Login} />
+			<Route path="/register" component={Registration} />
 			<Route path="/page-forgot-password" component={ForgotPassword} />
 		</Switch>
 	);
