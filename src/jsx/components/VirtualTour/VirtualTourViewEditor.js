@@ -7,7 +7,6 @@ import ReactPannellum, {
 	getPitch,
 	getYaw,
 } from "react-pannellum";
-import Sample360 from "../../../images/360/1.jpg";
 import {
 	Badge,
 	Button,

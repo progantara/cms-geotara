@@ -3,6 +3,7 @@ import PageTitle from "../../layouts/PageTitle";
 import { Link, useParams } from "react-router-dom";
 import { getView, updateView } from "../../../services/VirtualTourService";
 import Swal from "sweetalert2";
+import ReactPannellum from "react-pannellum";
 
 const VirtualTourViewForm = () => {
 	const { idView } = useParams();
@@ -110,7 +111,7 @@ const VirtualTourViewForm = () => {
 										<ReactPannellum
 											id="1"
 											type="equirectangular"
-											sceneId="firstScene"
+											sceneId={idView}
 											imageSource={
 												process.env.REACT_APP_STORAGE_BASE_URL +
 												"/view/" +

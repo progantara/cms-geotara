@@ -466,14 +466,14 @@ const ViewList = () => {
 																</svg>
 															</Dropdown.Toggle>
 															<Dropdown.Menu className="dropdown-menu dropdown-menu-right">
-																<Button
+																<Link
 																	className="dropdown-item"
 																	variant="secondary"
-																	onClick={() => {}}
+																	to={"/virtual-tour/view/edit/" + item.id}
 																>
 																	<i className="fa fa-pen text-dark me-2" />
 																	Edit View
-																</Button>
+																</Link>
 																<Button
 																	className="dropdown-item"
 																	variant="danger"

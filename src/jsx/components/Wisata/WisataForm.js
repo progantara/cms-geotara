@@ -312,7 +312,33 @@ const WisataForm = () => {
 			}
 		};
 
-		getTourismData();
+		if(id !== undefined) {
+			getTourismData();
+		} else {
+			getAllKategori()
+				.then((res) => {
+					setKategoriList(
+						res.data.data.map((item) => {
+							return {
+								value: item.nama,
+								label: capitalizeEachFirstLetter(item.nama),
+								color: "#00B8D9",
+							};
+						})
+					);
+				}
+			)
+			.catch((err) => {
+				if (err.response) {
+					Swal.fire("Gagal!", err.response.data.message, "error");
+				} else if (err.request) {
+					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
+				} else {
+					console.log("Error", err);
+					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
+				}
+			});
+		}
 	}, []);
 
 	return (
@@ -501,7 +527,7 @@ const WisataForm = () => {
 																		return res.data.data.map((subkategori) => {
 																			return {
 																				value: subkategori.nama,
-																				label: subkategori.nama,
+																				label: capitalizeEachFirstLetter(subkategori.nama),
 																				color: "#00B8D9",
 																			};
 																		});

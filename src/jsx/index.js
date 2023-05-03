@@ -143,7 +143,7 @@ const Markup = () => {
 		/// Virtual Tour
 		{ url: "virtual-tour/editor/:idView", component: VirtualTourViewEditor },
 		{ url: "virtual-tour/view/:idWisata", component: VirtualTourViewList },
-		{ url: "virtual-tour/form/:idSpot", component: VirtualTourViewForm },
+		{ url: "virtual-tour/view/edit/:idView", component: VirtualTourViewForm },
 		// TODO: Add SpotForm routes
 
 		/// Publikasi
