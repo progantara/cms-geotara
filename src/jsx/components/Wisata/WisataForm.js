@@ -23,7 +23,6 @@ import {
 } from "../../../services/TourismPlaceService";
 import { format } from "date-fns";
 import Swal from "sweetalert2";
-import ReactPannellum from "react-pannellum";
 import { getAllProvinsi } from "../../../services/ProvinsiService";
 import { getAllKotaByCode } from "../../../services/KotaService";
 import {
@@ -89,8 +88,7 @@ const WisataForm = () => {
 		],
 		desaId: {},
 		alamat: "",
-		file360: "",
-		file360Preview: "",
+		editor: "",
 	});
 	const [long, setLong] = useState(0);
 	const [lat, setLat] = useState(0);
@@ -132,7 +130,7 @@ const WisataForm = () => {
 		data.append("desa_id", formWisata.desaId.value);
 		data.append("alamat", formWisata.alamat);
 		data.append("thumbnail", formWisata.thumbnail);
-		data.append("file360", formWisata.file360);
+		data.append("editor", formWisata.editor);
 		createTourismPlace(data)
 			.then(() => {
 				setIsLoading(false);
@@ -181,7 +179,7 @@ const WisataForm = () => {
 		data.append("alamat", formWisata.alamat);
 		if (formWisata.thumbnail !== "")
 			data.append("thumbnail", formWisata.thumbnail);
-		if (formWisata.file360 !== "") data.append("file360", formWisata.file360);
+		data.append("editor", formWisata.editor);
 		updateTourismPlace(id, data)
 			.then((res) => {
 				setIsLoading(false);
@@ -249,7 +247,6 @@ const WisataForm = () => {
 							hari: item.hari,
 						})),
 						alamat: res.data.data.lokasi.alamat,
-						file360Preview: res.data.data.file360,
 						desaId: {
 							value: parentDesa.data.data.desa.kode,
 							label: parentDesa.data.data.desa.nama,
@@ -312,23 +309,19 @@ const WisataForm = () => {
 			}
 		};
 
-		if(id !== undefined) {
-			getTourismData();
-		} else {
-			getAllKategori()
-				.then((res) => {
-					setKategoriList(
-						res.data.data.map((item) => {
-							return {
-								value: item.nama,
-								label: capitalizeEachFirstLetter(item.nama),
-								color: "#00B8D9",
-							};
-						})
-					);
-				}
-			)
-			.catch((err) => {
+		const loadListKategori = async () => {
+			try {
+				const res = await getAllKategori();
+				setKategoriList(
+					res.data.data.map((item) => {
+						return {
+							value: item.nama,
+							label: capitalizeEachFirstLetter(item.nama),
+							color: "#00B8D9",
+						};
+					})
+				);
+			} catch (err) {
 				if (err.response) {
 					Swal.fire("Gagal!", err.response.data.message, "error");
 				} else if (err.request) {
@@ -337,7 +330,38 @@ const WisataForm = () => {
 					console.log("Error", err);
 					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
 				}
-			});
+			}
+		};
+
+		const loadListProvinsi = async () => {
+			try {
+				const res = await getAllProvinsi();
+				setProvinsiList(
+					res.data.data.map((item) => {
+						return {
+							value: item.kode,
+							label: capitalizeEachFirstLetter(item.nama),
+							color: "#00B8D9",
+						};
+					})
+				);
+			} catch (err) {
+				if (err.response) {
+					Swal.fire("Gagal!", err.response.data.message, "error");
+				} else if (err.request) {
+					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
+				} else {
+					console.log("Error", err);
+					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
+				}
+			}
+		};
+
+		if (id !== undefined) {
+			getTourismData();
+		} else {
+			loadListKategori();
+			loadListProvinsi();
 		}
 	}, []);
 
@@ -440,58 +464,6 @@ const WisataForm = () => {
 										</div>
 										<div className="row">
 											<div className="form-group mb-4">
-												<label>File 360</label>
-												<div className="input-group">
-													<div className="form-file">
-														<input
-															type="file"
-															className="custom-file-input form-control"
-															accept="image/*"
-															onChange={(event) => {
-																setFormWisata({
-																	...formWisata,
-																	file360: event.target.files[0],
-																});
-															}}
-														/>
-													</div>
-													<span className="input-group-text">Upload</span>
-												</div>
-												{formWisata.file360Preview?.length > 0 && (
-													<a
-														href={
-															process.env.REACT_APP_STORAGE_BASE_URL +
-															"/wisata/" +
-															formWisata.file360Preview
-														}
-														target="_blank"
-													>
-														See Preview
-													</a>
-												)}
-												{formWisata.file360?.length > 0 && (
-													<ReactPannellum
-														id="1"
-														type="equirectangular"
-														sceneId="firstScene"
-														imageSource={URL.createObjectURL(
-															formWisata.file360
-														)}
-														style={{
-															width: "40%",
-															height: "160px",
-														}}
-														config={{
-															autoLoad: true,
-															showFullscreenCtrl: false,
-															escapeHTML: true,
-														}}
-													></ReactPannellum>
-												)}
-											</div>
-										</div>
-										<div className="row">
-											<div className="form-group mb-4">
 												<label>Deskripsi</label>
 												<textarea
 													className="form-control"
@@ -527,7 +499,9 @@ const WisataForm = () => {
 																		return res.data.data.map((subkategori) => {
 																			return {
 																				value: subkategori.nama,
-																				label: capitalizeEachFirstLetter(subkategori.nama),
+																				label: capitalizeEachFirstLetter(
+																					subkategori.nama
+																				),
 																				color: "#00B8D9",
 																			};
 																		});
@@ -614,6 +588,36 @@ const WisataForm = () => {
 											</div>
 										</div>
 										<div className="row">
+											<div className="form-group mb-4 col-md-12">
+												<label>Editor</label>
+												<Select
+													closeMenuOnSelect={true}
+													components={{
+														ClearIndicator,
+													}}
+													styles={{
+														clearIndicator: ClearIndicatorStyles,
+													}}
+													value={formWisata.editor}
+													onChange={(e) => {
+														setFormWisata({ ...formWisata, editor: e });
+													}}
+													options={[
+														{
+															value: "pannellum",
+															label: "Pannellum",
+															color: "#00B8D9",
+														},
+														{
+															value: "3dvista",
+															label: "3D Vista",
+															color: "#00B8D9",
+														},
+													]}
+												/>
+											</div>
+										</div>
+										<div className="row">
 											<div className="form-group mb-4 col-md-4">
 												<label>Provinsi</label>
 												<Select
@@ -633,7 +637,7 @@ const WisataForm = () => {
 																	res.data.data.map((item) => {
 																		return {
 																			value: item.kode,
-																			label: item.nama,
+																			label: capitalizeEachFirstLetter(item.nama),
 																			color: "#00B8D9",
 																		};
 																	})
@@ -670,7 +674,7 @@ const WisataForm = () => {
 																	res.data.data.map((item) => {
 																		return {
 																			value: item.kode,
-																			label: item.nama,
+																			label: capitalizeEachFirstLetter(item.nama),
 																			color: "#00B8D9",
 																		};
 																	})
@@ -707,7 +711,7 @@ const WisataForm = () => {
 																	res.data.data.map((item) => {
 																		return {
 																			value: item.kode,
-																			label: item.nama,
+																			label: capitalizeEachFirstLetter(item.nama),
 																			color: "#00B8D9",
 																		};
 																	})
@@ -801,11 +805,7 @@ const WisataForm = () => {
 													<ROSM />
 													<RLayerVector>
 														<RFeature
-															geometry={
-																new Point(
-																	fromLonLat([long, lat])
-																)
-															}
+															geometry={new Point(fromLonLat([long, lat]))}
 														>
 															<RStyle.RStyle>
 																<RStyle.RIcon
