@@ -183,7 +183,7 @@ const WisataForm = () => {
 		data.append("alamat", formWisata.alamat);
 		if (formWisata.thumbnail !== "")
 			data.append("thumbnail", formWisata.thumbnail);
-		data.append("editor", formWisata.editor);
+		data.append("editor", formWisata.editor.value);
 		if (formWisata.file360 !== "") data.append("file360", formWisata.file360);
 		updateTourismPlace(id, data)
 			.then((res) => {
@@ -258,13 +258,11 @@ const WisataForm = () => {
 							label: parentDesa.data.data.desa.nama,
 							color: "#00B8D9",
 						},
-						editor: res.data.data.editor.map((item) => {
-							return {
-								value: item,
-								label: capitalizeEachFirstLetter(item),
-								color: "#00B8D9",
-							};
-						}),
+						editor: {
+							value: res.data.data.editor,
+							label: capitalizeEachFirstLetter(res.data.data.editor),
+							color: "#00B8D9",
+						},
 						file360Preview: res.data.data.file360,
 					});
 
@@ -318,6 +316,7 @@ const WisataForm = () => {
 				} else if (err.request) {
 					Swal.fire("Gagal!", "Tidak dapat terhubung ke server", "error");
 				} else {
+					console.log(err);
 					Swal.fire("Gagal!", "Terjadi kesalahan", "error");
 				}
 			}
@@ -500,7 +499,8 @@ const WisataForm = () => {
 												{formWisata.file360Preview !== "" && (
 													<Link
 														to={
-															"https://portal.geotara.my.id/virtual-tour/view/" + id
+															"https://portal.geotara.my.id/virtual-tour/view/" +
+															id
 														}
 														target="_blank"
 													>

@@ -43,7 +43,7 @@ const WisataList = () => {
 		},
 		{
 			name: "Aksi",
-			width: "25%",
+			width: "30%",
 			cell: (row) => (
 				<div className="d-flex">
 					<Link
