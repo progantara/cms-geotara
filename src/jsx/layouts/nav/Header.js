@@ -10,7 +10,7 @@ const Header = ({ onNote }) => {
 	const user = useSelector((state) => state.auth.auth.user);
 
 	var path = window.location.pathname.split("/");
-	if(path.length > 0) {
+	if(path.length > 3) {
 		var name = path.reverse().slice(1, path.length - 1).join(" ").split("-");
 	} else {
 		var name = path[path.length - 1].split("-");
