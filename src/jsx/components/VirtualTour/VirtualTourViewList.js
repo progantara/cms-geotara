@@ -586,7 +586,7 @@ const ViewList = () => {
 								<h2 className="card-title">3D Vista HTML Preview</h2>
 							</div>
 							<div className="card-body pb-0">
-								{viewForm.file360Preview && (
+								{/* {viewForm.file360Preview && (
 									<iframe
 										title="preview"
 										srcDoc={viewForm.file360Preview}
@@ -596,7 +596,7 @@ const ViewList = () => {
 											border: "none",
 										}}
 									/>
-								)}
+								)} */}
 							</div>
 						</div>
 					</div>

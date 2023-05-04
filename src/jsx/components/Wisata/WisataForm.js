@@ -133,7 +133,7 @@ const WisataForm = () => {
 		data.append("desa_id", formWisata.desaId.value);
 		data.append("alamat", formWisata.alamat);
 		data.append("thumbnail", formWisata.thumbnail);
-		data.append("editor", formWisata.editor);
+		data.append("editor", formWisata.editor.value);
 		data.append("file360", formWisata.file360);
 		createTourismPlace(data)
 			.then(() => {
@@ -258,6 +258,14 @@ const WisataForm = () => {
 							label: parentDesa.data.data.desa.nama,
 							color: "#00B8D9",
 						},
+						editor: res.data.data.editor.map((item) => {
+							return {
+								value: item,
+								label: capitalizeEachFirstLetter(item),
+								color: "#00B8D9",
+							};
+						}),
+						file360Preview: res.data.data.file360,
 					});
 
 					setLat(res.data.data.lokasi.lat);
@@ -490,16 +498,14 @@ const WisataForm = () => {
 													<span className="input-group-text">Upload</span>
 												</div>
 												{formWisata.file360Preview !== "" && (
-													<a
-														href={
-															process.env.REACT_APP_STORAGE_BASE_URL +
-															"/wisata/" +
-															formWisata.file360Preview
+													<Link
+														to={
+															"https://portal.geotara.my.id/virtual-tour/view/" + id
 														}
 														target="_blank"
 													>
 														See Preview
-													</a>
+													</Link>
 												)}
 												{formWisata.file360 !== "" && (
 													<ReactPannellum
