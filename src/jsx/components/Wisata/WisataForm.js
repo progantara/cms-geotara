@@ -31,6 +31,7 @@ import {
 } from "../../../services/DistrikService";
 import { getAllDesaByCode, getDesa } from "../../../services/DesaService";
 import BeatLoader from "react-spinners/BeatLoader";
+import ReactPannellum from "react-pannellum";
 
 const locationIcon =
 	"https://cdn.jsdelivr.net/npm/rlayers/examples/./svg/location.svg";
@@ -89,6 +90,8 @@ const WisataForm = () => {
 		desaId: {},
 		alamat: "",
 		editor: "",
+		file360: "",
+		file360Preview: "",
 	});
 	const [long, setLong] = useState(0);
 	const [lat, setLat] = useState(0);
@@ -131,6 +134,7 @@ const WisataForm = () => {
 		data.append("alamat", formWisata.alamat);
 		data.append("thumbnail", formWisata.thumbnail);
 		data.append("editor", formWisata.editor);
+		data.append("file360", formWisata.file360);
 		createTourismPlace(data)
 			.then(() => {
 				setIsLoading(false);
@@ -180,6 +184,7 @@ const WisataForm = () => {
 		if (formWisata.thumbnail !== "")
 			data.append("thumbnail", formWisata.thumbnail);
 		data.append("editor", formWisata.editor);
+		if (formWisata.file360 !== "") data.append("file360", formWisata.file360);
 		updateTourismPlace(id, data)
 			.then((res) => {
 				setIsLoading(false);
@@ -239,6 +244,7 @@ const WisataForm = () => {
 								color: "#00B8D9",
 							};
 						}),
+						file360Preview: res.data.data.file360,
 						hargaTiket: res.data.data.harga_tiket,
 						isActive: res.data.data.is_active,
 						jamOperasional: res.data.data.jam_operasional.map((item) => ({
@@ -436,7 +442,7 @@ const WisataForm = () => {
 													</div>
 													<span className="input-group-text">Upload</span>
 												</div>
-												{formWisata.thumbnailPreview?.length > 0 && (
+												{formWisata.thumbnailPreview !== "" && (
 													<img
 														src={
 															process.env.REACT_APP_STORAGE_BASE_URL +
@@ -451,16 +457,68 @@ const WisataForm = () => {
 														}}
 													/>
 												)}
-												{formWisata.thumbnail?.length > 0 && (
+												{formWisata.thumbnail !== "" && (
 													<img
 														src={URL.createObjectURL(formWisata.thumbnail)}
 														alt="thumbnail"
 														className="img-fluid border border-2 border-dark rounded-3"
 														style={{
-															width: "40%",
-															height: "auto",
+															width: "50%",
+															height: "300px",
 														}}
 													/>
+												)}
+											</div>
+										</div>
+										<div className="row">
+											<div className="form-group mb-4">
+												<label>File 360</label>
+												<div className="input-group">
+													<div className="form-file">
+														<input
+															type="file"
+															className="custom-file-input form-control"
+															accept="image/*"
+															onChange={(event) => {
+																setFormWisata({
+																	...formWisata,
+																	file360: event.target.files[0],
+																});
+															}}
+														/>
+													</div>
+													<span className="input-group-text">Upload</span>
+												</div>
+												{formWisata.file360Preview !== "" && (
+													<a
+														href={
+															process.env.REACT_APP_STORAGE_BASE_URL +
+															"/wisata/" +
+															formWisata.file360Preview
+														}
+														target="_blank"
+													>
+														See Preview
+													</a>
+												)}
+												{formWisata.file360 !== "" && (
+													<ReactPannellum
+														id="1"
+														type="equirectangular"
+														sceneId="firstScene"
+														imageSource={URL.createObjectURL(
+															formWisata.file360
+														)}
+														style={{
+															width: "40%",
+															height: "160px",
+														}}
+														config={{
+															autoLoad: true,
+															showFullscreenCtrl: false,
+															escapeHTML: true,
+														}}
+													></ReactPannellum>
 												)}
 											</div>
 										</div>
@@ -640,7 +698,9 @@ const WisataForm = () => {
 																	res.data.data.map((item) => {
 																		return {
 																			value: item.kode,
-																			label: capitalizeEachFirstLetter(item.nama),
+																			label: capitalizeEachFirstLetter(
+																				item.nama
+																			),
 																			color: "#00B8D9",
 																		};
 																	})
@@ -677,7 +737,9 @@ const WisataForm = () => {
 																	res.data.data.map((item) => {
 																		return {
 																			value: item.kode,
-																			label: capitalizeEachFirstLetter(item.nama),
+																			label: capitalizeEachFirstLetter(
+																				item.nama
+																			),
 																			color: "#00B8D9",
 																		};
 																	})
@@ -714,7 +776,9 @@ const WisataForm = () => {
 																	res.data.data.map((item) => {
 																		return {
 																			value: item.kode,
-																			label: capitalizeEachFirstLetter(item.nama),
+																			label: capitalizeEachFirstLetter(
+																				item.nama
+																			),
 																			color: "#00B8D9",
 																		};
 																	})

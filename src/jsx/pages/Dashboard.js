@@ -24,14 +24,15 @@ const Home = () => {
 	});
 	const [topArticleData, setTopArticleData] = useState([]);
 	const [topWisataData, setTopWisataData] = useState([]);
+	const [incomingEvent, setIncomingEvent] = useState([]);
 
 	useEffect(() => {
 		changeBackground({ value: "light", label: "Light" });
 		getDashboard()
 			.then((res) => {
-				console.log(res);
 				setTopArticleData(res.data.data.top.artikel);
 				setTopWisataData(res.data.data.top.wisata);
+				setIncomingEvent(res.data.data.incoming_event);
 				setWidgetData({
 					totalWisata: res.data.data.total.wisata,
 					totalKemitraan: res.data.data.total.sponsor,
@@ -184,34 +185,6 @@ const Home = () => {
 										</div>
 									</div>
 								</div>
-								<div className="col-xl-6 col-sm-6">
-									<div className="dz-image-bx rounded">
-										<div className="dz-media me-3">
-											<img className="rounded" src={pic6} alt="" />
-										</div>
-										<div className="dz-info">
-											<h5>Nobar Bola</h5>
-											<span className="text-primary">15 Februari 2023</span>
-											<div className="d-flex flex-wrap mt-3">
-												<span className="me-auto pe-3">Rp25.000/orang</span>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div className="col-xl-6 col-sm-6">
-									<div className="dz-image-bx rounded">
-										<div className="dz-media me-3">
-											<img className="rounded" src={pic5} alt="" />
-										</div>
-										<div className="dz-info">
-											<h5>Konser Islami</h5>
-											<span className="text-primary">20 Februari 2023</span>
-											<div className="d-flex flex-wrap mt-3">
-												<span className="me-auto pe-3">Rp50.000/orang</span>
-											</div>
-										</div>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>
@@ -232,8 +205,8 @@ const Home = () => {
 											>
 												<table className="table card-table display mb-4 dataTablesCard booking-table room-list-tbl dataTable no-footer">
 													<tbody>
-														{topWisataData.map((item, index) => (
-															<tr role="row" className="odd">
+														{topWisataData.slice(0, 2).map((item, index) => (
+															<tr role="row" className="odd" key={index}>
 																<td>
 																	<div className="guest-bx">
 																		<div
@@ -241,20 +214,28 @@ const Home = () => {
 																			className="carousel slide me-3"
 																		>
 																			<div className="carousel-inner">
-																				<img src={pic5} alt="" />
+																				<img
+																					src={
+																						process.env
+																							.REACT_APP_STORAGE_BASE_URL +
+																						"/wisata/" +
+																						item.thumbnail
+																					}
+																					alt=""
+																				/>
 																			</div>
 																		</div>
 																		<div>
 																			<span className="text-primary">
 																				<i className="fa fa-map-marker"></i>{" "}
-																				Arcamanik, Ciletuh
+																				{item.alamat.alamat.substring(0,20)}
 																			</span>
 																			<h4 className="mb-0 mt-1">
 																				<Link
 																					className="text-black"
 																					to={"./guest-detail"}
 																				>
-																					Curug Sodong
+																					{item.nama}
 																				</Link>
 																			</h4>
 																		</div>
@@ -278,7 +259,7 @@ const Home = () => {
 								<div className="card-body pt-3">
 									<div className="profile-news">
 										{topArticleData.map((item, index) => (
-											<div className="media pt-3 pb-3">
+											<div className="media pt-3 pb-3" key={index}>
 												<img
 													src={
 														process.env.REACT_APP_STORAGE_BASE_URL +
