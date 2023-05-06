@@ -1000,7 +1000,7 @@ export default function UserForm() {
 																type="text"
 																className="form-control"
 																placeholder="Masukkan tipe"
-																name="tipe"
+																name="tipe-kamar"
 																value={
 																	item.tipe
 																}
@@ -1022,7 +1022,7 @@ export default function UserForm() {
 																type="number"
 																className="form-control"
 																placeholder="Masukkan harga"
-																name="harga"
+																name="harga-kamar"
 																value={
 																	item.harga
 																}
@@ -1047,7 +1047,7 @@ export default function UserForm() {
 																	<input
 																		type="file"
 																		className="form-file-input form-control"
-																		name="thumbnail"
+																		name="thumbnail-kamar"
 																		accept="image/*"
 																		onChange={(
 																			e

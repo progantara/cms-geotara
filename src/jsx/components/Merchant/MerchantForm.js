@@ -958,7 +958,7 @@ export default function UserForm() {
 																type="text"
 																className="form-control"
 																placeholder="Masukkan nama"
-																name="nama"
+																name="nama-produk"
 																value={
 																	item.nama
 																}
@@ -980,7 +980,7 @@ export default function UserForm() {
 																type="number"
 																className="form-control"
 																placeholder="Masukkan harga"
-																name="harga"
+																name="harga-produk"
 																value={
 																	item.harga
 																}
@@ -1002,7 +1002,7 @@ export default function UserForm() {
 																type="number"
 																className="form-control"
 																placeholder="Masukkan rating"
-																name="rating"
+																name="rating-produk"
 																value={
 																	item.rating
 																}
@@ -1025,7 +1025,7 @@ export default function UserForm() {
 															<textarea
 																className="form-control"
 																rows="2"
-																name="deskripsi"
+																name="deskripsi-produk"
 																value={
 																	item.deskripsi
 																}
@@ -1055,7 +1055,7 @@ export default function UserForm() {
 																type="text"
 																className="form-control"
 																placeholder="Masukkan varian"
-																name="varian"
+																name="varian-produk"
 																value={
 																	item.varian
 																}
@@ -1080,7 +1080,7 @@ export default function UserForm() {
 																	<input
 																		type="file"
 																		className="form-file-input form-control"
-																		name="thumbnail"
+																		name="thumbnail-produk"
 																		accept="image/*"
 																		onChange={(
 																			e
