@@ -1,12 +1,7 @@
 import React from "react";
 
-import { Link } from "react-router-dom";
-/// Scroll
-import PerfectScrollbar from "react-perfect-scrollbar";
-
 /// Image
 import profile from "../../../images/avatar/pic1.jpg";
-import avatar from "../../../images/avatar/1.jpg";
 import { Dropdown } from "react-bootstrap";
 import LogoutPage from "./Logout";
 import { useSelector } from "react-redux";
@@ -15,7 +10,11 @@ const Header = ({ onNote }) => {
 	const user = useSelector((state) => state.auth.auth.user);
 
 	var path = window.location.pathname.split("/");
-	var name = path[path.length - 1].split("-");
+	if(path.length > 3) {
+		var name = path.reverse().slice(1, path.length - 1).join(" ").split("-");
+	} else {
+		var name = path[path.length - 1].split("-");
+	}
 	var filterName = name.length >= 3 ? name.filter((n, i) => i > 0) : name;
 	var finalName = filterName.includes("app")
 		? filterName.filter((f) => f !== "app")

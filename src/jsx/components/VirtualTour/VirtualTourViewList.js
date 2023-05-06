@@ -3,7 +3,10 @@ import { Button, Dropdown } from "react-bootstrap";
 import PageTitle from "../../layouts/PageTitle";
 import "./virtualTour.css";
 import { Link, useParams } from "react-router-dom";
-import { getTourismPlace } from "../../../services/TourismPlaceService";
+import {
+	getTourismPlace,
+	updateTourismPlace,
+} from "../../../services/TourismPlaceService";
 import { getParentDesa } from "../../../services/DesaService";
 import {
 	createView,
@@ -182,14 +185,18 @@ const ViewList = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const data = new FormData();
-		data.append("_method", "PUT");
+		// data.append("_method", "PUT");
+		// data.append("file", viewForm.file360);
+		data.append("wisata_detail_id", wisata.detail_id);
+		data.append("nama", "default");
+		data.append("with_cms", 0);
 		data.append("file", viewForm.file360);
 
-		const res = await updateView(viewForm.id, data);
+		const res = await createView(data);
 		if (res.status === 200) {
 			Swal.fire({
 				title: "Berhasil!",
-				text: "View berhasil diubah",
+				text: "View 3D Vista berhasil diunggah",
 				icon: "success",
 				confirmButtonText: "OK",
 			}).then(() => {
@@ -198,7 +205,7 @@ const ViewList = () => {
 		} else {
 			Swal.fire({
 				title: "Error!",
-				text: "Gagal mengubah view",
+				text: "Gagal mengunggah view 3D Vista",
 				icon: "error",
 				confirmButtonText: "OK",
 			});
@@ -211,17 +218,26 @@ const ViewList = () => {
 			const responseLokasi = await getParentDesa(
 				responseWisata.data.data.lokasi.desa_id
 			);
-			const newViewList = await Promise.all(
+			let newViewList = await Promise.all(
 				responseWisata.data.data.detail.views.map(async (item) => {
 					const responseView = await getView(item);
-					return {
-						id: responseView.data.data._id,
-						nama: responseView.data.data.nama,
-						withCms: responseView.data.data.with_cms,
-						image: responseView.data.data.file,
-					};
+					if (responseView.data.data.with_cms === 1) {
+						return {
+							id: responseView.data.data._id,
+							nama: responseView.data.data.nama,
+							withCms: responseView.data.data.with_cms,
+							image: responseView.data.data.file,
+						};
+					} else {
+						setViewForm({
+							...viewForm,
+							file360Preview: responseView.data.data.file,
+						});
+						return null;
+					}
 				})
 			);
+			newViewList = newViewList.filter((item) => item !== null);
 			setViewList(newViewList);
 			setWisata({
 				id: responseWisata.data.data._id,
@@ -237,7 +253,11 @@ const ViewList = () => {
 				detail_id: responseWisata.data.data.detail._id,
 				editor: responseWisata.data.data.editor,
 			});
-			setActiveEditor(responseWisata.data.data.editor === undefined ? "pannellum" : responseWisata.data.data.editor);
+			setActiveEditor(
+				responseWisata.data.data.editor === undefined
+					? "pannellum"
+					: responseWisata.data.data.editor
+			);
 		} catch (error) {
 			console.log(error);
 		}
@@ -358,7 +378,13 @@ const ViewList = () => {
 									<Button
 										className="ms-auto me-2"
 										variant="secondary btn-rounded"
-										onClick={() => setActiveEditor("3dvista")}
+										onClick={() => {
+											setActiveEditor("3dvista");
+											// const data = new FormData();
+											// data.append("_method", "PUT");
+											// data.append("editor", "3dvista");
+											// updateTourismPlace(idWisata, data);
+										}}
 									>
 										<i className="fa fa-toggle-on" />
 										&nbsp;Pannellum Editor
@@ -378,7 +404,13 @@ const ViewList = () => {
 								<Button
 									className="ms-auto me-2"
 									variant="info btn-rounded"
-									onClick={() => setActiveEditor("pannellum")}
+									onClick={() => {
+										setActiveEditor("pannellum");
+										// const data = new FormData();
+										// data.append("_method", "PUT");
+										// data.append("editor", "pannellum");
+										// updateTourismPlace(idWisata, data);
+									}}
 								>
 									<i className="fa fa-toggle-off" />
 									&nbsp;3D Vista Editor
@@ -588,8 +620,12 @@ const ViewList = () => {
 							<div className="card-body pb-0">
 								{viewForm.file360Preview && (
 									<iframe
-										title="preview"
-										srcDoc={viewForm.file360Preview}
+										src={
+											process.env.REACT_APP_STORAGE_BASE_URL +
+											"/view/" +
+											viewForm.file360Preview +
+											"_extracted/index.htm"
+										}
 										style={{
 											width: "100%",
 											height: "500px",

@@ -901,6 +901,7 @@ export default function UserForm() {
 															<label>Jam Keberangkatan</label>
 															<MuiPickersUtilsProvider utils={DateFnsUtils}>
 																<TimePicker
+																	id={"jam_keberangkatan" + index}
 																	name="jam_keberangkatan"
 																	value={
 																		detail.jurusan[index].jam_keberangkatan
@@ -919,6 +920,7 @@ export default function UserForm() {
 															<label>Estimasi Sampai</label>
 															<MuiPickersUtilsProvider utils={DateFnsUtils}>
 																<TimePicker
+																	id={"estimasi_sampai" + index}
 																	name="estimasi_sampai"
 																	value={
 																		detail.jurusan[index].estimasi_sampai
