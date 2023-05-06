@@ -13,7 +13,6 @@ import Select from "react-select";
 import {
 	RControl,
 	RFeature,
-	RLayerTile,
 	RLayerVector,
 	RMap,
 	ROSM,
@@ -127,7 +126,18 @@ export default function UserForm() {
 					});
 					setDetail({
 						fasilitas: data.detail.fasilitas,
-						jurusan: data.detail.jurusan,
+						jurusan: data.detail.jurusan.map((item) => {
+							return {
+								tipe: item.tipe,
+								harga: item.harga,
+								thumbnail: "",
+								thumbnailPreview: item.thumbnail,
+								keberangkatan: item.keberangkatan,
+								jam_keberangkatan: item.jam_keberangkatan,
+								tujuan: item.tujuan,
+								estimasi_sampai: item.estimasi_sampai,
+							};
+						}),
 					});
 					setProvinsiId({
 						value: parentDesa.data.data.provinsi.kode,
@@ -144,74 +154,6 @@ export default function UserForm() {
 						label: parentDesa.data.data.distrik.nama,
 						color: "#00B8D9",
 					});
-					getAllProvinsi()
-						.then((prov) => {
-							setProvinsiList(
-								prov.data.data.map((provItem) => {
-									getAllKotaByCode(provItem.kode)
-										.then((kota) => {
-											setKotaList(
-												kota.data.data.map((kotaItem) => {
-													getAllDistrikByCode(kotaItem.kode)
-														.then((distrik) => {
-															setDistrikList(
-																distrik.data.data.map((distrikItem) => {
-																	getAllDesaByCode(distrikItem.kode)
-																		.then((desa) => {
-																			setDesaList(
-																				desa.data.data.map((desaItem) => {
-																					return {
-																						value: desaItem.kode,
-																						label: desaItem.nama,
-																						color: "#00B8D9",
-																					};
-																				})
-																			);
-																		})
-																		.catch(() => {
-																			Swal.fire(
-																				"Gagal!",
-																				"Desa gagal dimuat",
-																				"error"
-																			);
-																		});
-																	return {
-																		value: distrikItem.kode,
-																		label: distrikItem.nama,
-																		color: "#00B8D9",
-																	};
-																})
-															);
-														})
-														.catch(() => {
-															Swal.fire(
-																"Gagal!",
-																"Distrik gagal dimuat",
-																"error"
-															);
-														});
-													return {
-														value: kotaItem.kode,
-														label: kotaItem.nama,
-														color: "#00B8D9",
-													};
-												})
-											);
-										})
-										.catch(() => {
-											Swal.fire("Gagal!", "Kota gagal dimuat", "error");
-										});
-									return {
-										value: provItem.kode,
-										label: provItem.nama,
-										color: "#00B8D9",
-									};
-								})
-							);
-						})
-						.catch(() => {
-							Swal.fire("Gagal!", "Provinsi gagal dimuat", "error");
-						});
 				})
 				.catch((err) => {
 					Swal.fire("Gagal!", "Tour gagal dimuat", "error").then(() => {
@@ -378,9 +320,8 @@ export default function UserForm() {
 		for (let i = 0; i < detail.jurusan.length; i++) {
 			data.append(`jurusan[${i}][tipe]`, detail.jurusan[i].tipe);
 			data.append(`jurusan[${i}][harga]`, detail.jurusan[i].harga);
-			data.append(`jurusan[${i}][thumbnail]`, detail.jurusan[i].thumbnail);
 			if (detail.jurusan[i].thumbnail !== "")
-				data.append("jurusan[${i}][thumbnail]", detail.jurusan[i].thumbnail);
+				data.append(`jurusan[${i}][thumbnail]`, detail.jurusan[i].thumbnail);
 			data.append(
 				`jurusan[${i}][keberangkatan]`,
 				detail.jurusan[i].keberangkatan
