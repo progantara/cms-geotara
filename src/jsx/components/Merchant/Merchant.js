@@ -6,7 +6,7 @@ const Merchant = () => {
 	return (
 		<Fragment>
 			<PageTitle activeMenu="Daftar" motherMenu="Merchant" pageContent="Daftar" />
-			<div className="row">
+			<div id="merchant-page" className="row">
 				<MerchantList />
 			</div>
 		</Fragment>

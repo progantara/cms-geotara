@@ -405,7 +405,7 @@ export default function UserForm() {
 	};
 
 	return (
-		<div className="h-80">
+		<div id="merchant-form" className="h-80">
 			<div className="row">
 				<div className="col-xl-12 col-xxl-12">
 					<div className="card">
