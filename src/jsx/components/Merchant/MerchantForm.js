@@ -1205,6 +1205,7 @@ export default function UserForm() {
 											</div>
 										</div>
 										<button
+											id="submit"
 											type="submit"
 											className="btn btn-primary me-2"
 										>

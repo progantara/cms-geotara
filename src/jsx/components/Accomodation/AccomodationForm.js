@@ -1169,6 +1169,7 @@ export default function UserForm() {
 											);
 										})}
 										<button
+											id="submit"
 											type="submit"
 											className="btn btn-primary me-2"
 										>
