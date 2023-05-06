@@ -310,9 +310,8 @@ export default function UserForm() {
 		for (let i = 0; i < detail.jurusan.length; i++) {
 			data.append(`jurusan[${i}][tipe]`, detail.jurusan[i].tipe);
 			data.append(`jurusan[${i}][harga]`, detail.jurusan[i].harga);
-			data.append(`jurusan[${i}][thumbnail]`, detail.jurusan[i].thumbnail);
 			if (detail.jurusan[i].thumbnail !== "")
-				data.append("jurusan[${i}][thumbnail]", detail.jurusan[i].thumbnail);
+				data.append(`jurusan[${i}][thumbnail]`, detail.jurusan[i].thumbnail);
 			data.append(
 				`jurusan[${i}][keberangkatan]`,
 				detail.jurusan[i].keberangkatan
