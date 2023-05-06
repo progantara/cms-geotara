@@ -514,6 +514,7 @@ export default function UserForm() {
 													Provinsi
 												</label>
 												<Select
+													name='provinsi'
 													closeMenuOnSelect={
 														true
 													}
@@ -579,6 +580,7 @@ export default function UserForm() {
 													Kota
 												</label>
 												<Select
+													name='kota'
 													closeMenuOnSelect={
 														true
 													}
@@ -644,6 +646,7 @@ export default function UserForm() {
 													Distrik
 												</label>
 												<Select
+													name='distrik'
 													closeMenuOnSelect={
 														true
 													}
@@ -761,6 +764,7 @@ export default function UserForm() {
 														Longitude
 													</label>
 													<input
+													name='longitude'
 														type="text"
 														className="mb-3 form-control"
 														placeholder="Pilih pada peta"
@@ -775,6 +779,7 @@ export default function UserForm() {
 														Latitude
 													</label>
 													<input
+													name='latitude'
 														type="text"
 														className="mb-3 form-control"
 														placeholder="Pilih pada peta"
