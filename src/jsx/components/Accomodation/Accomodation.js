@@ -6,7 +6,7 @@ const Accomodation = () => {
 	return (
 		<Fragment>
 			<PageTitle activeMenu="Daftar" motherMenu="Accomodation" pageContent="Daftar" />
-			<div className="row">
+			<div id="accomodation-page" className="row">
 				<AccomodationList />
 			</div>
 		</Fragment>

@@ -47,7 +47,7 @@ const Home = () => {
 	const [value, onChange] = useState(new Date());
 	return (
 		<>
-			<div className="row">
+			<div id="dashboard-page" className="row">
 				<div className="col-xl-3 col-sm-6">
 					<div className="card gradient-1 card-bx">
 						<div className="card-body d-flex align-items-center">
