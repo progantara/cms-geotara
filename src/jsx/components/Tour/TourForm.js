@@ -13,7 +13,6 @@ import Select from "react-select";
 import {
 	RControl,
 	RFeature,
-	RLayerTile,
 	RLayerVector,
 	RMap,
 	ROSM,
@@ -127,7 +126,18 @@ export default function UserForm() {
 					});
 					setDetail({
 						fasilitas: data.detail.fasilitas,
-						jurusan: data.detail.jurusan,
+						jurusan: data.detail.jurusan.map((item) => {
+							return {
+								tipe: item.tipe,
+								harga: item.harga,
+								thumbnail: "",
+								thumbnailPreview: item.thumbnail,
+								keberangkatan: item.keberangkatan,
+								jam_keberangkatan: item.jam_keberangkatan,
+								tujuan: item.tujuan,
+								estimasi_sampai: item.estimasi_sampai,
+							};
+						}),
 					});
 					setProvinsiId({
 						value: parentDesa.data.data.provinsi.kode,
