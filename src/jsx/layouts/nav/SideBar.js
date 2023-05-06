@@ -180,13 +180,14 @@ const SideBar = () => {
 						</ul>
 					</li>
 					<li className={`${bootstrap.includes(path) ? "mm-active" : ""}`}>
-						<Link className="has-arrow ai-icon" to="#">
+						<Link id="kemitraan-tab" className="has-arrow ai-icon" to="#">
 							<i className="fa fa-handshake"></i>
 							<span className="nav-text">Kemitraan</span>
 						</Link>
 						<ul>
 							<li>
 								<Link
+									id="akomodasi-menu"
 									className={`${path === "accomodation" ? "mm-active" : ""}`}
 									to="/accomodation"
 								>
@@ -203,6 +204,7 @@ const SideBar = () => {
 							</li>
 							<li>
 								<Link
+									id="merchant-menu"
 									className={`${path === "merchant" ? "mm-active" : ""}`}
 									to="/merchant"
 								>
